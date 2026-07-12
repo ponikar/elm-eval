@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@repo/ui";
 
 export default function HomePage() {
@@ -7,7 +8,9 @@ export default function HomePage() {
       <p className="text-muted-foreground">
         Supplier-audit AI reliability system with regression testing.
       </p>
-      <Button>Get Started</Button>
+      <Button asChild>
+        <Link href="/audits">Open Dashboard</Link>
+      </Button>
     </main>
   );
 }

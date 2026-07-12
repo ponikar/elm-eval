@@ -15,6 +15,7 @@
     "@hookform/resolvers": "^5.4.0",
     "@repo/db": "workspace:*",
     "@repo/domain": "workspace:*",
+    "@repo/test-fixtures": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.101.2",
     "@trpc/client": "^11.13.0",
