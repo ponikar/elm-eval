@@ -1,6 +1,6 @@
-import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
+import type * as React from 'react';
 
 import { cn } from '../../lib/utils';
 
@@ -104,11 +104,11 @@ function SelectSeparator({
 
 export {
   Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectLabel,
   SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 };

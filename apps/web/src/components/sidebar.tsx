@@ -1,18 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from '@repo/ui';
 import {
-  FileText,
-  BookOpen,
-  FlaskConical,
-  Bot,
-  Play,
-  GitCompare,
   Activity,
+  BookOpen,
+  Bot,
+  FileText,
+  FlaskConical,
+  GitCompare,
+  Play,
   Shield,
 } from 'lucide-react';
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from '@repo/ui';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const navSections = [
   {

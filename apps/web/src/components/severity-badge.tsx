@@ -1,4 +1,4 @@
-import { cn, Badge } from '@repo/ui';
+import { Badge, cn } from '@repo/ui';
 
 type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 

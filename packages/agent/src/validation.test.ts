@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
 import type { AuditFinding, AuditPage, ComplianceRule } from '@repo/domain';
+import { describe, expect, it } from 'vitest';
 import { normalizeEvidence, validateFinding } from './validation.js';
+
 const pages: AuditPage[] = [
   { pageNumber: 3, text: 'The emer-\ngency exit was blocked\u00a0by cartons.' },
 ];

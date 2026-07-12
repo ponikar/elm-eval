@@ -1,5 +1,5 @@
-import { and, eq } from 'drizzle-orm';
 import type { AuditFinding, PipelineFailureCode } from '@repo/domain';
+import { and, eq } from 'drizzle-orm';
 import { db } from './index.js';
 import { auditFinding, pipelineJob, traceEvent } from './schema.js';
 export interface PersistedPipelineTrace {

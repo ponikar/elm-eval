@@ -1,6 +1,6 @@
 'use client';
 
-import { ScrollArea, Badge } from '@repo/ui';
+import { Badge, ScrollArea } from '@repo/ui';
 import { FileText } from 'lucide-react';
 
 interface AuditPage {

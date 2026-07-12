@@ -1,4 +1,5 @@
 import { runPipelineJob } from './run-job.js';
+
 const jobId = process.argv[2];
 if (!jobId) {
   console.error('Usage: pnpm --filter pipeline start -- <pipeline-job-id>');

@@ -1,23 +1,23 @@
 'use client';
 
-import { trpc } from '@/trpc/react';
-import { DashboardHeader } from '@/components/dashboard-header';
 import {
+  Badge,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Badge,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Skeleton,
 } from '@repo/ui';
-import { Bot, Clock, Zap, RotateCcw, Timer } from 'lucide-react';
+import { Bot, Clock, RotateCcw, Timer, Zap } from 'lucide-react';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { trpc } from '@/trpc/react';
 
 export default function AgentsPage() {
   const agents = trpc.agentVersion.list.useQuery();

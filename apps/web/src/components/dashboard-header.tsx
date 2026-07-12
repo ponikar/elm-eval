@@ -1,9 +1,9 @@
 'use client';
 
+import { Button } from '@repo/ui';
+import { ChevronRight, Moon, PanelLeft, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRight, Sun, Moon, PanelLeft } from 'lucide-react';
-import { Button } from '@repo/ui';
 import { useEffect, useState } from 'react';
 
 function ThemeToggle() {

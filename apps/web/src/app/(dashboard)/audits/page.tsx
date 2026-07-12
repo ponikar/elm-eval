@@ -1,19 +1,19 @@
 'use client';
 
-import Link from 'next/link';
-import { trpc } from '@/trpc/react';
-import { DashboardHeader } from '@/components/dashboard-header';
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Badge,
-  Button,
   Skeleton,
 } from '@repo/ui';
-import { FileText, ArrowRight, Calendar, Building2 } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, FileText } from 'lucide-react';
+import Link from 'next/link';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { trpc } from '@/trpc/react';
 
 export default function AuditsPage() {
   const audits = trpc.audit.list.useQuery();

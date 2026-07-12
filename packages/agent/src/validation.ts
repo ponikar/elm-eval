@@ -1,5 +1,5 @@
-import { AuditFindingSchema } from '@repo/domain';
 import type { AuditFinding, AuditPage, ComplianceRule } from '@repo/domain';
+import { AuditFindingSchema } from '@repo/domain';
 export type FindingRejectionCode =
   | 'INVALID_AUDIT_CITATION'
   | 'INVALID_RULE_REFERENCE'

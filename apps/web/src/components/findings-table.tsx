@@ -1,9 +1,9 @@
 'use client';
 
 import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui';
-import { SeverityBadge } from './severity-badge';
-import { ReviewStatusBadge } from './review-status-badge';
 import { CategoryBadge } from './category-badge';
+import { ReviewStatusBadge } from './review-status-badge';
+import { SeverityBadge } from './severity-badge';
 
 interface Finding {
   id: string;

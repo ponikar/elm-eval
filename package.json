@@ -9,14 +9,14 @@
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
-    "format:check": "prettier --check .",
-    "format": "prettier --write .",
+    "format:check": "biome check .",
+    "format": "biome check --write .",
     "clean": "turbo clean",
     "pipeline:run": "pnpm --filter pipeline start",
     "pipeline:embed": "pnpm --filter pipeline embed"
   },
   "devDependencies": {
-    "prettier": "^3.4.0",
+    "@biomejs/biome": "^2.5.3",
     "turbo": "^2.4.0"
   },
   "packageManager": "pnpm@11.9.0",

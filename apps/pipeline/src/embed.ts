@@ -1,8 +1,8 @@
-import { ChunkBuilder, RuleSearcher } from '@repo/retrieval';
-import { env } from '@repo/domain';
-import { loadRulebookFixture, RULEBOOK_FIXTURE_IDS, RULEBOOK_METADATA } from '@repo/test-fixtures';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { env } from '@repo/domain';
+import { ChunkBuilder, RuleSearcher } from '@repo/retrieval';
+import { loadRulebookFixture, RULEBOOK_FIXTURE_IDS, RULEBOOK_METADATA } from '@repo/test-fixtures';
 
 const FIXTURES_DIR = path.resolve(import.meta.dirname, '../../../packages/test-fixtures/src');
 const OUTPUT_DIR = path.join(FIXTURES_DIR, 'rulebooks');

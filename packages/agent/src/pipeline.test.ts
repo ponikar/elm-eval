@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import type { AgentVersion, ComplianceRule, RuleChunk, SupplierAudit } from '@repo/domain';
+import { describe, expect, it } from 'vitest';
 import type {
   ModelProvider,
   StructuredGenerationRequest,
@@ -7,6 +7,7 @@ import type {
 } from './model-provider.js';
 import { ModelProviderError } from './model-provider.js';
 import { AuditAgentPipeline, type RuleRetriever } from './pipeline.js';
+
 const audit: SupplierAudit = {
   id: 'a',
   supplierName: 'S',

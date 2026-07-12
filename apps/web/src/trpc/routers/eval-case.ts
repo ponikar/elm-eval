@@ -1,5 +1,5 @@
-import { createTRPCRouter, publicProcedure } from '../init';
 import { SEED_EVAL_CASES } from '@repo/test-fixtures';
+import { createTRPCRouter, publicProcedure } from '../init';
 
 export const evalCaseRouter = createTRPCRouter({
   list: publicProcedure.query(() => {

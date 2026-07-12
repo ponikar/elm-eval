@@ -1,6 +1,6 @@
-import { GeminiEmbeddings } from './embeddings.js';
-import { batchCosineSimilarity } from './cosine-similarity.js';
 import type { RuleChunk } from './chunk-builder.js';
+import { batchCosineSimilarity } from './cosine-similarity.js';
+import { GeminiEmbeddings } from './embeddings.js';
 
 export interface SearchResult {
   chunk: RuleChunk;
