@@ -1,5 +1,13 @@
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
-import { relations } from 'drizzle-orm';
+import {
+  sqliteTable,
+  text,
+  integer,
+  real,
+  uniqueIndex,
+  index,
+  check,
+} from 'drizzle-orm/sqlite-core';
+import { relations, sql } from 'drizzle-orm';
 
 // ─── Core audit tables ───────────────────────────────────────────────────────
 
@@ -15,17 +23,44 @@ export const supplierAudit = sqliteTable('supplier_audit', {
   updatedAt: text('updated_at').notNull(),
 });
 
-export const auditPage = sqliteTable('audit_page', {
-  id: text('id').primaryKey(),
-  auditId: text('audit_id')
-    .notNull()
-    .references(() => supplierAudit.id, { onDelete: 'cascade' }),
-  pageNumber: integer('page_number').notNull(),
-  text: text('text').notNull(),
-  normalizedText: text('normalized_text'),
-  extractionStatus: text('extraction_status').notNull().default('PENDING'),
-  parserVersion: text('parser_version'),
-});
+export const auditPage = sqliteTable(
+  'audit_page',
+  {
+    id: text('id').primaryKey(),
+    auditId: text('audit_id')
+      .notNull()
+      .references(() => supplierAudit.id, { onDelete: 'cascade' }),
+    pageNumber: integer('page_number').notNull(),
+    text: text('text').notNull(),
+    normalizedText: text('normalized_text'),
+    extractionStatus: text('extraction_status').notNull().default('PENDING'),
+    parserVersion: text('parser_version'),
+  },
+  (table) => [uniqueIndex('audit_page_audit_number_unique').on(table.auditId, table.pageNumber)],
+);
+
+export const pipelineJob = sqliteTable(
+  'pipeline_job',
+  {
+    id: text('id').primaryKey(),
+    auditId: text('audit_id')
+      .notNull()
+      .references(() => supplierAudit.id, { onDelete: 'cascade' }),
+    agentVersionId: text('agent_version_id')
+      .notNull()
+      .references(() => agentVersion.id),
+    rulebookVersion: text('rulebook_version').notNull(),
+    idempotencyKey: text('idempotency_key').notNull().unique(),
+    status: text('status').notNull().default('PENDING'),
+    attemptCount: integer('attempt_count').notNull().default(0),
+    errorCode: text('error_code'),
+    errorMessage: text('error_message'),
+    createdAt: text('created_at').notNull(),
+    startedAt: text('started_at'),
+    completedAt: text('completed_at'),
+  },
+  (table) => [index('pipeline_job_status_idx').on(table.status)],
+);
 
 // ─── Rulebook tables ─────────────────────────────────────────────────────────
 
@@ -89,28 +124,35 @@ export const ruleChunk = sqliteTable('rule_chunk', {
 
 // ─── Finding tables ──────────────────────────────────────────────────────────
 
-export const auditFinding = sqliteTable('audit_finding', {
-  id: text('id').primaryKey(),
-  auditId: text('audit_id')
-    .notNull()
-    .references(() => supplierAudit.id, { onDelete: 'cascade' }),
-  agentVersionId: text('agent_version_id')
-    .notNull()
-    .references(() => agentVersion.id),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  category: text('category').notNull(),
-  severity: text('severity').notNull(),
-  evidencePage: integer('evidence_page').notNull(),
-  evidenceQuote: text('evidence_quote').notNull(),
-  ruleId: text('rule_id').notNull(),
-  rulebookVersion: text('rulebook_version').notNull(),
-  confidence: real('confidence').notNull(),
-  correctiveAction: text('corrective_action').notNull(),
-  reviewStatus: text('review_status').notNull().default('PENDING'),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
-});
+export const auditFinding = sqliteTable(
+  'audit_finding',
+  {
+    id: text('id').primaryKey(),
+    auditId: text('audit_id')
+      .notNull()
+      .references(() => supplierAudit.id, { onDelete: 'cascade' }),
+    agentVersionId: text('agent_version_id')
+      .notNull()
+      .references(() => agentVersion.id),
+    pipelineJobId: text('pipeline_job_id').references(() => pipelineJob.id, {
+      onDelete: 'cascade',
+    }),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    category: text('category').notNull(),
+    severity: text('severity').notNull(),
+    evidencePage: integer('evidence_page').notNull(),
+    evidenceQuote: text('evidence_quote').notNull(),
+    ruleId: text('rule_id').notNull(),
+    rulebookVersion: text('rulebook_version').notNull(),
+    confidence: real('confidence').notNull(),
+    correctiveAction: text('corrective_action').notNull(),
+    reviewStatus: text('review_status').notNull().default('PENDING'),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [index('audit_finding_job_idx').on(table.pipelineJobId)],
+);
 
 // ─── Agent version ───────────────────────────────────────────────────────────
 
@@ -177,29 +219,53 @@ export const testExecution = sqliteTable('test_execution', {
   completedAt: text('completed_at'),
 });
 
-export const traceEvent = sqliteTable('trace_event', {
-  id: text('id').primaryKey(),
-  executionId: text('execution_id')
-    .notNull()
-    .references(() => testExecution.id, { onDelete: 'cascade' }),
-  stage: text('stage').notNull(),
-  eventType: text('event_type').notNull(),
-  startedAt: text('started_at').notNull(),
-  completedAt: text('completed_at'),
-  durationMs: integer('duration_ms'),
-  inputSummary: text('input_summary'),
-  outputSummary: text('output_summary'),
-  errorCode: text('error_code'),
-  tokenInput: integer('token_input'),
-  tokenOutput: integer('token_output'),
-  costUsd: real('cost_usd'),
-});
+export const traceEvent = sqliteTable(
+  'trace_event',
+  {
+    id: text('id').primaryKey(),
+    executionId: text('execution_id').references(() => testExecution.id, { onDelete: 'cascade' }),
+    pipelineJobId: text('pipeline_job_id').references(() => pipelineJob.id, {
+      onDelete: 'cascade',
+    }),
+    stage: text('stage').notNull(),
+    eventType: text('event_type').notNull(),
+    sequence: integer('sequence').notNull(),
+    attempt: integer('attempt'),
+    startedAt: text('started_at').notNull(),
+    completedAt: text('completed_at'),
+    durationMs: integer('duration_ms'),
+    inputSummary: text('input_summary'),
+    outputSummary: text('output_summary'),
+    errorCode: text('error_code'),
+    tokenInput: integer('token_input'),
+    tokenOutput: integer('token_output'),
+    costUsd: real('cost_usd'),
+  },
+  (table) => [
+    index('trace_event_job_sequence_idx').on(table.pipelineJobId, table.sequence),
+    index('trace_event_execution_sequence_idx').on(table.executionId, table.sequence),
+    check(
+      'trace_event_exactly_one_owner',
+      sql`(${table.executionId} is not null and ${table.pipelineJobId} is null) or (${table.executionId} is null and ${table.pipelineJobId} is not null)`,
+    ),
+  ],
+);
 
 // ─── Relations ───────────────────────────────────────────────────────────────
 
 export const supplierAuditRelations = relations(supplierAudit, ({ many }) => ({
   pages: many(auditPage),
   findings: many(auditFinding),
+  pipelineJobs: many(pipelineJob),
+}));
+export const pipelineJobRelations = relations(pipelineJob, ({ one, many }) => ({
+  audit: one(supplierAudit, { fields: [pipelineJob.auditId], references: [supplierAudit.id] }),
+  agentVersion: one(agentVersion, {
+    fields: [pipelineJob.agentVersionId],
+    references: [agentVersion.id],
+  }),
+  findings: many(auditFinding),
+  traceEvents: many(traceEvent),
 }));
 
 export const auditPageRelations = relations(auditPage, ({ one }) => ({
@@ -250,11 +316,16 @@ export const auditFindingRelations = relations(auditFinding, ({ one }) => ({
     fields: [auditFinding.agentVersionId],
     references: [agentVersion.id],
   }),
+  pipelineJob: one(pipelineJob, {
+    fields: [auditFinding.pipelineJobId],
+    references: [pipelineJob.id],
+  }),
 }));
 
 export const agentVersionRelations = relations(agentVersion, ({ many }) => ({
   findings: many(auditFinding),
   evaluationRuns: many(evaluationRun),
+  pipelineJobs: many(pipelineJob),
 }));
 
 export const evaluationRunRelations = relations(evaluationRun, ({ one, many }) => ({
@@ -281,5 +352,9 @@ export const traceEventRelations = relations(traceEvent, ({ one }) => ({
   execution: one(testExecution, {
     fields: [traceEvent.executionId],
     references: [testExecution.id],
+  }),
+  pipelineJob: one(pipelineJob, {
+    fields: [traceEvent.pipelineJobId],
+    references: [pipelineJob.id],
   }),
 }));

@@ -336,3 +336,80 @@ Await user approval to merge PR #3. Then T-004 (audit review UI screens) can beg
 ### PR
 
 https://github.com/ponikar/elm-eval/pull/5
+## Entry 7 — 2026-07-12T12:31:00Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-003
+- **Branch:** feat/agent-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-agent-pipeline
+- **Status:** IN PROGRESS
+- **Scope:** Agent orchestration, validation, Gemini adapter, job persistence, and traces.
+- **Completed:** Published claim `70a47ea`; created and verified dedicated worktree; preserved dirty PRD on main.
+- **Pending:** Implementation and validation.
+- **Blockers:** None.
+- **Next Step:** Implement contracts and agent core.
+- **Changed Files and Evidence:** `.codex/codemap.md`; verified branch, worktree, and remote claim.
+
+---
+
+## Entry 8 — 2026-07-12T12:30:04Z
+
+- **Agent:** codex pipeline-review
+- **Ticket:** T-003
+- **Branch:** feat/agent-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-agent-pipeline
+- **Status:** REVIEW
+- **Scope:** Read-only failure-mode review for eval reuse, idempotency, traces, retries, citations, and rule isolation.
+- **Completed:** Required a DB-independent core, atomic completion, exactly-one trace owner, strict rulebook snapshots, transient-only retry, conservative citation matching, and complete page coverage.
+- **Pending:** Coordinator implementation.
+- **Blockers:** None.
+- **Next Step:** Validate the invariants with scripted-provider tests.
+- **Changed Files and Evidence:** `.codex/codemap.md` only; reviewed PRD and affected packages.
+
+---
+
+## Entry 9 — 2026-07-12T12:48:00Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-003
+- **Branch:** feat/agent-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-agent-pipeline
+- **Status:** IN PROGRESS
+- **Scope:** First complete implementation increment.
+- **Completed:** Added DB-independent page-complete agent core, Gemini structured provider with abort/retry, conservative citation/rule/CAP validation, version-scoped retrieval, job schema/store, atomic finding completion, ordered exactly-one-owner traces, database-backed worker, migration, and 7 focused tests.
+- **Pending:** Full repository validation, final ledger update, commit/push, and handoff.
+- **Blockers:** Root `turbo test` is expected to expose pre-existing packages with no test files; focused T-003 suites pass.
+- **Next Step:** Commit the validated implementation checkpoint, then run format, typecheck, build, focused tests, and lint again.
+- **Changed Files and Evidence:** Agent/domain/db/retrieval/pipeline/fixtures/config/lockfile; focused tests PASS (7/7), affected strict typechecks PASS, migration generation PASS.
+
+---
+
+## Entry 10 — 2026-07-12T12:50:00Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-003
+- **Branch:** feat/agent-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-agent-pipeline
+- **Status:** BLOCKED
+- **Scope:** Final validation and handoff.
+- **Completed:** Implementation committed; format, full typecheck, full build, 7 focused tests, and touched-package lint pass without warnings.
+- **Pending:** Resolve repository-wide validation policy, rerun gates, integrate, and remove worktree.
+- **Blockers:** `pnpm test` fails because untouched packages have no tests; `pnpm lint` fails because untouched documents/evals/ui/web lack ESLint setup. No suppression was added.
+- **Next Step:** Decide whether T-003 may expand to repair root test/lint infrastructure or accept scoped validation.
+- **Changed Files and Evidence:** Commit `36f5a23`; exact results recorded in `.codex/goal.md`.
+
+---
+
+## Entry 11 — 2026-07-12T12:53:00Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-003
+- **Branch:** feat/agent-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-agent-pipeline
+- **Status:** BLOCKED / HANDOFF
+- **Scope:** Remote publication.
+- **Completed:** Pushed commits `36f5a23` and `417746a`; opened draft PR #4.
+- **Pending:** User decision on root validation scope, final integration, main-board completion update, and worktree removal.
+- **Blockers:** Same pre-existing repository-wide test/lint failures recorded in Entry 10.
+- **Next Step:** After scope decision, repair or accept root validation, rerun final gates, update PR, and merge.
+- **Changed Files and Evidence:** `.codex/codemap.md`; remote branch verified and PR https://github.com/ponikar/elm-eval/pull/4 created.

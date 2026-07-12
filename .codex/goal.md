@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-12T12:26:38Z
+**Updated:** 2026-07-12T12:50:00Z
 
 ### Outcome
 
@@ -48,19 +48,19 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 
 ### Subgoals
 
-| ID     | Ticket                               | Owner    | Status      | Branch                 | Worktree                                      | Next Action                                    |
-| ------ | ------------------------------------ | -------- | ----------- | ---------------------- | --------------------------------------------- | ---------------------------------------------- |
-| T-001  | Monorepo scaffold                    | opencode | COMPLETE    | main                   | main                                          | Done                                           |
-| T-002  | Domain schemas + seed data           | opencode | IN PROGRESS | main                   | main                                          | Create Zod schemas + seed fixtures             |
-| T-002c | Schema alignment to PRD              | opencode | COMPLETE    | feat/schema-alignment  | —                                             | Align domain schemas with PRD types            |
-| T-002d | UI foundation (Tailwind+shadcn+tRPC) | opencode | IN PROGRESS | feat/ui-foundation     | —                                             | Tailwind + shadcn/ui + tRPC + providers        |
-| T-009  | Pre-seeded documentation pipeline    | opencode | COMPLETE    | feat/pre-seed-pipeline | —                                             | Gemini extraction + fixtures + DB schema       |
-| T-003  | Agent pipeline                       | codex    | IN PROGRESS | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Claim board, create worktree, implement stages |
-| T-004  | Audit review UI                      | opencode | planned     | —                      | —                                             | Build split-view workspace                     |
-| T-005  | Human correction loop                | opencode | planned     | —                      | —                                             | Correction → regression test                   |
-| T-006  | Evaluation engine                    | opencode | planned     | —                      | —                                             | Run suite + graders                            |
-| T-007  | Version comparison + quality gates   | opencode | planned     | —                      | —                                             | Comparison dashboard + gates                   |
-| T-008  | Trace viewer + demo validation       | opencode | planned     | —                      | —                                             | Trace UI + end-to-end verify                   |
+| ID     | Ticket                               | Owner    | Status      | Branch                 | Worktree                                      | Next Action                              |
+| ------ | ------------------------------------ | -------- | ----------- | ---------------------- | --------------------------------------------- | ---------------------------------------- |
+| T-001  | Monorepo scaffold                    | opencode | COMPLETE    | main                   | main                                          | Done                                     |
+| T-002  | Domain schemas + seed data           | opencode | IN PROGRESS | main                   | main                                          | Create Zod schemas + seed fixtures       |
+| T-002c | Schema alignment to PRD              | opencode | COMPLETE    | feat/schema-alignment  | —                                             | Align domain schemas with PRD types      |
+| T-002d | UI foundation (Tailwind+shadcn+tRPC) | opencode | IN PROGRESS | feat/ui-foundation     | —                                             | Tailwind + shadcn/ui + tRPC + providers  |
+| T-009  | Pre-seeded documentation pipeline    | opencode | COMPLETE    | feat/pre-seed-pipeline | —                                             | Gemini extraction + fixtures + DB schema |
+| T-003  | Agent pipeline                       | codex    | BLOCKED     | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Decide scope for root test/lint failures |
+| T-004  | Audit review UI                      | opencode | planned     | —                      | —                                             | Build split-view workspace               |
+| T-005  | Human correction loop                | opencode | planned     | —                      | —                                             | Correction → regression test             |
+| T-006  | Evaluation engine                    | opencode | planned     | —                      | —                                             | Run suite + graders                      |
+| T-007  | Version comparison + quality gates   | opencode | planned     | —                      | —                                             | Comparison dashboard + gates             |
+| T-008  | Trace viewer + demo validation       | opencode | planned     | —                      | —                                             | Trace UI + end-to-end verify             |
 
 ### Decisions
 
@@ -105,6 +105,18 @@ turbo typecheck       # PASS (8/8 packages clean)
 pnpm format:check     # PASS (after formatting)
 ```
 
+### T-003 Validation
+
+- `pnpm format:check` — PASS.
+- `pnpm typecheck` — PASS, 10/10 workspace tasks.
+- `pnpm build` — PASS, pipeline and Next.js build without warnings.
+- `pnpm --filter @repo/agent test` — PASS, 7/7 tests.
+- Touched-package ESLint commands — PASS with zero warnings.
+- `pnpm test` — BLOCKED because untouched packages have no test files and Vitest exits 1.
+- `pnpm lint` — BLOCKED because untouched documents/evals/ui/web packages lack usable ESLint setup.
+- Credentialed Gemini smoke test — not run because it would create billable external calls;
+  scripted-provider tests cover the identical core contract.
+
 ### Progress Log
 
 - 2026-07-12T16:00:00Z — GOAL-001 created. T-001 claimed.
@@ -125,11 +137,12 @@ pnpm format:check     # PASS (after formatting)
 
 ### Blockers
 
-None.
+- T-003 scoped gates pass, but repository-wide test/lint gates fail on pre-existing untouched
+  package configuration. Direction is required to expand scope or accept scoped validation.
 
 ### Handoff
 
-**Current state:** T-002c + T-009 complete. T-002d is complete on PR #3 and awaiting merge.
-T-003 is claimed with non-overlapping backend ownership.
-**Next exact action:** Publish the T-003 board claim, create its dedicated worktree, append the
-assignment acceptance to `.codex/codemap.md`, and implement the pipeline contracts.
+**Current state:** T-003 is committed on `feat/agent-pipeline`; focused tests, typecheck, build,
+format, and touched lint pass. Repository-wide test/lint are blocked by untouched package setup.
+**Next exact action:** Choose whether to repair repository-wide test/lint infrastructure or accept
+scoped validation, then rerun final gates and integrate.

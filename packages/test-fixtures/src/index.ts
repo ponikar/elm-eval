@@ -249,8 +249,8 @@ export const SEED_RULES: ComplianceRule[] = [
 export const SEED_AGENT_VERSIONS: AgentVersion[] = [
   {
     id: 'agent-v1',
-    name: 'GPT-4o RBA baseline',
-    model: 'gpt-4o',
+    name: 'Gemini 2.5 Flash RBA baseline',
+    model: 'gemini-2.5-flash',
     promptVersion: 'prompt-rba-v3',
     systemPrompt:
       'You are a supplier audit compliance officer. Analyze audit report pages against the RBA Code of Conduct. Extract findings with evidence, classify severity, and generate corrective actions.',
@@ -266,8 +266,8 @@ export const SEED_AGENT_VERSIONS: AgentVersion[] = [
   },
   {
     id: 'agent-v2',
-    name: 'GPT-4o-mini RBA candidate',
-    model: 'gpt-4o-mini',
+    name: 'Gemini 2.5 Flash Lite RBA candidate',
+    model: 'gemini-2.5-flash-lite',
     promptVersion: 'prompt-rba-v4',
     systemPrompt:
       'You are a supplier audit compliance officer. Analyze audit report pages against the RBA Code of Conduct. Extract findings with evidence, classify severity, and generate corrective actions. Be precise about rule citations.',
