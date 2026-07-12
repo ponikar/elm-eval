@@ -1,20 +1,5 @@
-import type { ComplianceRule } from '@repo/domain';
-
-export interface RuleChunk {
-  id: string;
-  ruleId: string;
-  rulebookId: string;
-  rulebookVersion: string;
-  text: string;
-  pageNumber: number;
-  metadata: {
-    sectionId: string;
-    sectionTitle: string;
-    category: string;
-  };
-  embedding?: number[];
-  embeddingModel?: string;
-}
+import type { ComplianceRule, RuleChunk as DomainRuleChunk } from '@repo/domain';
+export type RuleChunk = DomainRuleChunk;
 
 export class ChunkBuilder {
   buildChunksFromRules(rules: ComplianceRule[]): RuleChunk[] {

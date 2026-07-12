@@ -118,6 +118,16 @@ export const FindingExtractionOutputSchema = z.object({
     }),
   ),
 });
+export const CandidateFindingSchema = z.object({
+  title: z.string().min(5),
+  description: z.string().min(10),
+  category: FindingCategorySchema,
+  auditEvidence: EvidenceSchema,
+  confidence: z.number().min(0).max(1),
+});
+export const CandidateExtractionOutputSchema = z.object({
+  candidates: z.array(CandidateFindingSchema),
+});
 
 // ─── Rulebook types ──────────────────────────────────────────────────────────
 
@@ -178,6 +188,40 @@ export const AgentVersionSchema = z.object({
   maxRetries: z.number().int().min(0),
   createdAt: z.string(),
   type: z.enum(['baseline', 'candidate']),
+});
+export const PipelineStageSchema = z.enum([
+  'INPUT_VALIDATION',
+  'CANDIDATE_EXTRACTION',
+  'DUPLICATE_MERGE',
+  'RULE_RETRIEVAL',
+  'FINDING_COMPLETION',
+  'DETERMINISTIC_VALIDATION',
+  'PERSISTENCE',
+]);
+export const PipelineFailureCodeSchema = z.enum([
+  'INVALID_INPUT',
+  'MODEL_TIMEOUT',
+  'MODEL_ERROR',
+  'SCHEMA_ERROR',
+  'INVALID_AUDIT_CITATION',
+  'INVALID_RULE_REFERENCE',
+  'INCOMPLETE_CAP',
+  'DUPLICATE_FINDING',
+  'PIPELINE_ERROR',
+]);
+export const PipelineJobSchema = z.object({
+  id: z.string().min(1),
+  auditId: z.string().min(1),
+  agentVersionId: z.string().min(1),
+  rulebookVersion: z.string().min(1),
+  idempotencyKey: z.string().min(1),
+  status: z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']),
+  attemptCount: z.number().int().min(0),
+  errorCode: PipelineFailureCodeSchema.optional(),
+  errorMessage: z.string().optional(),
+  createdAt: z.string(),
+  startedAt: z.string().optional(),
+  completedAt: z.string().optional(),
 });
 
 // ─── Eval types ──────────────────────────────────────────────────────────────
@@ -248,9 +292,12 @@ export const GraderResultSchema = z.object({
 
 export const TraceEventSchema = z.object({
   id: z.string(),
-  executionId: z.string(),
+  executionId: z.string().optional(),
+  pipelineJobId: z.string().optional(),
   stage: z.string(),
   eventType: z.string(),
+  sequence: z.number().int().positive(),
+  attempt: z.number().int().positive().optional(),
   startedAt: z.string(),
   completedAt: z.string().optional(),
   durationMs: z.number().optional(),
@@ -311,10 +358,14 @@ export type CorrectiveAction = z.infer<typeof CorrectiveActionSchema>;
 export type AuditPage = z.infer<typeof AuditPageSchema>;
 export type SupplierAudit = z.infer<typeof SupplierAuditSchema>;
 export type AuditFinding = z.infer<typeof AuditFindingSchema>;
+export type CandidateFinding = z.infer<typeof CandidateFindingSchema>;
 export type Rulebook = z.infer<typeof RulebookSchema>;
 export type ComplianceRule = z.infer<typeof ComplianceRuleSchema>;
 export type RuleChunk = z.infer<typeof RuleChunkSchema>;
 export type AgentVersion = z.infer<typeof AgentVersionSchema>;
+export type PipelineStage = z.infer<typeof PipelineStageSchema>;
+export type PipelineFailureCode = z.infer<typeof PipelineFailureCodeSchema>;
+export type PipelineJob = z.infer<typeof PipelineJobSchema>;
 export type EvalCase = z.infer<typeof EvalCaseSchema>;
 export type EvaluationRun = z.infer<typeof EvaluationRunSchema>;
 export type TestExecution = z.infer<typeof TestExecutionSchema>;
