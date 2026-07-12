@@ -20,6 +20,60 @@ export const auditPage = sqliteTable('audit_page', {
     .references(() => supplierAudit.id, { onDelete: 'cascade' }),
   pageNumber: integer('page_number').notNull(),
   text: text('text').notNull(),
+  normalizedText: text('normalized_text'),
+  extractionStatus: text('extraction_status').notNull().default('PENDING'),
+  parserVersion: text('parser_version'),
+});
+
+export const sourceDocument = sqliteTable('source_document', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  type: text('type').notNull(),
+  version: text('version'),
+  language: text('language').notNull().default('en'),
+  filePath: text('file_path'),
+  createdAt: text('created_at').notNull(),
+});
+
+export const rulebook = sqliteTable('rulebook', {
+  id: text('id').primaryKey(),
+  sourceDocumentId: text('source_document_id')
+    .notNull()
+    .references(() => sourceDocument.id),
+  name: text('name').notNull(),
+  version: text('version').notNull(),
+  standard: text('standard').notNull(),
+  totalSections: integer('total_sections').notNull(),
+  totalRules: integer('total_rules').notNull(),
+  status: text('status').notNull().default('PROCESSING'),
+  createdAt: text('created_at').notNull(),
+});
+
+export const complianceRule = sqliteTable('compliance_rule', {
+  id: text('id').primaryKey(),
+  rulebookId: text('rulebook_id')
+    .notNull()
+    .references(() => rulebook.id, { onDelete: 'cascade' }),
+  sectionId: text('section_id').notNull(),
+  sectionTitle: text('section_title').notNull(),
+  category: text('category').notNull(),
+  requirementText: text('requirement_text').notNull(),
+  sourcePage: integer('source_page').notNull(),
+  severityGuidance: text('severity_guidance'),
+  createdAt: text('created_at').notNull(),
+});
+
+export const ruleChunk = sqliteTable('rule_chunk', {
+  id: text('id').primaryKey(),
+  ruleId: text('rule_id')
+    .notNull()
+    .references(() => complianceRule.id, { onDelete: 'cascade' }),
+  rulebookId: text('rulebook_id')
+    .notNull()
+    .references(() => rulebook.id, { onDelete: 'cascade' }),
+  chunkText: text('chunk_text').notNull(),
+  embedding: text('embedding').notNull(),
+  createdAt: text('created_at').notNull(),
 });
 
 export const auditFinding = sqliteTable('audit_finding', {
@@ -105,6 +159,45 @@ export const testExecution = sqliteTable('test_execution', {
 export const supplierAuditRelations = relations(supplierAudit, ({ many }) => ({
   pages: many(auditPage),
   findings: many(auditFinding),
+}));
+
+export const auditPageRelations = relations(auditPage, ({ one }) => ({
+  audit: one(supplierAudit, {
+    fields: [auditPage.auditId],
+    references: [supplierAudit.id],
+  }),
+}));
+
+export const sourceDocumentRelations = relations(sourceDocument, ({ many }) => ({
+  rulebooks: many(rulebook),
+}));
+
+export const rulebookRelations = relations(rulebook, ({ one, many }) => ({
+  sourceDocument: one(sourceDocument, {
+    fields: [rulebook.sourceDocumentId],
+    references: [sourceDocument.id],
+  }),
+  rules: many(complianceRule),
+  chunks: many(ruleChunk),
+}));
+
+export const complianceRuleRelations = relations(complianceRule, ({ one, many }) => ({
+  rulebook: one(rulebook, {
+    fields: [complianceRule.rulebookId],
+    references: [rulebook.id],
+  }),
+  chunks: many(ruleChunk),
+}));
+
+export const ruleChunkRelations = relations(ruleChunk, ({ one }) => ({
+  rule: one(complianceRule, {
+    fields: [ruleChunk.ruleId],
+    references: [complianceRule.id],
+  }),
+  rulebook: one(rulebook, {
+    fields: [ruleChunk.rulebookId],
+    references: [rulebook.id],
+  }),
 }));
 
 export const auditFindingRelations = relations(auditFinding, ({ one }) => ({

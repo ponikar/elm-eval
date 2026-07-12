@@ -17,6 +17,9 @@
     "@repo/db": "workspace:*",
     "@repo/agent": "workspace:*",
     "@repo/evals": "workspace:*",
+    "@repo/documents": "workspace:*",
+    "@repo/retrieval": "workspace:*",
+    "@repo/test-fixtures": "workspace:*",
     "zod": "^3.24.0"
   },
   "devDependencies": {

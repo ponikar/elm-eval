@@ -1,3 +1,5 @@
+import type { AuditStandard, FindingCategory, Severity } from '@repo/domain';
+
 export const SEED_AUDIT = {
   id: 'audit-seed-001',
   supplierName: 'Shenzhen Golden Electronics Co.',
@@ -63,4 +65,69 @@ export const SEED_POLICY = {
         'Complete and accurate wage records must be maintained for all workers, including temporary and contract workers. Records must be available for audit review.',
     },
   ],
+};
+
+export interface FixtureAuditPage {
+  pageNumber: number;
+  text: string;
+  normalizedText?: string;
+  extractionStatus: string;
+  parserVersion: string;
+}
+
+export interface FixtureRule {
+  id: string;
+  sectionId: string;
+  sectionTitle: string;
+  category: FindingCategory;
+  requirementText: string;
+  sourcePage: number;
+  severityGuidance?: {
+    defaultSeverity?: Severity;
+    escalationConditions?: string[];
+  };
+}
+
+export interface FixtureRulebook {
+  name: string;
+  version: string;
+  standard: AuditStandard;
+  rules: FixtureRule[];
+}
+
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+async function loadFixture<T>(relativePath: string): Promise<T> {
+  const fullPath = path.resolve(__dirname, relativePath);
+  const raw = await fs.readFile(fullPath, 'utf-8');
+  return JSON.parse(raw) as T;
+}
+
+export async function loadAuditFixture(id: string): Promise<FixtureAuditPage[]> {
+  return loadFixture<FixtureAuditPage[]>(`./audits/${id}.json`);
+}
+
+export async function loadRulebookFixture(id: string): Promise<FixtureRule[]> {
+  return loadFixture<FixtureRule[]>(`./rulebooks/${id}.json`);
+}
+
+export const AUDIT_FIXTURE_IDS = ['audit-001', 'audit-002', 'audit-003'] as const;
+export const RULEBOOK_FIXTURE_IDS = ['rba-v8.0', 'nike-coc-2025'] as const;
+
+export const RULEBOOK_METADATA: Record<string, Omit<FixtureRulebook, 'rules'>> = {
+  'rba-v8.0': {
+    name: 'RBA Code of Conduct v8.0',
+    version: '8.0',
+    standard: 'RBA',
+  },
+  'nike-coc-2025': {
+    name: 'Nike Facility Code of Conduct 2025',
+    version: '2025',
+    standard: 'CUSTOM',
+  },
 };

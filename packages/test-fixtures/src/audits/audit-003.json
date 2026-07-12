@@ -1,0 +1,44 @@
+[
+  {
+    "pageNumber": 1,
+    "text": "Social Responsibility Audit Report\nSupplier: Vietnam Footwear Assembly JSC\nFactory: Ho Chi Minh City Footwear Plant\nAudit Date: January 15-17, 2026\nAudit Standard: RBA Code of Conduct v8.0\nLead Auditor: Sarah Nguyen\n\nExecutive Summary:\nFacility produces athletic footwear with 2,150 employees. Audit identified systemic issues with working hours, emergency preparedness, and wage transparency.\n\nOverall Score: 47% (Minor Non-conformances: 22, Major Non-conformances: 7, Critical: 3)",
+    "normalizedText": "Social Responsibility Audit Report\nSupplier: Vietnam Footwear Assembly JSC\nFactory: Ho Chi Minh City Footwear Plant\nAudit Date: January 15-17, 2026\nAudit Standard: RBA Code of Conduct v8.0\nLead Auditor: Sarah Nguyen\n\nExecutive Summary:\nFacility produces athletic footwear with 2,150 employees. Audit identified systemic issues with working hours, emergency preparedness, and wage transparency.\n\nOverall Score: 47% (Minor Non-conformances: 22, Major Non-conformances: 7, Critical: 3)",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 2,
+    "text": "Section 3: Health and Safety\n\n3.1 Emergency Preparedness\nNo evacuation drill conducted in 2025. Fire extinguishers on Production Floor B last inspected April 2024.\n\n3.2 Safety Training\nNew hire safety training limited to 2-hour orientation. No refresher training program. Machine safety training documented for only 60% of operators.\n\n3.3 PPE\nCut-resistant gloves provided but workers report discomfort and remove them during operations. Safety footwear compliance 70%.\n\n3.4 Chemical Safety\nAdhesive and solvent use in assembly area lacks adequate local exhaust ventilation. Workers reported headaches and dizziness. SDS available for 80% of chemicals used.",
+    "normalizedText": "Section 3: Health and Safety\n\n3.1 Emergency Preparedness\nNo evacuation drill conducted in 2025. Fire extinguishers on Production Floor B last inspected April 2024.\n\n3.2 Safety Training\nNew hire safety training limited to 2-hour orientation. No refresher training program. Machine safety training documented for only 60% of operators.\n\n3.3 PPE\nCut-resistant gloves provided but workers report discomfort and remove them during operations. Safety footwear compliance 70%.\n\n3.4 Chemical Safety\nAdhesive and solvent use in assembly area lacks adequate local exhaust ventilation. Workers reported headaches and dizziness. SDS available for 80% of chemicals used.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 3,
+    "text": "Section 3: Health and Safety (continued)\n\n3.5 Emergency Exits\nAll emergency exits on Production Floor A unobstructed. Production Floor B: Exit B-2 blocked by raw material staging area. Exit B-3 door handle broken, requires two hands to open.\n\nBuilding C (warehouse): Emergency exit signage missing on 2nd and 3rd floors. Exit path on 3rd floor cluttered with returned goods.\n\nFire alarm system: Manual pull stations present but automatic detection system not connected to central alarm on Floors 2-4.",
+    "normalizedText": "Section 3: Health and Safety (continued)\n\n3.5 Emergency Exits\nAll emergency exits on Production Floor A unobstructed. Production Floor B: Exit B-2 blocked by raw material staging area. Exit B-3 door handle broken, requires two hands to open.\n\nBuilding C (warehouse): Emergency exit signage missing on 2nd and 3rd floors. Exit path on 3rd floor cluttered with returned goods.\n\nFire alarm system: Manual pull stations present but automatic detection system not connected to central alarm on Floors 2-4.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 4,
+    "text": "Section 4: Labor\n\n4.1 Working Hours\nDecember 2025 peak season records: 156 workers exceeded 60 hours/week for 4 consecutive weeks. 23 workers exceeded 72 hours/week. Night shift operates 7pm-7am with mandatory overtime on Saturdays.\n\n4.2 Wages and Benefits\nBase wage meets minimum. However: (a) attendance bonus structure unclear, (b) piece-rate calculations not transparent, (c) night shift differential not documented.\n\n4.3 Workers' Rights\nUnion exists but independent worker interviews suggest management influence. Two workers reported fear of retaliation for raising safety concerns.\n\n4.4 Recruitment\nLabor broker fees deducted from first 3 months' wages for 87 migrant workers from rural provinces.",
+    "normalizedText": "Section 4: Labor\n\n4.1 Working Hours\nDecember 2025 peak season records: 156 workers exceeded 60 hours/week for 4 consecutive weeks. 23 workers exceeded 72 hours/week. Night shift operates 7pm-7am with mandatory overtime on Saturdays.\n\n4.2 Wages and Benefits\nBase wage meets minimum. However: (a) attendance bonus structure unclear, (b) piece-rate calculations not transparent, (c) night shift differential not documented.\n\n4.3 Workers' Rights\nUnion exists but independent worker interviews suggest management influence. Two workers reported fear of retaliation for raising safety concerns.\n\n4.4 Recruitment\nLabor broker fees deducted from first 3 months' wages for 87 migrant workers from rural provinces.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 5,
+    "text": "Section 5: Environment\n\n5.1 Environmental Permits\nCurrent and valid. Air quality monitoring conducted monthly.\n\n5.2 Hazardous Waste\nWaste adhesive and solvent containers stored beyond 90-day limit. Three 55-gallon drums present since August 2025.\n\n5.3 Air Emissions\nVOC levels in assembly area exceed occupational exposure limits. Industrial hygiene assessment not conducted.\n\n5.4 Energy\nEnergy consumption data shows 23% increase year-over-year with no efficiency program in place.",
+    "normalizedText": "Section 5: Environment\n\n5.1 Environmental Permits\nCurrent and valid. Air quality monitoring conducted monthly.\n\n5.2 Hazardous Waste\nWaste adhesive and solvent containers stored beyond 90-day limit. Three 55-gallon drums present since August 2025.\n\n5.3 Air Emissions\nVOC levels in assembly area exceed occupational exposure limits. Industrial hygiene assessment not conducted.\n\n5.4 Energy\nEnergy consumption data shows 23% increase year-over-year with no efficiency program in place.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 6,
+    "text": "Section 6: Ethics\n\n6.1 Business Integrity\nGift and entertainment policy exists but not enforced consistently. Three instances of vendor gifts exceeding $100 threshold without disclosure.\n\n6.2 Privacy\nWorker biometric data (fingerprint attendance) collected without written consent. Data shared with labor broker for payroll processing.\n\n6.3 Grievance Mechanisms\nSuggestion boxes present but no evidence of response process. Worker hotline in Vietnamese only, excludes Khmer-speaking seasonal workers.\n\nSection 7: Management System\n\n7.1 No systematic management system. Corrective actions from previous audit (2023) not tracked. Quality management limited to product quality, not social compliance.",
+    "normalizedText": "Section 6: Ethics\n\n6.1 Business Integrity\nGift and entertainment policy exists but not enforced consistently. Three instances of vendor gifts exceeding $100 threshold without disclosure.\n\n6.2 Privacy\nWorker biometric data (fingerprint attendance) collected without written consent. Data shared with labor broker for payroll processing.\n\n6.3 Grievance Mechanisms\nSuggestion boxes present but no evidence of response process. Worker hotline in Vietnamese only, excludes Khmer-speaking seasonal workers.\n\nSection 7: Management System\n\n7.1 No systematic management system. Corrective actions from previous audit (2023) not tracked. Quality management limited to product quality, not social compliance.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  }
+]

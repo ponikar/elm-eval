@@ -1,5 +1,5 @@
 {
-  "name": "@repo/test-fixtures",
+  "name": "@repo/documents",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,14 +10,19 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf node_modules .turbo"
+    "test": "vitest run",
+    "lint": "eslint . --max-warnings=0"
   },
   "dependencies": {
-    "@repo/domain": "workspace:*"
+    "@repo/domain": "workspace:*",
+    "@google/genai": "^1.0.0",
+    "pdf-parse": "^1.1.1",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
   }
 }

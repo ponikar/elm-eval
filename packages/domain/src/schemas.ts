@@ -1,33 +1,33 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const AuditStandardSchema = z.enum(["RBA", "SLCP", "BSCI", "SMETA", "CUSTOM"]);
+export const AuditStandardSchema = z.enum(['RBA', 'SLCP', 'BSCI', 'SMETA', 'CUSTOM']);
 export const FindingCategorySchema = z.enum([
-  "HEALTH_AND_SAFETY",
-  "WORKING_HOURS",
-  "WAGES_AND_BENEFITS",
-  "FORCED_LABOR",
-  "CHILD_LABOR",
-  "ENVIRONMENT",
-  "ETHICS",
-  "MANAGEMENT_SYSTEM",
+  'HEALTH_AND_SAFETY',
+  'WORKING_HOURS',
+  'WAGES_AND_BENEFITS',
+  'FORCED_LABOR',
+  'CHILD_LABOR',
+  'ENVIRONMENT',
+  'ETHICS',
+  'MANAGEMENT_SYSTEM',
 ]);
-export const SeveritySchema = z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]);
-export const ReviewStatusSchema = z.enum(["PENDING", "APPROVED", "CORRECTED", "REJECTED"]);
+export const SeveritySchema = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
+export const ReviewStatusSchema = z.enum(['PENDING', 'APPROVED', 'CORRECTED', 'REJECTED']);
 export const FailureTypeSchema = z.enum([
-  "MISSED_FINDING",
-  "FALSE_POSITIVE_FINDING",
-  "WRONG_CATEGORY",
-  "WRONG_SEVERITY",
-  "CRITICAL_UNDERCLASSIFICATION",
-  "INVALID_CITATION",
-  "UNSUPPORTED_FINDING",
-  "DUPLICATE_FINDING",
-  "POLICY_MISMATCH",
-  "INCOMPLETE_CAP",
-  "IRRELEVANT_CAP",
-  "SCHEMA_ERROR",
-  "MODEL_TIMEOUT",
-  "PIPELINE_ERROR",
+  'MISSED_FINDING',
+  'FALSE_POSITIVE_FINDING',
+  'WRONG_CATEGORY',
+  'WRONG_SEVERITY',
+  'CRITICAL_UNDERCLASSIFICATION',
+  'INVALID_CITATION',
+  'UNSUPPORTED_FINDING',
+  'DUPLICATE_FINDING',
+  'POLICY_MISMATCH',
+  'INCOMPLETE_CAP',
+  'IRRELEVANT_CAP',
+  'SCHEMA_ERROR',
+  'MODEL_TIMEOUT',
+  'PIPELINE_ERROR',
 ]);
 
 export const EvidenceSchema = z.object({
@@ -106,7 +106,7 @@ export const AgentVersionSchema = z.object({
   policyVersion: z.string().min(1),
   extractionSchemaVersion: z.string().min(1),
   createdAt: z.string(),
-  type: z.enum(["baseline", "candidate"]),
+  type: z.enum(['baseline', 'candidate']),
 });
 
 export const EvalCaseInputSchema = z.object({
@@ -129,11 +129,11 @@ export const EvalCaseSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
   category: FindingCategorySchema,
-  criticality: z.enum(["NORMAL", "CRITICAL"]),
+  criticality: z.enum(['NORMAL', 'CRITICAL']),
   input: EvalCaseInputSchema,
   expected: EvalCaseExpectedSchema,
-  source: z.enum(["HUMAN_CREATED", "HUMAN_CORRECTION", "PRODUCTION_FAILURE", "GENERATED_APPROVED"]),
-  status: z.enum(["DRAFT", "PENDING_REVIEW", "TRUSTED"]),
+  source: z.enum(['HUMAN_CREATED', 'HUMAN_CORRECTION', 'PRODUCTION_FAILURE', 'GENERATED_APPROVED']),
+  status: z.enum(['DRAFT', 'PENDING_REVIEW', 'TRUSTED']),
   parentCaseId: z.string().optional(),
 });
 
