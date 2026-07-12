@@ -22,6 +22,34 @@ export const auditPage = sqliteTable('audit_page', {
   text: text('text').notNull(),
 });
 
+export const rulebook = sqliteTable('rulebook', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  version: text('version').notNull(),
+  standard: text('standard').notNull(),
+  effectiveFrom: text('effective_from').notNull(),
+  effectiveTo: text('effective_to'),
+  language: text('language').notNull().default('en'),
+  indexStatus: text('index_status').notNull().default('PENDING'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+export const complianceRule = sqliteTable('compliance_rule', {
+  id: text('id').primaryKey(),
+  rulebookId: text('rulebook_id')
+    .notNull()
+    .references(() => rulebook.id, { onDelete: 'cascade' }),
+  rulebookVersion: text('rulebook_version').notNull(),
+  sectionId: text('section_id').notNull(),
+  sectionTitle: text('section_title').notNull(),
+  category: text('category').notNull(),
+  requirementText: text('requirement_text').notNull(),
+  sourcePage: integer('source_page').notNull(),
+  severityGuidance: text('severity_guidance'),
+  correctiveActionGuidance: text('corrective_action_guidance'),
+});
+
 export const auditFinding = sqliteTable('audit_finding', {
   id: text('id').primaryKey(),
   auditId: text('audit_id')
@@ -36,8 +64,8 @@ export const auditFinding = sqliteTable('audit_finding', {
   severity: text('severity').notNull(),
   evidencePage: integer('evidence_page').notNull(),
   evidenceQuote: text('evidence_quote').notNull(),
-  policyName: text('policy_name'),
-  policySection: text('policy_section'),
+  ruleId: text('rule_id').notNull(),
+  rulebookVersion: text('rulebook_version').notNull(),
   confidence: real('confidence').notNull(),
   correctiveAction: text('corrective_action').notNull(),
   reviewStatus: text('review_status').notNull().default('PENDING'),
@@ -52,8 +80,12 @@ export const agentVersion = sqliteTable('agent_version', {
   promptVersion: text('prompt_version').notNull(),
   systemPrompt: text('system_prompt').notNull(),
   temperature: real('temperature').notNull(),
-  policyVersion: text('policy_version').notNull(),
+  rulebookVersionId: text('rulebook_version_id').notNull(),
+  retrievalTopK: integer('retrieval_top_k').notNull(),
   extractionSchemaVersion: text('extraction_schema_version').notNull(),
+  correctiveActionPromptVersion: text('corrective_action_prompt_version').notNull(),
+  timeoutMs: integer('timeout_ms').notNull(),
+  maxRetries: integer('max_retries').notNull(),
   type: text('type').notNull().default('candidate'),
   createdAt: text('created_at').notNull(),
 });
@@ -63,8 +95,8 @@ export const evalCase = sqliteTable('eval_case', {
   name: text('name').notNull(),
   category: text('category').notNull(),
   criticality: text('criticality').notNull().default('NORMAL'),
-  inputAuditText: text('input_audit_text').notNull(),
-  inputPolicyCtx: text('input_policy_ctx').notNull(),
+  inputAuditPages: text('input_audit_pages').notNull(),
+  inputRulebookVersionId: text('input_rulebook_version_id').notNull(),
   expectedJson: text('expected_json').notNull(),
   source: text('source').notNull().default('HUMAN_CREATED'),
   status: text('status').notNull().default('DRAFT'),
@@ -102,6 +134,26 @@ export const testExecution = sqliteTable('test_execution', {
   completedAt: text('completed_at'),
 });
 
+export const traceEvent = sqliteTable('trace_event', {
+  id: text('id').primaryKey(),
+  executionId: text('execution_id')
+    .notNull()
+    .references(() => testExecution.id, { onDelete: 'cascade' }),
+  stage: text('stage').notNull(),
+  eventType: text('event_type').notNull(),
+  startedAt: text('started_at').notNull(),
+  completedAt: text('completed_at'),
+  durationMs: integer('duration_ms'),
+  inputSummary: text('input_summary'),
+  outputSummary: text('output_summary'),
+  errorCode: text('error_code'),
+  tokenInput: integer('token_input'),
+  tokenOutput: integer('token_output'),
+  costUsd: real('cost_usd'),
+});
+
+// ─── Relations ───────────────────────────────────────────────────────────────
+
 export const supplierAuditRelations = relations(supplierAudit, ({ many }) => ({
   pages: many(auditPage),
   findings: many(auditFinding),
@@ -131,7 +183,7 @@ export const evaluationRunRelations = relations(evaluationRun, ({ one, many }) =
   testExecutions: many(testExecution),
 }));
 
-export const testExecutionRelations = relations(testExecution, ({ one }) => ({
+export const testExecutionRelations = relations(testExecution, ({ one, many }) => ({
   run: one(evaluationRun, {
     fields: [testExecution.runId],
     references: [evaluationRun.id],
@@ -139,5 +191,13 @@ export const testExecutionRelations = relations(testExecution, ({ one }) => ({
   evalCase: one(evalCase, {
     fields: [testExecution.evalCaseId],
     references: [evalCase.id],
+  }),
+  traceEvents: many(traceEvent),
+}));
+
+export const traceEventRelations = relations(traceEvent, ({ one }) => ({
+  execution: one(testExecution, {
+    fields: [traceEvent.executionId],
+    references: [testExecution.id],
   }),
 }));
