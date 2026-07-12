@@ -11,7 +11,7 @@ export default function ComparePage() {
         title="Version Compare"
         description="Compare baseline vs candidate agent performance"
       />
-      <div className="p-6">
+      <div className="p-8">
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted">

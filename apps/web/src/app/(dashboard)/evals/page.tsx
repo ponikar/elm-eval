@@ -111,7 +111,7 @@ export default function EvalsPage() {
         title="Eval Suite"
         description="Trusted evaluation cases for agent quality gates"
       />
-      <div className="p-6">
+      <div className="p-8">
         {evalCases.isLoading ? (
           <div className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-4">

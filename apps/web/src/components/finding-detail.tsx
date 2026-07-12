@@ -27,7 +27,7 @@ interface FindingDetailProps {
 
 export function FindingDetail({ finding }: FindingDetailProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
@@ -35,7 +35,7 @@ export function FindingDetail({ finding }: FindingDetailProps) {
             <ReviewStatusBadge status={finding.reviewStatus as never} />
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           <div className="flex gap-2">
             <CategoryBadge category={finding.category as never} />
             <SeverityBadge severity={finding.severity as never} />
@@ -50,7 +50,7 @@ export function FindingDetail({ finding }: FindingDetailProps) {
               <FileText className="h-3 w-3" />
               Audit Evidence
             </h4>
-            <div className="rounded-lg border bg-muted/50 p-3">
+            <div className="rounded-lg border bg-muted/50 p-4">
               <span className="text-[11px] font-medium text-muted-foreground/70">
                 Page {finding.auditEvidence.pageNumber}
               </span>
@@ -82,7 +82,7 @@ export function FindingDetail({ finding }: FindingDetailProps) {
               <AlertTriangle className="h-3 w-3" />
               Corrective Action
             </h4>
-            <div className="space-y-3 rounded-lg border p-4">
+            <div className="space-y-3 rounded-lg border p-5">
               <div>
                 <p className="text-[11px] font-medium text-muted-foreground/70">Action</p>
                 <p className="text-sm">{finding.correctiveAction.action}</p>

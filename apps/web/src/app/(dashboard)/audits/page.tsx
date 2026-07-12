@@ -24,7 +24,7 @@ export default function AuditsPage() {
         title="Audit Review"
         description="Review supplier audit findings and evidence"
       />
-      <div className="p-6">
+      <div className="p-8">
         {audits.isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (

@@ -16,11 +16,11 @@ interface AuditPageViewerProps {
 export function AuditPageViewer({ pages, highlightPage }: AuditPageViewerProps) {
   return (
     <ScrollArea className="h-full">
-      <div className="space-y-3 p-4">
+      <div className="space-y-4 p-5">
         {pages.map((page) => (
           <div
             key={page.pageNumber}
-            className={`rounded-lg border p-4 transition-all ${
+            className={`rounded-lg border p-5 transition-all ${
               highlightPage === page.pageNumber
                 ? 'border-primary/40 bg-primary/5 shadow-sm'
                 : 'bg-background hover:bg-muted/30'

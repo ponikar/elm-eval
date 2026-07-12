@@ -285,3 +285,54 @@ Await user approval to merge PR #3. Then T-004 (audit review UI screens) can beg
 - packages/ui/src/styles/globals.css (new)
 - packages/ui/src/components/ui/button.tsx (new)
 - pnpm-lock.yaml
+
+---
+
+## Entry 7 — 2026-07-12T21:30:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-002d
+- **Branch:** feat/ui-polish
+- **Worktree:** /Users/darshan/work/agent-eval
+- **Status:** COMPLETE (PR #5 created)
+- **Scope:** Dashboard UI polish — full shadcn/ui design system overhaul
+
+### Completed
+
+- Merged feat/ui-foundation into main (Tailwind v4, shadcn, tRPC foundation)
+- Added 6 new shadcn/ui components: Tooltip, DropdownMenu, Sheet, Avatar, Skeleton, Collapsible
+- Revamped sidebar with Lucide icons, section grouping (Review/Evaluation/Agents), active states
+- Created DashboardHeader component with breadcrumbs and theme toggle
+- Added full dark mode support (light + dark CSS variable themes with oklch)
+- Polished landing page with hero section, feature cards, and CTAs
+- Improved all core pages: audits list, audit detail, agents, evals
+- Polished placeholder pages with centered empty states and icons
+- Fixed badge components to use theme-aware colors for dark mode
+- Added skeleton loaders for loading states
+
+### Validation
+
+- turbo typecheck: PASS (10/10 packages)
+- turbo build: PASS (Next.js compiles, all 11 routes)
+- pnpm format: PASS
+
+### Changed Files
+
+- apps/web/src/app/globals.css (full theme variables)
+- apps/web/src/app/page.tsx (hero landing page)
+- apps/web/src/app/(dashboard)/layout.tsx (tooltip provider)
+- apps/web/src/components/sidebar.tsx (Lucide icons, sections)
+- apps/web/src/components/dashboard-header.tsx (new)
+- apps/web/src/components/audit-page-viewer.tsx (better highlighting)
+- apps/web/src/components/finding-detail.tsx (structured layout)
+- apps/web/src/components/severity-badge.tsx (theme-aware)
+- apps/web/src/components/review-status-badge.tsx (theme-aware)
+- apps/web/src/app/(dashboard)/evals/page.tsx (stat cards, tabs)
+- apps/web/src/app/(dashboard)/agents/page.tsx (icon cards)
+- apps/web/src/app/(dashboard)/audits/page.tsx (hover states)
+- packages/ui/src/components/ui/ (6 new components)
+- packages/ui/src/index.ts (exports)
+
+### PR
+
+https://github.com/ponikar/elm-eval/pull/5

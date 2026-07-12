@@ -28,7 +28,7 @@ export default function AgentsPage() {
         title="Agent Versions"
         description="Compare agent configurations and track baseline vs candidate"
       />
-      <div className="p-6">
+      <div className="p-8">
         {agents.isLoading ? (
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">

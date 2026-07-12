@@ -63,7 +63,7 @@ export default function AuditDetailPage() {
 
         {/* Right panel: Findings */}
         <div className="flex w-1/2 flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b px-4 py-3">
+          <div className="flex items-center justify-between border-b px-6 py-4">
             <h2 className="text-sm font-semibold">
               Findings
               <span className="ml-1.5 text-muted-foreground font-normal">
@@ -74,7 +74,7 @@ export default function AuditDetailPage() {
 
           {selectedFinding ? (
             <div className="flex flex-1 flex-col overflow-hidden">
-              <div className="border-b px-4 py-2">
+              <div className="border-b px-6 py-3">
                 <button
                   onClick={() => setSelectedFindingId(null)}
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -83,7 +83,7 @@ export default function AuditDetailPage() {
                   Back to all findings
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-6">
                 <FindingDetail finding={selectedFinding} />
               </div>
             </div>
