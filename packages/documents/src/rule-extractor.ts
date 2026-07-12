@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
+import { env } from '@repo/domain';
 
 const ComplianceRuleSchema = z.object({
   id: z.string(),
@@ -37,12 +38,9 @@ export class RuleExtractor {
   private model: string;
 
   constructor(config: RuleExtractorConfig = {}) {
-    const apiKey = config.apiKey ?? process.env['GEMINI_API_KEY'];
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY required: set env var or pass config.apiKey');
-    }
+    const apiKey = config.apiKey ?? env.GEMINI_API_KEY;
     this.genAI = new GoogleGenAI({ apiKey });
-    this.model = config.model ?? 'gemini-2.5-flash';
+    this.model = config.model ?? env.GEMINI_MODEL;
   }
 
   async extractRules(rulebookText: string, standardName: string): Promise<ExtractedRule[]> {

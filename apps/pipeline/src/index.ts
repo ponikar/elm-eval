@@ -3,6 +3,7 @@ import { RulebookParser } from '@repo/documents';
 import { RuleExtractor } from '@repo/documents';
 import { ChunkBuilder } from '@repo/retrieval';
 import { RuleSearcher } from '@repo/retrieval';
+import { env } from '@repo/domain';
 import {
   AUDIT_FIXTURE_IDS,
   RULEBOOK_FIXTURE_IDS,
@@ -125,7 +126,7 @@ async function main(): Promise<void> {
   console.log(`\nTotal chunks created: ${allChunks.length}`);
 
   let searchTestPassed = false;
-  if (process.env['GEMINI_API_KEY']) {
+  if (env.GEMINI_API_KEY) {
     console.log('\nGEMINI_API_KEY found — running embedding + search test');
     const searcher = new RuleSearcher();
     const embeddedChunks = await searcher.embedChunks(allChunks);

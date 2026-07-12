@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { env } from '@repo/domain';
 
 export interface EmbeddingConfig {
   apiKey?: string;
@@ -12,13 +13,10 @@ export class GeminiEmbeddings {
   private dimensions: number;
 
   constructor(config: EmbeddingConfig = {}) {
-    const apiKey = config.apiKey ?? process.env['GEMINI_API_KEY'];
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY required: set env var or pass config.apiKey');
-    }
+    const apiKey = config.apiKey ?? env.GEMINI_API_KEY;
     this.genAI = new GoogleGenAI({ apiKey });
-    this.model = config.model ?? 'gemini-embedding-001';
-    this.dimensions = config.dimensions ?? 768;
+    this.model = config.model ?? env.GEMINI_EMBEDDING_MODEL;
+    this.dimensions = config.dimensions ?? env.EMBEDDING_DIMENSIONS;
   }
 
   async embed(text: string): Promise<number[]> {

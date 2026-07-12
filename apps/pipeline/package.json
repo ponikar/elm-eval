@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
+    "embed": "tsx src/embed.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",

@@ -189,6 +189,9 @@ importers:
 
   packages/domain:
     dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.13.0
+        version: 0.13.11(typescript@5.9.3)(zod@3.25.76)
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -196,6 +199,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
@@ -232,8 +238,11 @@ importers:
       '@repo/domain':
         specifier: workspace:*
         version: link:../domain
+      '@t3-oss/env-core':
+        specifier: ^0.13.11
+        version: 0.13.11(typescript@5.9.3)(zod@3.25.76)
       zod:
-        specifier: ^3.24.0
+        specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
       '@repo/typescript-config':
@@ -1676,6 +1685,26 @@ packages:
       {
         integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==,
       }
+
+  '@t3-oss/env-core@0.13.11':
+    resolution:
+      {
+        integrity: sha512-sM7GYY+KL7H/Hl0BE0inWfk3nRHZOLhmVn7sHGxaZt9FAR6KqREXAE+6TqKfiavfXmpRxO/OZ2QgKRd+oiBYRQ==,
+      }
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
 
   '@turbo/darwin-64@2.10.4':
     resolution:
@@ -3884,6 +3913,11 @@ snapshots:
   '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
+
+  '@t3-oss/env-core@0.13.11(typescript@5.9.3)(zod@3.25.76)':
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 3.25.76
 
   '@turbo/darwin-64@2.10.4':
     optional: true
