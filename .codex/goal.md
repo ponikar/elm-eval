@@ -51,6 +51,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | ----- | ---------------------------------- | -------- | ----------- | ------ | -------- | ---------------------------------- |
 | T-001 | Monorepo scaffold                  | opencode | COMPLETE    | main   | main     | Done                               |
 | T-002 | Domain schemas + seed data         | opencode | IN PROGRESS | main   | main     | Create Zod schemas + seed fixtures |
+| T-002c| Schema alignment to PRD            | opencode | IN PROGRESS | feat/schema-alignment | worktrees/feat-schema-alignment | Align domain schemas with PRD types |
+| T-009 | Pre-seeded documentation pipeline  | opencode | IN PROGRESS | feat/pre-seed-pipeline | — | Gemini extraction + fixtures + DB schema |
 | T-003 | Agent pipeline                     | opencode | planned     | —      | —        | Implement pipeline stages          |
 | T-004 | Audit review UI                    | opencode | planned     | —      | —        | Build split-view workspace         |
 | T-005 | Human correction loop              | opencode | planned     | —      | —        | Correction → regression test       |
@@ -97,5 +99,5 @@ None.
 
 ### Handoff
 
-**Current state:** T-001 complete. Monorepo scaffolded, all packages typecheck, build passes, format clean. Drizzle ORM with better-sqlite3. 7 core tables + relations defined.
-**Next exact action:** T-002 — Create Zod validation schemas for API boundaries and complete the 10 seed evaluation cases in test-fixtures.
+**Current state:** T-002c in progress. Aligning domain Zod schemas with PRD types — 6 fixes + 8 new schemas. After this, T-002 seed data updates, then UI work.
+**Next exact action:** T-002c — Implement schema alignment in packages/domain/src/schemas.ts.
