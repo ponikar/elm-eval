@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle, Separator } from '@repo/ui';
-import { SeverityBadge } from './severity-badge';
-import { ReviewStatusBadge } from './review-status-badge';
+import { AlertTriangle, CheckCircle, Clock, FileText, Scale, User } from 'lucide-react';
 import { CategoryBadge } from './category-badge';
-import { FileText, Scale, AlertTriangle, Clock, CheckCircle, User } from 'lucide-react';
+import { ReviewStatusBadge } from './review-status-badge';
+import { SeverityBadge } from './severity-badge';
 
 interface FindingDetailProps {
   finding: {

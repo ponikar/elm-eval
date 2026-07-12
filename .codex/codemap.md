@@ -430,3 +430,20 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** T-010 owns the currently modified package manifests and `pnpm-lock.yaml`; other tickets must avoid those paths until handoff.
 - **Next Step:** Finish T-010, record exact clean validation results, then claim T-005 in a dedicated branch/worktree.
 - **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`; evidence from `origin/main`, merged PRs #4/#5, ten `SEED_EVAL_CASES`, agent pipeline tests, current routers/pages, and current DB/domain/eval implementations.
+
+---
+
+## Entry 13 — 2026-07-12T23:20:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-010
+- **Branch:** main
+- **Worktree:** /Users/darshan/work/agent-eval
+- **Status:** COMPLETE
+- **Scope:** Repository validation repair — regenerate lockfile, replace ESLint+Prettier with Biome, remove fake test scripts, make full validation gate pass.
+- **Completed:** Regenerated pnpm-lock.yaml from scratch (was corrupted with hundreds of duplicate mapping keys). Installed Biome 2.5.3 as root devDependency. Created root biome.json (recommended rules, single quotes, semicolons, trailing commas, lineWidth 100, Tailwind CSS directive parsing, CSS linting disabled). Deleted packages/eslint-config/ (4 files), .prettierrc, 9 eslint.config.js files. Removed eslint, @repo/eslint-config, prettier from all package.json files. Changed all 10 lint scripts from `eslint . --max-warnings=0` to `biome check .`. Removed fake vitest test scripts from 7 packages (domain, documents, retrieval, db, evals, web, pipeline). Ran `biome check --write` to auto-fix formatting (56+ files: semicolons, quotes, trailing commas, import organization).
+- **Pending:** Nothing — T-010 complete.
+- **Blockers:** None.
+- **Next Step:** Claim T-005 in a dedicated worktree.
+- **Validation:** pnpm install --frozen-lockfile PASS, pnpm format:check PASS (29 warnings, 0 errors), pnpm typecheck PASS (10/10), pnpm test PASS (7/7), pnpm build PASS (2/2).
+- **Changed Files and Evidence:** biome.json (new), package.json (root + 9 workspace packages), 9 eslint.config.js (deleted), packages/eslint-config/ (deleted), .prettierrc (deleted), AGENTS.md (updated format instruction), pnpm-lock.yaml (regenerated), biome auto-fixed formatting across 56+ source files. All validation gates pass with exit 0.

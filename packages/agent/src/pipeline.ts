@@ -1,8 +1,8 @@
 import {
-  AuditFindingSchema,
-  CandidateExtractionOutputSchema,
   type AgentVersion,
   type AuditFinding,
+  AuditFindingSchema,
+  CandidateExtractionOutputSchema,
   type CandidateFinding,
   type ComplianceRule,
   type PipelineStage,
@@ -12,10 +12,10 @@ import {
 import type { ModelProvider, StructuredGenerationResult } from './model-provider.js';
 import { ModelProviderError } from './model-provider.js';
 import {
+  type FindingRejection,
   findingDedupeKey,
   normalizeEvidence,
   validateFinding,
-  type FindingRejection,
 } from './validation.js';
 export interface RetrievedRule {
   chunk: RuleChunk;

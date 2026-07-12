@@ -1,8 +1,8 @@
 'use client';
 
-import { DashboardHeader } from '@/components/dashboard-header';
 import { Card, CardContent } from '@repo/ui';
-import { BookOpen, ArrowRight } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
+import { DashboardHeader } from '@/components/dashboard-header';
 
 export default function RulebooksPage() {
   return (

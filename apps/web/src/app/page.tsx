@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { Button } from '@repo/ui';
-import { Shield, FlaskConical, GitCompare, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2, FlaskConical, GitCompare, Shield } from 'lucide-react';
+import Link from 'next/link';
 
 const features = [
   {

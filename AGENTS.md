@@ -133,6 +133,17 @@ Work only within the ticket's recorded scope and file ownership. Keep the goal b
 append-only codemap current at material checkpoints. Run the complete validation gate before
 handoff, fixing every error and warning.
 
+**Mandatory formatting:** After every code change — before committing, before running validation,
+and before handoff — run:
+
+```bash
+pnpm format
+```
+
+This executes `biome check --write .` which auto-fixes formatting and safe lint fixes across the
+entire workspace. Every agent (human, Codex, Claude Code, OpenCode) must run this before any
+commit. Never commit code that has not been formatted.
+
 ### 4. Commit, push, and hand off
 
 When the ticket is complete:

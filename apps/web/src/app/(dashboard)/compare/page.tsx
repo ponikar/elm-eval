@@ -1,8 +1,8 @@
 'use client';
 
-import { DashboardHeader } from '@/components/dashboard-header';
 import { Card, CardContent } from '@repo/ui';
-import { GitCompare, ArrowRight } from 'lucide-react';
+import { ArrowRight, GitCompare } from 'lucide-react';
+import { DashboardHeader } from '@/components/dashboard-header';
 
 export default function ComparePage() {
   return (

@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
-import { z } from 'zod';
 import { env } from '@repo/domain';
+import { z } from 'zod';
 
 const ComplianceRuleSchema = z.object({
   id: z.string(),

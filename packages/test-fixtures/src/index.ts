@@ -1,16 +1,15 @@
-import type {
-  SupplierAudit,
-  Rulebook,
-  ComplianceRule,
-  AgentVersion,
-  EvalCase,
-  AuditFinding,
-  AuditStandard,
-  FindingCategory,
-} from '@repo/domain';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type {
+  AgentVersion,
+  AuditFinding,
+  AuditStandard,
+  ComplianceRule,
+  EvalCase,
+  Rulebook,
+  SupplierAudit,
+} from '@repo/domain';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

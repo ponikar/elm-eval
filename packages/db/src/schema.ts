@@ -1,13 +1,13 @@
+import { relations, sql } from 'drizzle-orm';
 import {
-  sqliteTable,
-  text,
+  check,
+  index,
   integer,
   real,
+  sqliteTable,
+  text,
   uniqueIndex,
-  index,
-  check,
 } from 'drizzle-orm/sqlite-core';
-import { relations, sql } from 'drizzle-orm';
 
 // ─── Core audit tables ───────────────────────────────────────────────────────
 

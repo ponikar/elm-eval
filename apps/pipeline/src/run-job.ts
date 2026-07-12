@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { AuditAgentPipeline, GeminiModelProvider, type PipelineTrace } from '@repo/agent';
 import {
   appendPipelineTrace,
   claimPipelineJob,
@@ -18,12 +18,12 @@ import {
 import {
   AgentVersionSchema,
   ComplianceRuleSchema,
+  type PipelineFailureCode,
   RuleChunkSchema,
   SupplierAuditSchema,
-  type PipelineFailureCode,
 } from '@repo/domain';
-import { AuditAgentPipeline, GeminiModelProvider, type PipelineTrace } from '@repo/agent';
 import { RuleSearcher } from '@repo/retrieval';
+import { eq } from 'drizzle-orm';
 export async function runPipelineJob(jobId: string) {
   if (!claimPipelineJob(jobId, new Date().toISOString()))
     throw new Error(`Pipeline job ${jobId} is missing, terminal, or already claimed`);

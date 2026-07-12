@@ -1,15 +1,12 @@
 'use client';
 
-import { trpc } from '@/trpc/react';
-import { DashboardHeader } from '@/components/dashboard-header';
-import { CategoryBadge } from '@/components/category-badge';
-import { SeverityBadge } from '@/components/severity-badge';
 import {
+  Badge,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  Badge,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -20,9 +17,12 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-  Skeleton,
 } from '@repo/ui';
-import { FlaskConical, ShieldCheck, Clock, FileEdit } from 'lucide-react';
+import { Clock, FileEdit, FlaskConical, ShieldCheck } from 'lucide-react';
+import { CategoryBadge } from '@/components/category-badge';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { SeverityBadge } from '@/components/severity-badge';
+import { trpc } from '@/trpc/react';
 
 function CriticalityBadge({ criticality }: { criticality: string }) {
   return (
