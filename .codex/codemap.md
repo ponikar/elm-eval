@@ -349,3 +349,19 @@ Await user approval to merge PR #3. Then T-004 (audit review UI screens) can beg
 - **Blockers:** `pnpm test` fails because untouched packages have no tests; `pnpm lint` fails because untouched documents/evals/ui/web lack ESLint setup. No suppression was added.
 - **Next Step:** Decide whether T-003 may expand to repair root test/lint infrastructure or accept scoped validation.
 - **Changed Files and Evidence:** Commit `36f5a23`; exact results recorded in `.codex/goal.md`.
+
+---
+
+## Entry 11 — 2026-07-12T12:53:00Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-003
+- **Branch:** feat/agent-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-agent-pipeline
+- **Status:** BLOCKED / HANDOFF
+- **Scope:** Remote publication.
+- **Completed:** Pushed commits `36f5a23` and `417746a`; opened draft PR #4.
+- **Pending:** User decision on root validation scope, final integration, main-board completion update, and worktree removal.
+- **Blockers:** Same pre-existing repository-wide test/lint failures recorded in Entry 10.
+- **Next Step:** After scope decision, repair or accept root validation, rerun final gates, update PR, and merge.
+- **Changed Files and Evidence:** `.codex/codemap.md`; remote branch verified and PR https://github.com/ponikar/elm-eval/pull/4 created.
