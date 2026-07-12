@@ -1,33 +1,34 @@
-import { cn, Badge } from "@repo/ui";
+import { cn, Badge } from '@repo/ui';
 
-type Severity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
-const severityConfig: Record<
-  Severity,
-  { className: string; label: string }
-> = {
+const severityConfig: Record<Severity, { className: string; label: string }> = {
   LOW: {
-    className: "bg-blue-100 text-blue-800 border-blue-200",
-    label: "Low",
+    className:
+      'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300',
+    label: 'Low',
   },
   MEDIUM: {
-    className: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    label: "Medium",
+    className:
+      'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300',
+    label: 'Medium',
   },
   HIGH: {
-    className: "bg-orange-100 text-orange-800 border-orange-200",
-    label: "High",
+    className:
+      'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300',
+    label: 'High',
   },
   CRITICAL: {
-    className: "bg-red-100 text-red-800 border-red-200",
-    label: "Critical",
+    className:
+      'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300',
+    label: 'Critical',
   },
 };
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
   const config = severityConfig[severity] ?? severityConfig.LOW;
   return (
-    <Badge variant="outline" className={cn("text-xs font-medium", config.className)}>
+    <Badge variant="outline" className={cn('text-xs font-medium', config.className)}>
       {config.label}
     </Badge>
   );

@@ -16,8 +16,11 @@
     "pipeline:embed": "pnpm --filter pipeline embed"
   },
   "devDependencies": {
-    "turbo": "^2.4.0",
-    "prettier": "^3.4.0"
+    "prettier": "^3.4.0",
+    "turbo": "^2.4.0"
   },
-  "packageManager": "pnpm@11.9.0"
+  "packageManager": "pnpm@11.9.0",
+  "dependencies": {
+    "lucide-react": "^1.24.0"
+  }
 }

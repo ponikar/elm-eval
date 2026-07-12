@@ -1,7 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle, Separator } from "@repo/ui";
-import { SeverityBadge } from "./severity-badge";
-import { ReviewStatusBadge } from "./review-status-badge";
-import { CategoryBadge } from "./category-badge";
+import { Card, CardContent, CardHeader, CardTitle, Separator } from '@repo/ui';
+import { SeverityBadge } from './severity-badge';
+import { ReviewStatusBadge } from './review-status-badge';
+import { CategoryBadge } from './category-badge';
+import { FileText, Scale, AlertTriangle, Clock, CheckCircle, User } from 'lucide-react';
 
 interface FindingDetailProps {
   finding: {
@@ -40,57 +41,78 @@ export function FindingDetail({ finding }: FindingDetailProps) {
             <SeverityBadge severity={finding.severity as never} />
           </div>
 
-          <p className="text-sm text-muted-foreground">{finding.description}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{finding.description}</p>
 
           <Separator />
 
           <div>
-            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">
+            <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground">
+              <FileText className="h-3 w-3" />
               Audit Evidence
             </h4>
-            <div className="rounded-md bg-muted p-3 text-sm">
-              <span className="text-xs text-muted-foreground">
+            <div className="rounded-lg border bg-muted/50 p-3">
+              <span className="text-[11px] font-medium text-muted-foreground/70">
                 Page {finding.auditEvidence.pageNumber}
               </span>
-              <p className="mt-1 italic">&ldquo;{finding.auditEvidence.quote}&rdquo;</p>
+              <p className="mt-1 text-sm italic leading-relaxed">
+                &ldquo;{finding.auditEvidence.quote}&rdquo;
+              </p>
             </div>
           </div>
 
           <div>
-            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">
+            <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground">
+              <Scale className="h-3 w-3" />
               Applicable Rule
             </h4>
-            <p className="text-sm">
-              {finding.applicableRule.ruleId} (v{finding.applicableRule.rulebookVersion})
-            </p>
+            <div className="flex items-center gap-2">
+              <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium">
+                {finding.applicableRule.ruleId}
+              </code>
+              <span className="text-xs text-muted-foreground">
+                v{finding.applicableRule.rulebookVersion}
+              </span>
+            </div>
           </div>
 
           <Separator />
 
           <div>
-            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">
+            <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground">
+              <AlertTriangle className="h-3 w-3" />
               Corrective Action
             </h4>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-3 rounded-lg border p-4">
               <div>
-                <span className="font-medium">Action:</span>{" "}
-                {finding.correctiveAction.action}
+                <p className="text-[11px] font-medium text-muted-foreground/70">Action</p>
+                <p className="text-sm">{finding.correctiveAction.action}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground/70">
+                    <User className="h-3 w-3" />
+                    Owner
+                  </p>
+                  <p className="text-sm">{finding.correctiveAction.ownerRole}</p>
+                </div>
+                <div>
+                  <p className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground/70">
+                    <Clock className="h-3 w-3" />
+                    Deadline
+                  </p>
+                  <p className="text-sm">{finding.correctiveAction.deadlineDays} days</p>
+                </div>
               </div>
               <div>
-                <span className="font-medium">Owner:</span>{" "}
-                {finding.correctiveAction.ownerRole}
+                <p className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground/70">
+                  <CheckCircle className="h-3 w-3" />
+                  Verification
+                </p>
+                <p className="text-sm">{finding.correctiveAction.verificationMethod}</p>
               </div>
               <div>
-                <span className="font-medium">Deadline:</span>{" "}
-                {finding.correctiveAction.deadlineDays} days
-              </div>
-              <div>
-                <span className="font-medium">Verification:</span>{" "}
-                {finding.correctiveAction.verificationMethod}
-              </div>
-              <div>
-                <span className="font-medium">Priority:</span>{" "}
-                {finding.correctiveAction.priority}
+                <p className="text-[11px] font-medium text-muted-foreground/70">Priority</p>
+                <p className="text-sm font-medium">{finding.correctiveAction.priority}</p>
               </div>
             </div>
           </div>
