@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@repo/ui';
-import { ChevronRight, Moon, PanelLeft, Sun } from 'lucide-react';
+import { ChevronRight, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -39,7 +39,7 @@ function Breadcrumbs() {
   if (segments.length === 0) return null;
 
   const crumbs = segments.map((segment, index) => {
-    const href = '/' + segments.slice(0, index + 1).join('/');
+    const href = `/${segments.slice(0, index + 1).join('/')}`;
     const label = segment.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
     return { href, label };
   });

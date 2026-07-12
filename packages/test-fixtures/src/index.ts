@@ -7,7 +7,6 @@ import type {
   AuditStandard,
   ComplianceRule,
   EvalCase,
-  FindingCategory,
   Rulebook,
   SupplierAudit,
 } from '@repo/domain';

@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@repo/ui';
-import { Bot, Clock, RotateCcw, Timer, Zap } from 'lucide-react';
+import { Bot, RotateCcw, Timer, Zap } from 'lucide-react';
 import { DashboardHeader } from '@/components/dashboard-header';
 import { trpc } from '@/trpc/react';
 

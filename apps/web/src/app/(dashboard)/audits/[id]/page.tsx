@@ -76,6 +76,7 @@ export default function AuditDetailPage() {
             <div className="flex flex-1 flex-col overflow-hidden">
               <div className="border-b px-6 py-3">
                 <button
+                  type="button"
                   onClick={() => setSelectedFindingId(null)}
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
