@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
+    "embed": "tsx src/embed.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
@@ -17,6 +18,9 @@
     "@repo/db": "workspace:*",
     "@repo/agent": "workspace:*",
     "@repo/evals": "workspace:*",
+    "@repo/documents": "workspace:*",
+    "@repo/retrieval": "workspace:*",
+    "@repo/test-fixtures": "workspace:*",
     "zod": "^3.24.0"
   },
   "devDependencies": {

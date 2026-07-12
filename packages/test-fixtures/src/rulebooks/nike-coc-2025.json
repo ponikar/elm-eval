@@ -1,0 +1,263 @@
+[
+  {
+    "id": "NIKE-R-001",
+    "sectionId": "R-1.1",
+    "sectionTitle": "Respected — Freedom of Association",
+    "category": "ETHICS",
+    "requirementText": "All suppliers must respect workers' rights to freedom of association, including the right to form and join trade unions of their own choosing and to bargain collectively without interference.",
+    "sourcePage": 1,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Interference with union activity",
+        "Retaliation against union members",
+        "No freedom of association policy"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-R-002",
+    "sectionId": "R-1.2",
+    "sectionTitle": "Respected — No Forced Labor",
+    "category": "FORCED_LABOR",
+    "requirementText": "Suppliers must not use forced, bonded, indentured, involuntary prison labor, slavery, or human trafficking. Workers must be free to leave employment with reasonable notice without penalty.",
+    "sourcePage": 1,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": [
+        "Any evidence of forced labor",
+        "Passport retention",
+        "Debt bondage",
+        "Movement restrictions"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-R-003",
+    "sectionId": "R-1.3",
+    "sectionTitle": "Respected — No Child Labor",
+    "category": "CHILD_LABOR",
+    "requirementText": "Suppliers must not employ any person younger than 15 or the local minimum working age, whichever is higher. Workers under 18 must not perform hazardous work.",
+    "sourcePage": 1,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": [
+        "Workers under minimum age",
+        "Under-18 in hazardous work",
+        "No age verification"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-R-004",
+    "sectionId": "R-1.4",
+    "sectionTitle": "Respected — Working Hours",
+    "category": "WORKING_HOURS",
+    "requirementText": "Regular working hours must not exceed 60 hours per week (including overtime). Workers must receive at least one day off per seven-day period. All overtime must be voluntary and compensated at legally required rates.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Hours exceeding 60/week regularly",
+        "Mandatory overtime",
+        "Less than 1 day off per 7 days"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-R-005",
+    "sectionId": "R-1.5",
+    "sectionTitle": "Respected — Wages and Benefits",
+    "category": "WAGES_AND_BENEFITS",
+    "requirementText": "Wages must meet or exceed local legal minimum. Pay must be transparent, with clear documentation of calculation methods. Workers must receive legally mandated benefits.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": ["Below minimum wage", "Opaque pay calculations", "Missing benefits"]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-R-006",
+    "sectionId": "R-1.6",
+    "sectionTitle": "Respected — Harassment and Abuse",
+    "category": "ETHICS",
+    "requirementText": "Workers must not be subject to physical abuse, verbal abuse, sexual harassment, intimidation, or any other form of physical, sexual, psychological, or verbal harassment or abuse.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": ["Physical abuse", "Sexual harassment", "Systematic intimidation"]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-R-007",
+    "sectionId": "R-1.7",
+    "sectionTitle": "Respected — Non-Discrimination",
+    "category": "ETHICS",
+    "requirementText": "Employment decisions must be based on merit and ability to perform. Workers must not be discriminated against based on race, color, age, gender, sexual orientation, gender identity, ethnicity, religion, disability, or other protected characteristics.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Systematic discrimination",
+        "Discriminatory hiring practices",
+        "Unequal pay for equal work"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-F-001",
+    "sectionId": "F-1.1",
+    "sectionTitle": "Fair — Health and Safety",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "Suppliers must provide a safe and healthy working environment. Emergency preparedness plans must be documented and drills conducted at least quarterly. All emergency exits must remain unobstructed.",
+    "sourcePage": 3,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": [
+        "Blocked emergency exits",
+        "No emergency plan",
+        "No safety training",
+        "Inadequate PPE"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-F-002",
+    "sectionId": "F-1.2",
+    "sectionTitle": "Fair — Chemical Management",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "Suppliers must maintain current Safety Data Sheets for all chemicals. Chemical storage and handling must comply with applicable regulations. Workers must be trained on chemical hazards and PPE requirements.",
+    "sourcePage": 3,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Expired or missing SDS",
+        "Improper chemical storage",
+        "No chemical safety training"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-F-003",
+    "sectionId": "F-1.3",
+    "sectionTitle": "Fair — Environmental Compliance",
+    "category": "ENVIRONMENT",
+    "requirementText": "Suppliers must maintain all required environmental permits and comply with permit conditions. Air emissions, wastewater discharge, and hazardous waste must meet or exceed applicable regulations.",
+    "sourcePage": 3,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Expired permits",
+        "Emissions above limits",
+        "Improper waste disposal"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-F-004",
+    "sectionId": "F-1.4",
+    "sectionTitle": "Fair — Grievance Mechanisms",
+    "category": "MANAGEMENT_SYSTEM",
+    "requirementText": "Suppliers must provide accessible, confidential grievance mechanisms in languages spoken by the workforce. Complaints must be investigated and resolved without retaliation.",
+    "sourcePage": 4,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "No grievance mechanism",
+        "Not in worker languages",
+        "Retaliation against complainants",
+        "No complaint resolution evidence"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-S-001",
+    "sectionId": "S-1.1",
+    "sectionTitle": "Sustainable — Environmental Management",
+    "category": "ENVIRONMENT",
+    "requirementText": "Suppliers must implement environmental management systems. Energy and water consumption must be monitored. Waste reduction and recycling programs must be established.",
+    "sourcePage": 4,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "No environmental management system",
+        "No consumption monitoring",
+        "No waste reduction program"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-S-002",
+    "sectionId": "S-1.2",
+    "sectionTitle": "Sustainable — Greenhouse Gas Emissions",
+    "category": "ENVIRONMENT",
+    "requirementText": "Suppliers must measure and report greenhouse gas emissions. Emission reduction targets must be established and tracked. Energy efficiency improvements must be pursued.",
+    "sourcePage": 4,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "No GHG measurement",
+        "No reduction targets",
+        "Significant year-over-year increases"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-S-003",
+    "sectionId": "S-1.3",
+    "sectionTitle": "Sustainable — Water Stewardship",
+    "category": "ENVIRONMENT",
+    "requirementText": "Water use must be monitored and reduced where possible. Wastewater must be treated before discharge. Water quality testing must be conducted per permit requirements.",
+    "sourcePage": 4,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": ["No water monitoring", "Untreated discharge", "Permit exceedance"]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  },
+  {
+    "id": "NIKE-S-004",
+    "sectionId": "S-1.4",
+    "sectionTitle": "Sustainable — Management Systems",
+    "category": "MANAGEMENT_SYSTEM",
+    "requirementText": "Suppliers must establish and maintain management systems for social and environmental compliance. Internal audits must be conducted at least annually. Previous findings must be tracked to closure.",
+    "sourcePage": 5,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "No management system",
+        "No internal audits",
+        "Unresolved previous findings"
+      ]
+    },
+    "rulebookId": "nike-coc-2025",
+    "rulebookVersion": "2025"
+  }
+]

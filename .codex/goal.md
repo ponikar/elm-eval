@@ -47,18 +47,18 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 
 ### Subgoals
 
-| ID    | Ticket                             | Owner    | Status      | Branch | Worktree | Next Action                        |
-| ----- | ---------------------------------- | -------- | ----------- | ------ | -------- | ---------------------------------- |
-| T-001 | Monorepo scaffold                  | opencode | COMPLETE    | main   | main     | Done                               |
-| T-002 | Domain schemas + seed data         | opencode | IN PROGRESS | main   | main     | Create Zod schemas + seed fixtures |
-| T-002c| Schema alignment to PRD            | opencode | COMPLETE    | feat/schema-alignment | — | Align domain schemas with PRD types |
-| T-009 | Pre-seeded documentation pipeline  | opencode | IN PROGRESS | feat/pre-seed-pipeline | — | Gemini extraction + fixtures + DB schema |
-| T-003 | Agent pipeline                     | opencode | planned     | —      | —        | Implement pipeline stages          |
-| T-004 | Audit review UI                    | opencode | planned     | —      | —        | Build split-view workspace         |
-| T-005 | Human correction loop              | opencode | planned     | —      | —        | Correction → regression test       |
-| T-006 | Evaluation engine                  | opencode | planned     | —      | —        | Run suite + graders                |
-| T-007 | Version comparison + quality gates | opencode | planned     | —      | —        | Comparison dashboard + gates       |
-| T-008 | Trace viewer + demo validation     | opencode | planned     | —      | —        | Trace UI + end-to-end verify       |
+| ID     | Ticket                             | Owner    | Status      | Branch                 | Worktree | Next Action                              |
+| ------ | ---------------------------------- | -------- | ----------- | ---------------------- | -------- | ---------------------------------------- |
+| T-001  | Monorepo scaffold                  | opencode | COMPLETE    | main                   | main     | Done                                     |
+| T-002  | Domain schemas + seed data         | opencode | IN PROGRESS | main                   | main     | Create Zod schemas + seed fixtures       |
+| T-002c | Schema alignment to PRD            | opencode | COMPLETE    | feat/schema-alignment  | —        | Align domain schemas with PRD types      |
+| T-009  | Pre-seeded documentation pipeline  | opencode | IN PROGRESS | feat/pre-seed-pipeline | —        | Gemini extraction + fixtures + DB schema |
+| T-003  | Agent pipeline                     | opencode | planned     | —                      | —        | Implement pipeline stages                |
+| T-004  | Audit review UI                    | opencode | planned     | —                      | —        | Build split-view workspace               |
+| T-005  | Human correction loop              | opencode | planned     | —                      | —        | Correction → regression test             |
+| T-006  | Evaluation engine                  | opencode | planned     | —                      | —        | Run suite + graders                      |
+| T-007  | Version comparison + quality gates | opencode | planned     | —                      | —        | Comparison dashboard + gates             |
+| T-008  | Trace viewer + demo validation     | opencode | planned     | —                      | —        | Trace UI + end-to-end verify             |
 
 ### Decisions
 

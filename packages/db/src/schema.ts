@@ -1,6 +1,8 @@
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
+// ─── Core audit tables ───────────────────────────────────────────────────────
+
 export const supplierAudit = sqliteTable('supplier_audit', {
   id: text('id').primaryKey(),
   supplierName: text('supplier_name').notNull(),
@@ -20,10 +22,26 @@ export const auditPage = sqliteTable('audit_page', {
     .references(() => supplierAudit.id, { onDelete: 'cascade' }),
   pageNumber: integer('page_number').notNull(),
   text: text('text').notNull(),
+  normalizedText: text('normalized_text'),
+  extractionStatus: text('extraction_status').notNull().default('PENDING'),
+  parserVersion: text('parser_version'),
+});
+
+// ─── Rulebook tables ─────────────────────────────────────────────────────────
+
+export const sourceDocument = sqliteTable('source_document', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  type: text('type').notNull(),
+  version: text('version'),
+  language: text('language').notNull().default('en'),
+  filePath: text('file_path'),
+  createdAt: text('created_at').notNull(),
 });
 
 export const rulebook = sqliteTable('rulebook', {
   id: text('id').primaryKey(),
+  sourceDocumentId: text('source_document_id').references(() => sourceDocument.id),
   name: text('name').notNull(),
   version: text('version').notNull(),
   standard: text('standard').notNull(),
@@ -50,6 +68,27 @@ export const complianceRule = sqliteTable('compliance_rule', {
   correctiveActionGuidance: text('corrective_action_guidance'),
 });
 
+export const ruleChunk = sqliteTable('rule_chunk', {
+  id: text('id').primaryKey(),
+  ruleId: text('rule_id')
+    .notNull()
+    .references(() => complianceRule.id, { onDelete: 'cascade' }),
+  rulebookId: text('rulebook_id')
+    .notNull()
+    .references(() => rulebook.id, { onDelete: 'cascade' }),
+  rulebookVersion: text('rulebook_version').notNull(),
+  text: text('text').notNull(),
+  pageNumber: integer('page_number').notNull(),
+  sectionId: text('section_id').notNull(),
+  sectionTitle: text('section_title').notNull(),
+  category: text('category').notNull(),
+  embedding: text('embedding'),
+  embeddingModel: text('embedding_model'),
+  createdAt: text('created_at').notNull(),
+});
+
+// ─── Finding tables ──────────────────────────────────────────────────────────
+
 export const auditFinding = sqliteTable('audit_finding', {
   id: text('id').primaryKey(),
   auditId: text('audit_id')
@@ -73,6 +112,8 @@ export const auditFinding = sqliteTable('audit_finding', {
   updatedAt: text('updated_at').notNull(),
 });
 
+// ─── Agent version ───────────────────────────────────────────────────────────
+
 export const agentVersion = sqliteTable('agent_version', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -89,6 +130,8 @@ export const agentVersion = sqliteTable('agent_version', {
   type: text('type').notNull().default('candidate'),
   createdAt: text('created_at').notNull(),
 });
+
+// ─── Eval tables ─────────────────────────────────────────────────────────────
 
 export const evalCase = sqliteTable('eval_case', {
   id: text('id').primaryKey(),
@@ -157,6 +200,45 @@ export const traceEvent = sqliteTable('trace_event', {
 export const supplierAuditRelations = relations(supplierAudit, ({ many }) => ({
   pages: many(auditPage),
   findings: many(auditFinding),
+}));
+
+export const auditPageRelations = relations(auditPage, ({ one }) => ({
+  audit: one(supplierAudit, {
+    fields: [auditPage.auditId],
+    references: [supplierAudit.id],
+  }),
+}));
+
+export const sourceDocumentRelations = relations(sourceDocument, ({ many }) => ({
+  rulebooks: many(rulebook),
+}));
+
+export const rulebookRelations = relations(rulebook, ({ one, many }) => ({
+  sourceDocument: one(sourceDocument, {
+    fields: [rulebook.sourceDocumentId],
+    references: [sourceDocument.id],
+  }),
+  rules: many(complianceRule),
+  chunks: many(ruleChunk),
+}));
+
+export const complianceRuleRelations = relations(complianceRule, ({ one, many }) => ({
+  rulebook: one(rulebook, {
+    fields: [complianceRule.rulebookId],
+    references: [rulebook.id],
+  }),
+  chunks: many(ruleChunk),
+}));
+
+export const ruleChunkRelations = relations(ruleChunk, ({ one }) => ({
+  rule: one(complianceRule, {
+    fields: [ruleChunk.ruleId],
+    references: [complianceRule.id],
+  }),
+  rulebook: one(rulebook, {
+    fields: [ruleChunk.rulebookId],
+    references: [rulebook.id],
+  }),
 }));
 
 export const auditFindingRelations = relations(auditFinding, ({ one }) => ({

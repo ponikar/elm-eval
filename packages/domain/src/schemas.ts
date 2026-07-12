@@ -1,41 +1,41 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
-export const AuditStandardSchema = z.enum(["RBA", "SLCP", "BSCI", "SMETA", "CUSTOM"]);
+export const AuditStandardSchema = z.enum(['RBA', 'SLCP', 'BSCI', 'SMETA', 'CUSTOM']);
 
 export const FindingCategorySchema = z.enum([
-  "HEALTH_AND_SAFETY",
-  "WORKING_HOURS",
-  "WAGES_AND_BENEFITS",
-  "FORCED_LABOR",
-  "CHILD_LABOR",
-  "ENVIRONMENT",
-  "ETHICS",
-  "MANAGEMENT_SYSTEM",
+  'HEALTH_AND_SAFETY',
+  'WORKING_HOURS',
+  'WAGES_AND_BENEFITS',
+  'FORCED_LABOR',
+  'CHILD_LABOR',
+  'ENVIRONMENT',
+  'ETHICS',
+  'MANAGEMENT_SYSTEM',
 ]);
 
-export const SeveritySchema = z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]);
+export const SeveritySchema = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
 
-export const ReviewStatusSchema = z.enum(["PENDING", "APPROVED", "CORRECTED", "REJECTED"]);
+export const ReviewStatusSchema = z.enum(['PENDING', 'APPROVED', 'CORRECTED', 'REJECTED']);
 
-export const CorrectiveActionPrioritySchema = z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]);
+export const CorrectiveActionPrioritySchema = z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']);
 
 export const FailureTypeSchema = z.enum([
-  "MISSED_FINDING",
-  "FALSE_POSITIVE_FINDING",
-  "WRONG_CATEGORY",
-  "WRONG_SEVERITY",
-  "CRITICAL_UNDERCLASSIFICATION",
-  "INVALID_AUDIT_CITATION",
-  "INVALID_RULE_REFERENCE",
-  "UNSUPPORTED_FINDING",
-  "DUPLICATE_FINDING",
-  "INCOMPLETE_CAP",
-  "IRRELEVANT_CAP",
-  "SCHEMA_ERROR",
-  "MODEL_TIMEOUT",
-  "PIPELINE_ERROR",
+  'MISSED_FINDING',
+  'FALSE_POSITIVE_FINDING',
+  'WRONG_CATEGORY',
+  'WRONG_SEVERITY',
+  'CRITICAL_UNDERCLASSIFICATION',
+  'INVALID_AUDIT_CITATION',
+  'INVALID_RULE_REFERENCE',
+  'UNSUPPORTED_FINDING',
+  'DUPLICATE_FINDING',
+  'INCOMPLETE_CAP',
+  'IRRELEVANT_CAP',
+  'SCHEMA_ERROR',
+  'MODEL_TIMEOUT',
+  'PIPELINE_ERROR',
 ]);
 
 // ─── Shared types ────────────────────────────────────────────────────────────
@@ -128,8 +128,8 @@ export const RulebookSchema = z.object({
   standard: AuditStandardSchema,
   effectiveFrom: z.string(),
   effectiveTo: z.string().optional(),
-  language: z.string().default("en"),
-  indexStatus: z.enum(["PENDING", "INDEXING", "INDEXED", "FAILED"]),
+  language: z.string().default('en'),
+  indexStatus: z.enum(['PENDING', 'INDEXING', 'INDEXED', 'FAILED']),
 });
 
 export const ComplianceRuleSchema = z.object({
@@ -157,6 +157,8 @@ export const RuleChunkSchema = z.object({
     sectionTitle: z.string(),
     category: FindingCategorySchema,
   }),
+  embedding: z.array(z.number()).optional(),
+  embeddingModel: z.string().optional(),
 });
 
 // ─── Agent types ─────────────────────────────────────────────────────────────
@@ -175,7 +177,7 @@ export const AgentVersionSchema = z.object({
   timeoutMs: z.number().int().positive(),
   maxRetries: z.number().int().min(0),
   createdAt: z.string(),
-  type: z.enum(["baseline", "candidate"]),
+  type: z.enum(['baseline', 'candidate']),
 });
 
 // ─── Eval types ──────────────────────────────────────────────────────────────
@@ -199,11 +201,11 @@ export const EvalCaseSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
   category: FindingCategorySchema,
-  criticality: z.enum(["NORMAL", "CRITICAL"]),
+  criticality: z.enum(['NORMAL', 'CRITICAL']),
   input: EvalCaseInputSchema,
   expected: z.array(EvalCaseExpectedSchema),
-  source: z.enum(["HUMAN_CREATED", "HUMAN_CORRECTION", "PRODUCTION_FAILURE", "GENERATED_APPROVED"]),
-  status: z.enum(["DRAFT", "PENDING_REVIEW", "TRUSTED"]),
+  source: z.enum(['HUMAN_CREATED', 'HUMAN_CORRECTION', 'PRODUCTION_FAILURE', 'GENERATED_APPROVED']),
+  status: z.enum(['DRAFT', 'PENDING_REVIEW', 'TRUSTED']),
   parentCaseId: z.string().optional(),
 });
 
@@ -213,7 +215,7 @@ export const EvaluationRunSchema = z.object({
   id: z.string(),
   agentVersionId: z.string(),
   suiteId: z.string(),
-  status: z.enum(["PENDING", "RUNNING", "COMPLETED", "FAILED"]),
+  status: z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']),
   startedAt: z.string(),
   completedAt: z.string().optional(),
 });
@@ -222,7 +224,7 @@ export const TestExecutionSchema = z.object({
   id: z.string(),
   runId: z.string(),
   evalCaseId: z.string(),
-  status: z.enum(["PENDING", "RUNNING", "COMPLETED", "FAILED"]),
+  status: z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']),
   agentOutput: z.string(),
   graderResult: z.string(),
   passed: z.boolean(),
@@ -272,7 +274,7 @@ export const ComparisonResultSchema = z.object({
   regressions: z.array(
     z.object({
       caseName: z.string(),
-      criticality: z.enum(["NORMAL", "CRITICAL"]),
+      criticality: z.enum(['NORMAL', 'CRITICAL']),
       failureType: FailureTypeSchema,
       executionId: z.string(),
     }),
@@ -280,7 +282,7 @@ export const ComparisonResultSchema = z.object({
   improvements: z.array(
     z.object({
       caseName: z.string(),
-      criticality: z.enum(["NORMAL", "CRITICAL"]),
+      criticality: z.enum(['NORMAL', 'CRITICAL']),
       executionId: z.string(),
     }),
   ),

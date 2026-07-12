@@ -1,0 +1,37 @@
+[
+  {
+    "pageNumber": 1,
+    "text": "RBA VAP Audit Report\nSupplier: Shenzhen Textiles Manufacturing Ltd.\nFactory: Shenzhen Textiles Weaving Plant\nAudit Date: November 5-7, 2025\nAudit Standard: RBA Code of Conduct v8.0\nLead Auditor: James Chen\n\nExecutive Summary:\nAudit conducted across 3 production floors with 892 employees. Main findings relate to working hours, chemical safety, and worker grievance mechanisms.\n\nOverall Score: 54% (Minor Non-conformances: 18, Major Non-conformances: 5, Critical: 2)",
+    "normalizedText": "RBA VAP Audit Report\nSupplier: Shenzhen Textiles Manufacturing Ltd.\nFactory: Shenzhen Textiles Weaving Plant\nAudit Date: November 5-7, 2025\nAudit Standard: RBA Code of Conduct v8.0\nLead Auditor: James Chen\n\nExecutive Summary:\nAudit conducted across 3 production floors with 892 employees. Main findings relate to working hours, chemical safety, and worker grievance mechanisms.\n\nOverall Score: 54% (Minor Non-conformances: 18, Major Non-conformances: 5, Critical: 2)",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 2,
+    "text": "Section 3: Health and Safety\n\n3.1 Emergency Preparedness\nFire suppression systems present but quarterly drill schedule not maintained. Last drill recorded June 2025.\n\n3.2 Safety Training\nWorkers on Floor 3 reported no safety training beyond initial orientation. Forklift operators on all floors lacked updated certification.\n\n3.3 PPE\nChemical-resistant gloves provided but compliance rate approximately 45% on Floor 2. Safety glasses compliance 90%.\n\n3.4 Chemical Safety\nMultiple expired Safety Data Sheets found. Acetone SDS expired March 2025. Two additional solvents had SDS dated 2023. Chemical storage area lacked proper ventilation signage.",
+    "normalizedText": "Section 3: Health and Safety\n\n3.1 Emergency Preparedness\nFire suppression systems present but quarterly drill schedule not maintained. Last drill recorded June 2025.\n\n3.2 Safety Training\nWorkers on Floor 3 reported no safety training beyond initial orientation. Forklift operators on all floors lacked updated certification.\n\n3.3 PPE\nChemical-resistant gloves provided but compliance rate approximately 45% on Floor 2. Safety glasses compliance 90%.\n\n3.4 Chemical Safety\nMultiple expired Safety Data Sheets found. Acetone SDS expired March 2025. Two additional solvents had SDS dated 2023. Chemical storage area lacked proper ventilation signage.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 3,
+    "text": "Section 4: Labor\n\n4.1 Working Hours\nSeptember 2025 records show 67 workers worked 72+ hours per week for two consecutive weeks. Night shift workers reported 12-hour shifts with only 30-minute breaks.\n\n4.2 Wages and Benefits\nMinimum wage met. However, overtime calculation methodology not documented. Piece-rate workers on Floor 1 lacked clear wage breakdown.\n\n4.3 Child Labor\nAge verification records incomplete for 14 workers classified as 'apprentices'. Three workers appeared to be under 18 based on personnel photos but had no age documentation.\n\n4.4 Forced Labor\nNo evidence of forced labor identified. Workers retain personal documentation.",
+    "normalizedText": "Section 4: Labor\n\n4.1 Working Hours\nSeptember 2025 records show 67 workers worked 72+ hours per week for two consecutive weeks. Night shift workers reported 12-hour shifts with only 30-minute breaks.\n\n4.2 Wages and Benefits\nMinimum wage met. However, overtime calculation methodology not documented. Piece-rate workers on Floor 1 lacked clear wage breakdown.\n\n4.3 Child Labor\nAge verification records incomplete for 14 workers classified as 'apprentices'. Three workers appeared to be under 18 based on personnel photos but had no age documentation.\n\n4.4 Forced Labor\nNo evidence of forced labor identified. Workers retain personal documentation.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 4,
+    "text": "Section 5: Environment\n\n5.1 Environmental Permits\nWastewater treatment permit expired August 2025. Renewal application pending.\n\n5.2 Hazardous Waste\nDye waste disposal manifests incomplete for Q3 2025. Two disposal receipts missing contractor certification numbers.\n\n5.3 Air Emissions\nDyeing operation ventilation system underperforming. Stack test results from 2024 show particulate matter at 85% of permitted limit with increasing trend.\n\n5.4 Water\nWater recycling system operational but maintenance logs show 3-week gap in September 2025.",
+    "normalizedText": "Section 5: Environment\n\n5.1 Environmental Permits\nWastewater treatment permit expired August 2025. Renewal application pending.\n\n5.2 Hazardous Waste\nDye waste disposal manifests incomplete for Q3 2025. Two disposal receipts missing contractor certification numbers.\n\n5.3 Air Emissions\nDyeing operation ventilation system underperforming. Stack test results from 2024 show particulate matter at 85% of permitted limit with increasing trend.\n\n5.4 Water\nWater recycling system operational but maintenance logs show 3-week gap in September 2025.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  },
+  {
+    "pageNumber": 5,
+    "text": "Section 6: Ethics\n\n6.1 Business Integrity\nNo evidence of corruption identified. Gift registry maintained.\n\n6.2 Privacy\nWorker records stored in shared drive accessible to all HR staff without access controls.\n\n6.3 Grievance Mechanisms\nWorker hotline posted in Mandarin only. Vietnamese-speaking workers (estimated 40% of workforce) have no access mechanism. Only 1 complaint recorded in 12 months.\n\nSection 7: Management System\n\n7.1 Documented management system exists. No third-party certifications. Internal audit schedule irregular - last audit conducted 14 months ago.",
+    "normalizedText": "Section 6: Ethics\n\n6.1 Business Integrity\nNo evidence of corruption identified. Gift registry maintained.\n\n6.2 Privacy\nWorker records stored in shared drive accessible to all HR staff without access controls.\n\n6.3 Grievance Mechanisms\nWorker hotline posted in Mandarin only. Vietnamese-speaking workers (estimated 40% of workforce) have no access mechanism. Only 1 complaint recorded in 12 months.\n\nSection 7: Management System\n\n7.1 Documented management system exists. No third-party certifications. Internal audit schedule irregular - last audit conducted 14 months ago.",
+    "extractionStatus": "EXTRACTED",
+    "parserVersion": "1.0.0"
+  }
+]

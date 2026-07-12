@@ -132,3 +132,48 @@ Create PR and merge into main. Then clean up worktree.
 - packages/db/src/schema.ts (72 lines added)
 - packages/evals/src/index.ts (66 lines added)
 - packages/test-fixtures/src/index.ts (713 lines added)
+
+---
+
+## Entry 4 — 2026-07-12T20:10:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-009
+- **Branch:** feat/pre-seed-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-merge
+- **Status:** IN PROGRESS
+- **Scope:** Merge feat/pre-seed-pipeline with main (T-002c schema alignment)
+
+### Completed
+
+- Resolved schema conflict in `packages/db/src/schema.ts` — took T-002c's PRD-aligned base, added `sourceDocument` + `ruleChunk` tables, enriched `auditPage`, kept `traceEvent`
+- Resolved domain schemas conflict — took their PRD-aligned types, added `embedding` + `embeddingModel` to `RuleChunkSchema`
+- Resolved test-fixtures conflict — took their version, added rulebook fixture loaders
+- Updated `packages/retrieval/src/chunk-builder.ts` to match PRD's `RuleChunk` type (text, pageNumber, metadata, rulebookVersion, embeddingModel)
+- Updated `packages/retrieval/src/rule-searcher.ts` to use `c.text` instead of `c.chunkText`
+- Resolved `.codex/codemap.md` conflict
+- Fixed `apps/pipeline/src/index.ts` and `apps/pipeline/src/embed.ts` for new API
+- Patched rulebook fixture JSONs with `rulebookId` + `rulebookVersion` fields
+- Added `@types/node` to `@repo/agent`, `@repo/evals`, `@repo/ui` packages
+- Ran `pnpm format` to fix formatting
+
+### Validation
+
+- turbo typecheck: PASS (10/10 packages)
+- turbo build: PASS (Next.js compiles)
+- pnpm format: PASS (after formatting)
+- Pipeline dry-run: PASS (3 audits, 2 rulebooks, 35 chunks, 7ms)
+
+### Pending
+
+- Commit merge resolution
+- Push to origin/feat/pre-seed-pipeline
+- Create PR
+
+### Blockers
+
+None.
+
+### Next Step
+
+Commit and push. Create PR.

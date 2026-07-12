@@ -1,5 +1,5 @@
 {
-  "name": "@repo/evals",
+  "name": "@repo/retrieval",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,16 +11,17 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "eslint . --max-warnings=0",
-    "clean": "rm -rf node_modules .turbo"
+    "lint": "eslint . --max-warnings=0"
   },
   "dependencies": {
+    "@google/genai": "^1.0.0",
     "@repo/domain": "workspace:*",
-    "zod": "^3.24.0"
+    "@t3-oss/env-core": "^0.13.11",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^22.20.1",
+    "@types/node": "^22.0.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }

@@ -1,0 +1,346 @@
+[
+  {
+    "id": "RULE-2.1-1",
+    "sectionId": "2.1",
+    "sectionTitle": "Freely Chosen Employment",
+    "category": "FORCED_LABOR",
+    "requirementText": "Workers must not be subjected to forced, bonded, indentured, involuntary prison labor, slavery or human trafficking. All employment must be voluntary.",
+    "sourcePage": 1,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": [
+        "Any evidence of forced labor",
+        "Retention of identity documents",
+        "Debt bondage or recruitment fees"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-2.2-1",
+    "sectionId": "2.2",
+    "sectionTitle": "Child Labor",
+    "category": "CHILD_LABOR",
+    "requirementText": "Child labor is prohibited. Workers must be at least the age of 15 or the local minimum working age, whichever is higher.",
+    "sourcePage": 1,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": ["Workers under 15", "Workers under 18 in hazardous work"]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-2.3-1",
+    "sectionId": "2.3",
+    "sectionTitle": "Working Hours",
+    "category": "WORKING_HOURS",
+    "requirementText": "Working hours must comply with local laws and not exceed 60 hours per week including overtime. Workers must receive at least one day off per seven-day period.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Regular exceedance of 60 hours/week",
+        "Less than 1 day off per 7 days",
+        "Mandatory overtime without worker consent"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-2.4-1",
+    "sectionId": "2.4",
+    "sectionTitle": "Wages and Benefits",
+    "category": "WAGES_AND_BENEFITS",
+    "requirementText": "Wages paid must meet or exceed local legal minimum wage. Wage records must be accurate and maintained for all workers including temporary and contract workers.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Wages below legal minimum",
+        "Incomplete wage records",
+        "Unauthorized wage deductions"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-2.5-1",
+    "sectionId": "2.5",
+    "sectionTitle": "Humane Treatment",
+    "category": "ETHICS",
+    "requirementText": "Workers must not be subjected to harsh or inhumane treatment including any form of physical abuse, sexual harassment, verbal abuse, psychological coercion, or other forms of intimidation.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": ["Physical abuse", "Sexual harassment", "Systematic verbal abuse"]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-2.6-1",
+    "sectionId": "2.6",
+    "sectionTitle": "Non-Discrimination",
+    "category": "ETHICS",
+    "requirementText": "Employment decisions must be based on ability to perform job requirements, not personal characteristics. Workers must not be discriminated against based on race, color, age, gender, sexual orientation, gender identity, ethnicity, religion, disability, union membership, political affiliation, marital status, or national origin.",
+    "sourcePage": 2,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Systematic exclusion of protected groups",
+        "Discriminatory pay practices"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-3.1-1",
+    "sectionId": "3.1",
+    "sectionTitle": "Emergency Preparedness",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "Emergency procedures and response plans must be established, documented, and communicated to all workers. Emergency drills must be conducted at least quarterly.",
+    "sourcePage": 3,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "No emergency plan documented",
+        "No drills conducted in 12 months",
+        "Emergency exits blocked"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-3.2-1",
+    "sectionId": "3.2",
+    "sectionTitle": "Safety Training",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "All workers must receive comprehensive safety training upon hiring and refresher training at least annually. Job-specific safety training must be provided for high-risk roles.",
+    "sourcePage": 3,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "No safety training program",
+        "High-risk workers untrained",
+        "No refresher training"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-3.3-1",
+    "sectionId": "3.3",
+    "sectionTitle": "Personal Protective Equipment",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "Appropriate PPE must be provided at no cost to workers. PPE must be maintained and workers must be trained on proper use. Compliance must be monitored and enforced.",
+    "sourcePage": 3,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": ["PPE not provided", "PPE compliance below 80%", "No PPE training"]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-3.4-1",
+    "sectionId": "3.4",
+    "sectionTitle": "Chemical Safety",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "Safety Data Sheets must be current, accessible, and in local languages for all chemicals used. Expired SDS must be replaced within 30 days. Chemical storage must comply with applicable regulations.",
+    "sourcePage": 3,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Expired SDS for hazardous chemicals",
+        "SDS missing for any chemical",
+        "Improper chemical storage"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-3.5-1",
+    "sectionId": "3.5",
+    "sectionTitle": "Emergency Exits and Evacuation",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "All emergency exits must remain unobstructed at all times. Exit pathways must maintain a minimum clear width of 80cm. Emergency exit signage must be illuminated and visible. Exit doors must open freely and not require special tools or knowledge to operate.",
+    "sourcePage": 4,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": [
+        "Emergency exit physically blocked",
+        "Exit width below 80cm minimum",
+        "Exit signage missing",
+        "Exit door mechanism defective"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-3.6-1",
+    "sectionId": "3.6",
+    "sectionTitle": "First Aid and Medical Services",
+    "category": "HEALTH_AND_SAFETY",
+    "requirementText": "First aid supplies must be readily available and accessible. At least one trained first aid responder must be present during all working shifts. Emergency contact information must be posted visibly.",
+    "sourcePage": 4,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "No first aid supplies",
+        "No trained first aid responders",
+        "Emergency contacts not posted"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-4.1-1",
+    "sectionId": "4.1",
+    "sectionTitle": "Environmental Permits",
+    "category": "ENVIRONMENT",
+    "requirementText": "All required environmental permits and registrations must be current and maintained. Operations must comply with permit conditions.",
+    "sourcePage": 5,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": ["Expired environmental permit", "Operations beyond permit scope"]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-4.2-1",
+    "sectionId": "4.2",
+    "sectionTitle": "Hazardous Waste Management",
+    "category": "ENVIRONMENT",
+    "requirementText": "Hazardous waste must be identified, tracked, and disposed of through licensed contractors. Waste manifests must be maintained and complete. Waste must not be stored on-site beyond regulatory limits (typically 90 days).",
+    "sourcePage": 5,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Incomplete waste manifests",
+        "Waste stored beyond limits",
+        "Unlicensed disposal contractor"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-4.3-1",
+    "sectionId": "4.3",
+    "sectionTitle": "Air Emissions",
+    "category": "ENVIRONMENT",
+    "requirementText": "Air emissions must comply with applicable regulations. Emission monitoring must be conducted per permit requirements. Workers must not be exposed to concentrations exceeding occupational exposure limits.",
+    "sourcePage": 5,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "Emissions exceed permit limits",
+        "OEL exceedance for workers",
+        "No monitoring conducted"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-5.1-1",
+    "sectionId": "5.1",
+    "sectionTitle": "Business Integrity",
+    "category": "ETHICS",
+    "requirementText": "All business dealings must be free from corruption, bribery, extortion, or embezzlement. Gifts and entertainment must comply with anti-corruption policies and be documented.",
+    "sourcePage": 6,
+    "severityGuidance": {
+      "defaultSeverity": "CRITICAL",
+      "escalationConditions": [
+        "Evidence of bribery",
+        "Undisclosed gifts above threshold",
+        "Kickbacks or embezzlement"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-5.2-1",
+    "sectionId": "5.2",
+    "sectionTitle": "Privacy and Data Protection",
+    "category": "ETHICS",
+    "requirementText": "Worker personal information must be collected, stored, and processed with appropriate security measures. Access must be limited to authorized personnel. Workers must provide informed consent for data collection.",
+    "sourcePage": 6,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "No access controls on personal data",
+        "Data shared without consent",
+        "Biometric data collected without consent"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-6.1-1",
+    "sectionId": "6.1",
+    "sectionTitle": "Management System",
+    "category": "MANAGEMENT_SYSTEM",
+    "requirementText": "A documented management system must be established to ensure compliance with the Code of Conduct. Management must designate a representative responsible for implementation.",
+    "sourcePage": 7,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "No documented management system",
+        "No designated compliance representative"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-6.2-1",
+    "sectionId": "6.2",
+    "sectionTitle": "Grievance Mechanisms",
+    "category": "MANAGEMENT_SYSTEM",
+    "requirementText": "Workers must have access to confidential grievance mechanisms. Mechanisms must be accessible in languages spoken by the workforce. Complaints must be investigated and resolved in a timely manner.",
+    "sourcePage": 7,
+    "severityGuidance": {
+      "defaultSeverity": "HIGH",
+      "escalationConditions": [
+        "No grievance mechanism available",
+        "Mechanism not in worker languages",
+        "No evidence of complaint resolution",
+        "Retaliation against complainants"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  },
+  {
+    "id": "RULE-6.3-1",
+    "sectionId": "6.3",
+    "sectionTitle": "Corrective Action and Continuous Improvement",
+    "category": "MANAGEMENT_SYSTEM",
+    "requirementText": "Non-conformances must be identified, documented, and corrected within defined timelines. Corrective actions must address root causes. Previous audit findings must be tracked to closure.",
+    "sourcePage": 7,
+    "severityGuidance": {
+      "defaultSeverity": "MEDIUM",
+      "escalationConditions": [
+        "Previous findings not addressed",
+        "No corrective action tracking system",
+        "Repeated non-conformances"
+      ]
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
+  }
+]
