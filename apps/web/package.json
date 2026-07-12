@@ -12,21 +12,33 @@
     "clean": "rm -rf dist .next node_modules .turbo"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@repo/db": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "@repo/test-fixtures": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.101.2",
+    "@trpc/client": "^11.13.0",
+    "@trpc/next": "^11.13.0",
+    "@trpc/react-query": "^11.13.0",
+    "@trpc/server": "^11.13.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@repo/domain": "workspace:*",
-    "@repo/db": "workspace:*",
-    "@repo/ui": "workspace:*"
+    "react-hook-form": "^7.81.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
     "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0",
     "eslint": "^9.0.0",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }
 }
