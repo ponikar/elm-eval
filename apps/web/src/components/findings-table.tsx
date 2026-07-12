@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
-import { SeverityBadge } from "./severity-badge";
-import { ReviewStatusBadge } from "./review-status-badge";
-import { CategoryBadge } from "./category-badge";
+import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui';
+import { SeverityBadge } from './severity-badge';
+import { ReviewStatusBadge } from './review-status-badge';
+import { CategoryBadge } from './category-badge';
 
 interface Finding {
   id: string;
@@ -38,14 +38,9 @@ export function FindingsTable({ findings, selectedId, onSelect }: FindingsTableP
           <TableRow
             key={finding.id}
             onClick={() => onSelect?.(finding.id)}
-            className={cn(
-              "cursor-pointer",
-              selectedId === finding.id && "bg-accent"
-            )}
+            className={cn('cursor-pointer', selectedId === finding.id && 'bg-accent')}
           >
-            <TableCell className="font-medium max-w-[200px] truncate">
-              {finding.title}
-            </TableCell>
+            <TableCell className="font-medium max-w-[200px] truncate">{finding.title}</TableCell>
             <TableCell>
               <CategoryBadge category={finding.category as never} />
             </TableCell>

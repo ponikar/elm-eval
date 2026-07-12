@@ -1,5 +1,5 @@
-import { initTRPC } from "@trpc/server";
-import { ZodError } from "zod";
+import { initTRPC } from '@trpc/server';
+import { ZodError } from 'zod';
 
 export async function createTRPCContext() {
   return {};
@@ -13,8 +13,7 @@ const t = initTRPC.context<Context>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },

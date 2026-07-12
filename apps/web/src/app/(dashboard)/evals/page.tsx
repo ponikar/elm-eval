@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { trpc } from "@/trpc/react";
-import { PageHeader } from "@/components/page-header";
-import { CategoryBadge } from "@/components/category-badge";
-import { SeverityBadge } from "@/components/severity-badge";
+import { trpc } from '@/trpc/react';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { CategoryBadge } from '@/components/category-badge';
+import { SeverityBadge } from '@/components/severity-badge';
 import {
   Card,
   CardContent,
@@ -20,38 +20,50 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@repo/ui";
+  Skeleton,
+} from '@repo/ui';
+import { FlaskConical, ShieldCheck, Clock, FileEdit } from 'lucide-react';
 
 function CriticalityBadge({ criticality }: { criticality: string }) {
   return (
-    <Badge
-      variant={criticality === "CRITICAL" ? "destructive" : "secondary"}
-      className="text-xs"
-    >
+    <Badge variant={criticality === 'CRITICAL' ? 'destructive' : 'secondary'} className="text-xs">
       {criticality}
     </Badge>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, string> = {
-    TRUSTED: "bg-green-100 text-green-800 border-green-200",
-    PENDING_REVIEW: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    DRAFT: "bg-gray-100 text-gray-800 border-gray-200",
+  const map: Record<string, { className: string; label: string }> = {
+    TRUSTED: {
+      className:
+        'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+      label: 'Trusted',
+    },
+    PENDING_REVIEW: {
+      className:
+        'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300',
+      label: 'Pending Review',
+    },
+    DRAFT: {
+      className: '',
+      label: 'Draft',
+    },
   };
+  const fallback = { className: '', label: status };
+  const config = map[status] ?? fallback;
   return (
-    <Badge variant="outline" className={`text-xs ${config[status] ?? ""}`}>
-      {status.replace("_", " ")}
+    <Badge variant="outline" className={`text-xs ${config.className}`}>
+      {config.label}
     </Badge>
   );
 }
 
 function SourceBadge({ source }: { source: string }) {
   const labels: Record<string, string> = {
-    HUMAN_CREATED: "Human",
-    HUMAN_CORRECTION: "Correction",
-    PRODUCTION_FAILURE: "Failure",
-    GENERATED_APPROVED: "Generated",
+    HUMAN_CREATED: 'Human',
+    HUMAN_CORRECTION: 'Correction',
+    PRODUCTION_FAILURE: 'Failure',
+    GENERATED_APPROVED: 'Generated',
   };
   return (
     <Badge variant="outline" className="text-xs">
@@ -60,59 +72,95 @@ function SourceBadge({ source }: { source: string }) {
   );
 }
 
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: number;
+  color: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="flex items-center gap-4 pt-6">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${color}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+        <div>
+          <p className="text-2xl font-bold">{value}</p>
+          <p className="text-xs text-muted-foreground">{label}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function EvalsPage() {
   const evalCases = trpc.evalCase.list.useQuery();
 
-  const trusted = evalCases.data?.filter((c) => c.status === "TRUSTED") ?? [];
-  const pending =
-    evalCases.data?.filter((c) => c.status === "PENDING_REVIEW") ?? [];
-  const draft = evalCases.data?.filter((c) => c.status === "DRAFT") ?? [];
+  const trusted = evalCases.data?.filter((c) => c.status === 'TRUSTED') ?? [];
+  const pending = evalCases.data?.filter((c) => c.status === 'PENDING_REVIEW') ?? [];
+  const draft = evalCases.data?.filter((c) => c.status === 'DRAFT') ?? [];
 
   return (
     <div>
-      <PageHeader
+      <DashboardHeader
         title="Eval Suite"
         description="Trusted evaluation cases for agent quality gates"
       />
-      <div className="p-6">
+      <div className="p-8">
         {evalCases.isLoading ? (
-          <div className="text-sm text-muted-foreground">Loading...</div>
+          <div className="space-y-6">
+            <div className="grid gap-4 sm:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="pt-6">
+                    <Skeleton className="h-8 w-12 mb-2" />
+                    <Skeleton className="h-3 w-20" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-5 w-40" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-64 w-full" />
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           <>
             {/* Summary cards */}
-            <div className="mb-6 grid grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">
-                    {evalCases.data?.length ?? 0}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Total Cases</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-green-600">
-                    {trusted.length}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Trusted</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-yellow-600">
-                    {pending.length}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Pending Review</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-gray-500">
-                    {draft.length}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Draft</p>
-                </CardContent>
-              </Card>
+            <div className="mb-6 grid gap-4 sm:grid-cols-4">
+              <StatCard
+                icon={FlaskConical}
+                label="Total Cases"
+                value={evalCases.data?.length ?? 0}
+                color="bg-muted text-muted-foreground"
+              />
+              <StatCard
+                icon={ShieldCheck}
+                label="Trusted"
+                value={trusted.length}
+                color="bg-emerald-100 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-400"
+              />
+              <StatCard
+                icon={Clock}
+                label="Pending Review"
+                value={pending.length}
+                color="bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400"
+              />
+              <StatCard
+                icon={FileEdit}
+                label="Draft"
+                value={draft.length}
+                color="bg-muted text-muted-foreground"
+              />
             </div>
 
             {/* Cases table with tabs */}
@@ -123,18 +171,10 @@ export default function EvalsPage() {
               <CardContent>
                 <Tabs defaultValue="all">
                   <TabsList>
-                    <TabsTrigger value="all">
-                      All ({evalCases.data?.length ?? 0})
-                    </TabsTrigger>
-                    <TabsTrigger value="trusted">
-                      Trusted ({trusted.length})
-                    </TabsTrigger>
-                    <TabsTrigger value="pending">
-                      Pending ({pending.length})
-                    </TabsTrigger>
-                    <TabsTrigger value="draft">
-                      Draft ({draft.length})
-                    </TabsTrigger>
+                    <TabsTrigger value="all">All ({evalCases.data?.length ?? 0})</TabsTrigger>
+                    <TabsTrigger value="trusted">Trusted ({trusted.length})</TabsTrigger>
+                    <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
+                    <TabsTrigger value="draft">Draft ({draft.length})</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="all">
@@ -169,7 +209,10 @@ function CasesTable({
     criticality: string;
     source: string;
     status: string;
-    expected: Array<{ findingShouldExist: boolean; severity?: string }>;
+    expected: Array<{
+      findingShouldExist: boolean;
+      severity?: string;
+    }>;
   }>;
 }) {
   return (
@@ -195,13 +238,13 @@ function CasesTable({
               <CriticalityBadge criticality={c.criticality} />
             </TableCell>
             <TableCell>
-              <div className="flex gap-1">
+              <div className="flex flex-wrap gap-1">
                 {c.expected.map((exp, i) => (
                   <span key={i} className="text-xs text-muted-foreground">
-                    {exp.findingShouldExist ? "must find" : "must not find"}
+                    {exp.findingShouldExist ? 'must find' : 'must not find'}
                     {exp.severity && (
                       <>
-                        {" "}
+                        {' '}
                         <SeverityBadge severity={exp.severity as never} />
                       </>
                     )}

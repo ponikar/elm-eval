@@ -1,11 +1,6 @@
-import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../init";
-import {
-  SEED_AUDIT,
-  MOCK_FINDINGS,
-  SEED_RULEBOOK,
-  SEED_RULES,
-} from "@repo/test-fixtures";
+import { z } from 'zod';
+import { createTRPCRouter, publicProcedure } from '../init';
+import { SEED_AUDIT, MOCK_FINDINGS, SEED_RULEBOOK, SEED_RULES } from '@repo/test-fixtures';
 
 export const auditRouter = createTRPCRouter({
   list: publicProcedure.query(() => {
@@ -23,19 +18,15 @@ export const auditRouter = createTRPCRouter({
     ];
   }),
 
-  get: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(({ input }) => {
-      if (input.id !== SEED_AUDIT.id) return null;
-      return SEED_AUDIT;
-    }),
+  get: publicProcedure.input(z.object({ id: z.string() })).query(({ input }) => {
+    if (input.id !== SEED_AUDIT.id) return null;
+    return SEED_AUDIT;
+  }),
 
-  getFindings: publicProcedure
-    .input(z.object({ auditId: z.string() }))
-    .query(({ input }) => {
-      if (input.auditId !== SEED_AUDIT.id) return [];
-      return MOCK_FINDINGS;
-    }),
+  getFindings: publicProcedure.input(z.object({ auditId: z.string() })).query(({ input }) => {
+    if (input.auditId !== SEED_AUDIT.id) return [];
+    return MOCK_FINDINGS;
+  }),
 
   getRules: publicProcedure.query(() => {
     return SEED_RULES;

@@ -1,33 +1,33 @@
-import { cn, Badge } from "@repo/ui";
+import { cn, Badge } from '@repo/ui';
 
-type ReviewStatus = "PENDING" | "APPROVED" | "CORRECTED" | "REJECTED";
+type ReviewStatus = 'PENDING' | 'APPROVED' | 'CORRECTED' | 'REJECTED';
 
-const statusConfig: Record<
-  ReviewStatus,
-  { className: string; label: string }
-> = {
+const statusConfig: Record<ReviewStatus, { className: string; label: string }> = {
   PENDING: {
-    className: "bg-gray-100 text-gray-800 border-gray-200",
-    label: "Pending",
+    className: '',
+    label: 'Pending',
   },
   APPROVED: {
-    className: "bg-green-100 text-green-800 border-green-200",
-    label: "Approved",
+    className:
+      'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+    label: 'Approved',
   },
   CORRECTED: {
-    className: "bg-purple-100 text-purple-800 border-purple-200",
-    label: "Corrected",
+    className:
+      'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950 dark:text-violet-300',
+    label: 'Corrected',
   },
   REJECTED: {
-    className: "bg-red-100 text-red-800 border-red-200",
-    label: "Rejected",
+    className:
+      'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300',
+    label: 'Rejected',
   },
 };
 
 export function ReviewStatusBadge({ status }: { status: ReviewStatus }) {
   const config = statusConfig[status] ?? statusConfig.PENDING;
   return (
-    <Badge variant="outline" className={cn("text-xs font-medium", config.className)}>
+    <Badge variant="outline" className={cn('text-xs font-medium', config.className)}>
       {config.label}
     </Badge>
   );

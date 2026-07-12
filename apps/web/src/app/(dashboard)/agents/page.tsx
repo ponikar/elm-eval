@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { trpc } from "@/trpc/react";
-import { PageHeader } from "@/components/page-header";
+import { trpc } from '@/trpc/react';
+import { DashboardHeader } from '@/components/dashboard-header';
 import {
   Card,
   CardContent,
@@ -15,66 +15,87 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/ui";
+  Skeleton,
+} from '@repo/ui';
+import { Bot, Clock, Zap, RotateCcw, Timer } from 'lucide-react';
 
 export default function AgentsPage() {
   const agents = trpc.agentVersion.list.useQuery();
 
   return (
     <div>
-      <PageHeader
+      <DashboardHeader
         title="Agent Versions"
         description="Compare agent configurations and track baseline vs candidate"
       />
-      <div className="p-6">
+      <div className="p-8">
         {agents.isLoading ? (
-          <div className="text-sm text-muted-foreground">Loading...</div>
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-3">
+                      {Array.from({ length: 6 }).map((_, j) => (
+                        <Skeleton key={j} className="h-4 w-20" />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         ) : (
           <div className="space-y-6">
-            {/* Summary cards */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Agent cards */}
+            <div className="grid gap-4 sm:grid-cols-2">
               {agents.data?.map((agent) => (
                 <Card key={agent.id}>
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-base">{agent.name}</CardTitle>
-                        <CardDescription>{agent.model}</CardDescription>
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                          <Bot className="h-4.5 w-4.5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-base">{agent.name}</CardTitle>
+                          <CardDescription>{agent.model}</CardDescription>
+                        </div>
                       </div>
                       <Badge
-                        variant={
-                          agent.type === "baseline" ? "secondary" : "default"
-                        }
+                        variant={agent.type === 'baseline' ? 'secondary' : 'default'}
+                        className="text-xs"
                       >
                         {agent.type}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Prompt v:</span>{" "}
-                        {agent.promptVersion}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Zap className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        <div>
+                          <p className="text-[11px] text-muted-foreground/60">Temperature</p>
+                          <p className="font-medium">{agent.temperature}</p>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">Temperature:</span>{" "}
-                        {agent.temperature}
+                      <div className="flex items-center gap-2 text-sm">
+                        <RotateCcw className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        <div>
+                          <p className="text-[11px] text-muted-foreground/60">Top K</p>
+                          <p className="font-medium">{agent.retrievalTopK}</p>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">Top K:</span>{" "}
-                        {agent.retrievalTopK}
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Timeout:</span>{" "}
-                        {agent.timeoutMs}ms
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Max Retries:</span>{" "}
-                        {agent.maxRetries}
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Schema v:</span>{" "}
-                        {agent.extractionSchemaVersion}
+                      <div className="flex items-center gap-2 text-sm">
+                        <Timer className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        <div>
+                          <p className="text-[11px] text-muted-foreground/60">Timeout</p>
+                          <p className="font-medium">{agent.timeoutMs}ms</p>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -91,71 +112,46 @@ export default function AgentsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Setting</TableHead>
+                      <TableHead className="w-[200px]">Setting</TableHead>
                       {agents.data?.map((agent) => (
                         <TableHead key={agent.id}>{agent.name}</TableHead>
                       ))}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Model</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>{agent.model}</TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Type</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>
-                          <Badge
-                            variant={
-                              agent.type === "baseline" ? "secondary" : "default"
-                            }
-                          >
-                            {agent.type}
-                          </Badge>
+                    {[
+                      { label: 'Model', key: 'model' },
+                      { label: 'Type', key: 'type' },
+                      { label: 'Prompt Version', key: 'promptVersion' },
+                      { label: 'Temperature', key: 'temperature' },
+                      { label: 'Retrieval Top K', key: 'retrievalTopK' },
+                      {
+                        label: 'Rulebook Version',
+                        key: 'rulebookVersionId',
+                      },
+                      { label: 'Timeout (ms)', key: 'timeoutMs' },
+                      { label: 'Max Retries', key: 'maxRetries' },
+                    ].map((row) => (
+                      <TableRow key={row.key}>
+                        <TableCell className="font-medium text-muted-foreground">
+                          {row.label}
                         </TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Prompt Version</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>{agent.promptVersion}</TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Temperature</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>{agent.temperature}</TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Retrieval Top K</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>{agent.retrievalTopK}</TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Rulebook Version</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>
-                          {agent.rulebookVersionId}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Timeout (ms)</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>{agent.timeoutMs}</TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Max Retries</TableCell>
-                      {agents.data?.map((agent) => (
-                        <TableCell key={agent.id}>{agent.maxRetries}</TableCell>
-                      ))}
-                    </TableRow>
+                        {agents.data?.map((agent) => (
+                          <TableCell key={agent.id}>
+                            {row.key === 'type' ? (
+                              <Badge
+                                variant={agent.type === 'baseline' ? 'secondary' : 'default'}
+                                className="text-xs"
+                              >
+                                {String(agent[row.key as keyof typeof agent])}
+                              </Badge>
+                            ) : (
+                              String(agent[row.key as keyof typeof agent])
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </CardContent>
