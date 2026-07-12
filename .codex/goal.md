@@ -56,7 +56,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-002d | UI foundation (Tailwind+shadcn+tRPC) | opencode    | COMPLETE    | feat/ui-polish         | —                                             | Merged in PRs #3 and #5                       |
 | T-009  | Pre-seeded documentation pipeline    | opencode    | COMPLETE    | feat/pre-seed-pipeline | —                                             | Gemini extraction + fixtures + DB schema      |
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
-| T-004  | Audit review UI                      | unassigned  | planned     | —                      | —                                             | Verify fixture flow; add rule/review actions  |
+| T-004  | Audit review UI                      | opencode    | IN PROGRESS | feat/audit-review-ui   | —                                             | Verify fixture flow; add rule/review actions  |
 | T-005  | Human correction loop                | codex       | IN PROGRESS | feat/human-correction-loop | /Users/darshan/work/agent-eval-human-correction | Persist correction → trusted regression test |
 | T-006  | Evaluation engine                    | opencode    | planned     | —                      | —                                             | Run suite + graders                           |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
