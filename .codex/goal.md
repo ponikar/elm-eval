@@ -51,6 +51,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | ----- | ---------------------------------- | -------- | ----------- | ------ | -------- | ---------------------------------- |
 | T-001 | Monorepo scaffold                  | opencode | COMPLETE    | main   | main     | Done                               |
 | T-002 | Domain schemas + seed data         | opencode | IN PROGRESS | main   | main     | Create Zod schemas + seed fixtures |
+| T-009 | Pre-seeded documentation pipeline  | opencode | IN PROGRESS | feat/pre-seed-pipeline | — | Gemini extraction + fixtures + DB schema |
 | T-003 | Agent pipeline                     | opencode | planned     | —      | —        | Implement pipeline stages          |
 | T-004 | Audit review UI                    | opencode | planned     | —      | —        | Build split-view workspace         |
 | T-005 | Human correction loop              | opencode | planned     | —      | —        | Correction → regression test       |

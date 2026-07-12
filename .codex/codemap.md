@@ -46,4 +46,38 @@ Run `pnpm install` and verify the full build pipeline passes.
 
 ### Validation
 
-Pending — pnpm install + turbo pipeline not yet run.
+- pnpm install: PASS
+- turbo typecheck: PASS (8/8 packages)
+- turbo build: PASS (Next.js compiles)
+- pnpm format:check: PASS (after formatting)
+- git push: PASS (origin/main)
+
+### Entry 2 — 2026-07-12T16:25:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-001
+- **Branch:** main
+- **Worktree:** main
+- **Status:** COMPLETE
+- **Scope:** Monorepo scaffold
+
+### Completed
+
+- Prisma removed, Drizzle ORM + better-sqlite3 installed
+- Drizzle schema: 7 tables (supplier_audit, audit_page, audit_finding, agent_version, eval_case, evaluation_run, test_execution) + relations
+- Zod validation schemas for all domain types
+- Commit: e90d164
+- Pushed to git@github.com:ponikar/elm-eval.git
+
+### Pending
+
+- T-002: 10 seed evaluation cases
+- T-003 through T-008
+
+### Blockers
+
+None.
+
+### Next Step
+
+T-002 — Complete 10 seed eval cases in test-fixtures package.
