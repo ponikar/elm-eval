@@ -1,0 +1,21 @@
+{
+  "name": "audit-reliability-lab",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:pipeline": "pnpm --filter pipeline dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "prettier": "^3.4.0"
+  },
+  "packageManager": "pnpm@11.9.0"
+}
