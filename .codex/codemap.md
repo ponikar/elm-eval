@@ -336,6 +336,7 @@ Await user approval to merge PR #3. Then T-004 (audit review UI screens) can beg
 ### PR
 
 https://github.com/ponikar/elm-eval/pull/5
+
 ## Entry 7 — 2026-07-12T12:31:00Z
 
 - **Agent:** codex (coordinator)
@@ -413,3 +414,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** Same pre-existing repository-wide test/lint failures recorded in Entry 10.
 - **Next Step:** After scope decision, repair or accept root validation, rerun final gates, update PR, and merge.
 - **Changed Files and Evidence:** `.codex/codemap.md`; remote branch verified and PR https://github.com/ponikar/elm-eval/pull/4 created.
+
+---
+
+## Entry 12 — 2026-07-12T17:38:51Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** GOAL-001 board reconciliation
+- **Branch:** main
+- **Worktree:** /Users/darshan/work/agent-eval
+- **Status:** COMPLETE
+- **Scope:** Reconcile the canonical goal board with merged code and isolate the active validation repair.
+- **Completed:** Verified `main` equals `origin/main` at `fc0a5a3`; recorded T-002 complete with ten seed cases, T-002d complete via PRs #3/#5, and T-003 complete via PR #4; recorded T-010 as the active lockfile/lint/test repair; clarified remaining T-004 through T-008 product work.
+- **Pending:** T-010 validation handoff, then T-005 correction-to-regression implementation followed by T-006, T-007, and T-008.
+- **Blockers:** T-010 owns the currently modified package manifests and `pnpm-lock.yaml`; other tickets must avoid those paths until handoff.
+- **Next Step:** Finish T-010, record exact clean validation results, then claim T-005 in a dedicated branch/worktree.
+- **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`; evidence from `origin/main`, merged PRs #4/#5, ten `SEED_EVAL_CASES`, agent pipeline tests, current routers/pages, and current DB/domain/eval implementations.
