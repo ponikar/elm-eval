@@ -52,7 +52,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-001  | Monorepo scaffold                  | opencode | COMPLETE    | main                   | main     | Done                                     |
 | T-002  | Domain schemas + seed data         | opencode | IN PROGRESS | main                   | main     | Create Zod schemas + seed fixtures       |
 | T-002c | Schema alignment to PRD            | opencode | COMPLETE    | feat/schema-alignment  | —        | Align domain schemas with PRD types      |
-| T-009  | Pre-seeded documentation pipeline  | opencode | IN PROGRESS | feat/pre-seed-pipeline | —        | Gemini extraction + fixtures + DB schema |
+| T-002d | UI foundation (Tailwind+shadcn+tRPC)| opencode | IN PROGRESS | feat/ui-foundation     | —        | Tailwind + shadcn/ui + tRPC + providers  |
+| T-009  | Pre-seeded documentation pipeline  | opencode | COMPLETE    | feat/pre-seed-pipeline | —        | Gemini extraction + fixtures + DB schema |
 | T-003  | Agent pipeline                     | opencode | planned     | —                      | —        | Implement pipeline stages                |
 | T-004  | Audit review UI                    | opencode | planned     | —                      | —        | Build split-view workspace               |
 | T-005  | Human correction loop              | opencode | planned     | —                      | —        | Correction → regression test             |
@@ -93,6 +94,8 @@ pnpm format:check     # PASS (after formatting)
 - 2026-07-12T16:15:00Z — Drizzle schema created (supplier_audit, audit_page, audit_finding, agent_version, eval_case, evaluation_run, test_execution + relations).
 - 2026-07-12T16:18:00Z — T-001 COMPLETE. turbo typecheck PASS (8/8). turbo build PASS. format PASS.
 - 2026-07-12T18:30:00Z — T-002c COMPLETE. 6 schema fixes + 8 new schemas aligned to PRD. typecheck PASS, build PASS. PR #2 merged.
+- 2026-07-12T20:00:00Z — T-009 COMPLETE. Pre-seeded pipeline merged via PR #1. Documents + retrieval packages added.
+- 2026-07-12T20:15:00Z — T-002d claimed. UI foundation: Tailwind + shadcn/ui + tRPC + TanStack Query + React Hook Form.
 
 ### Blockers
 
@@ -100,5 +103,5 @@ None.
 
 ### Handoff
 
-**Current state:** T-002c complete. All domain schemas aligned with PRD. 24 schemas total (12 original + 8 new + 4 new enums). DB schema updated. 10 seed eval cases, 6 findings, 10 rules, 2 agent versions, 1 rulebook.
-**Next exact action:** T-004 — Build UI foundation (Tailwind + shadcn + tRPC) or T-003 — Agent pipeline implementation.
+**Current state:** T-002c + T-009 complete. All domain schemas aligned with PRD. Pre-seeded pipeline merged. T-002d claimed — building UI foundation.
+**Next exact action:** T-002d — Implement Tailwind + shadcn/ui + tRPC + TanStack Query + React Hook Form in feat/ui-foundation worktree.
