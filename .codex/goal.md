@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-12T17:38:51Z
+**Updated:** 2026-07-12T17:57:55Z
 
 ### Outcome
 
@@ -57,7 +57,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-009  | Pre-seeded documentation pipeline    | opencode    | COMPLETE    | feat/pre-seed-pipeline | —                                             | Gemini extraction + fixtures + DB schema      |
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
 | T-004  | Audit review UI                      | unassigned  | planned     | —                      | —                                             | Verify fixture flow; add rule/review actions  |
-| T-005  | Human correction loop                | opencode    | planned     | —                      | —                                             | Correction → regression test                  |
+| T-005  | Human correction loop                | codex       | IN PROGRESS | feat/human-correction-loop | /Users/darshan/work/agent-eval-human-correction | Persist correction → trusted regression test |
 | T-006  | Evaluation engine                    | opencode    | planned     | —                      | —                                             | Run suite + graders                           |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
@@ -96,6 +96,32 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Started/checkpoint:** 2026-07-12T12:26:38Z / 2026-07-12T12:26:38Z
 - **Status/next action:** COMPLETE — merged by PR #4 at `f7b822d`; focused implementation gates
   passed. Repository-wide lint/test infrastructure is tracked separately in T-010.
+
+### T-005 Assignment
+
+- **Outcome:** A reviewer can approve, reject, or correct a persisted audit finding, and an explicit
+  correction can atomically become a trusted regression case used by future evaluation runs.
+- **Definition of done:** Seed audit data loads idempotently into SQLite; review state survives
+  reloads; corrected evidence and rule references are deterministically validated; original and
+  corrected snapshots persist; conversion creates exactly one trusted `HUMAN_CORRECTION` case;
+  focused and repository validation gates pass without warnings or errors.
+- **Owner:** codex
+- **Branch/worktree:** `feat/human-correction-loop` at
+  `/Users/darshan/work/agent-eval-human-correction`
+- **Owned paths:** correction-specific additions in `packages/domain/**`, `packages/db/**`,
+  `apps/web/src/trpc/routers/**`, audit review components/pages, Drizzle migration files, focused
+  tests, and coordination journal entries. No dependency or validation configuration changes.
+- **Dependencies:** T-002, T-003, T-004 foundation, and T-010 are complete.
+- **Non-goals:** Evaluation execution/grading, agent comparison, quality-gate execution, trace UI,
+  authentication, and generic document ingestion.
+- **Verified assumptions:** SQLite is the MVP source of truth; existing fixtures seed persisted
+  records but are not runtime API responses; explicit “Save as regression test” means human
+  approval and creates a `TRUSTED` case; reviewer identity is out of scope.
+- **Validation:** idempotent seed tests; correction validation/transaction/idempotency tests;
+  router/UI behavior tests where supported; Biome check, strict TypeScript, full tests, and build.
+- **Started/checkpoint:** 2026-07-12T17:57:55Z / 2026-07-12T17:57:55Z
+- **Status/next action:** IN PROGRESS — publish this claim, create and verify the worktree, append
+  assignment acceptance, then implement domain and persistence contracts.
 
 ### Validation Commands
 
@@ -142,6 +168,8 @@ pnpm build                       # PASS (pipeline + Next.js)
   removed fake vitest test scripts from 7 packages, ran `biome check --write` (56+ files
   formatted). Validation: install PASS, format:check PASS (29 warnings), typecheck PASS (10/10),
   test PASS (7/7), build PASS (2/2). Repo-wide validation gate fully operational.
+- 2026-07-12T17:57:55Z — T-005 claimed by codex for the durable correction-to-regression loop in
+  a dedicated worktree, with evaluation execution and comparison explicitly out of scope.
 
 ### Blockers
 
@@ -153,4 +181,5 @@ pnpm build                       # PASS (pipeline + Next.js)
 auditable agent pipeline, the fixture-backed review/eval UI, and a fully operational validation
 gate (Biome replaces ESLint+Prettier). The correction loop, evaluation runner/graders, version
 comparison/gates, and trace viewer remain.
-**Next exact action:** Claim T-005 (human correction to trusted regression case) in a dedicated worktree.
+**Next exact action:** Implement and validate T-005 in its dedicated worktree, push the ticket
+branch, open a PR, then integrate and remove the worktree.
