@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type {
-  AgentVersion,
-  AuditFinding,
-  ComplianceRule,
-  RuleChunk,
-  SupplierAudit,
-} from '@repo/domain';
+import type { AgentVersion, ComplianceRule, RuleChunk, SupplierAudit } from '@repo/domain';
 import type {
   ModelProvider,
   StructuredGenerationRequest,

@@ -333,3 +333,19 @@ Await user approval to merge PR #3. Then T-004 (audit review UI screens) can beg
 - **Blockers:** Root `turbo test` is expected to expose pre-existing packages with no test files; focused T-003 suites pass.
 - **Next Step:** Commit the validated implementation checkpoint, then run format, typecheck, build, focused tests, and lint again.
 - **Changed Files and Evidence:** Agent/domain/db/retrieval/pipeline/fixtures/config/lockfile; focused tests PASS (7/7), affected strict typechecks PASS, migration generation PASS.
+
+---
+
+## Entry 10 — 2026-07-12T12:50:00Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-003
+- **Branch:** feat/agent-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-agent-pipeline
+- **Status:** BLOCKED
+- **Scope:** Final validation and handoff.
+- **Completed:** Implementation committed; format, full typecheck, full build, 7 focused tests, and touched-package lint pass without warnings.
+- **Pending:** Resolve repository-wide validation policy, rerun gates, integrate, and remove worktree.
+- **Blockers:** `pnpm test` fails because untouched packages have no tests; `pnpm lint` fails because untouched documents/evals/ui/web lack ESLint setup. No suppression was added.
+- **Next Step:** Decide whether T-003 may expand to repair root test/lint infrastructure or accept scoped validation.
+- **Changed Files and Evidence:** Commit `36f5a23`; exact results recorded in `.codex/goal.md`.
