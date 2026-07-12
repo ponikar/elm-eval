@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-12T16:20:00Z
+**Updated:** 2026-07-12T12:26:38Z
 
 ### Outcome
 
@@ -43,7 +43,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 
 ### Skills
 
-- No local skills applicable. Standard T3 monorepo pattern.
+- `senior-software-architecture` — selected for T-003 pipeline boundaries, failure modes,
+  idempotency, persistence, and observability design. No repository-local skill is available.
 
 ### Subgoals
 
@@ -54,7 +55,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-002c | Schema alignment to PRD            | opencode | COMPLETE    | feat/schema-alignment  | —        | Align domain schemas with PRD types      |
 | T-002d | UI foundation (Tailwind+shadcn+tRPC)| opencode | IN PROGRESS | feat/ui-foundation     | —        | Tailwind + shadcn/ui + tRPC + providers  |
 | T-009  | Pre-seeded documentation pipeline  | opencode | COMPLETE    | feat/pre-seed-pipeline | —        | Gemini extraction + fixtures + DB schema |
-| T-003  | Agent pipeline                     | opencode | planned     | —                      | —        | Implement pipeline stages                |
+| T-003  | Agent pipeline                     | codex    | IN PROGRESS | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Claim board, create worktree, implement stages |
 | T-004  | Audit review UI                    | opencode | planned     | —                      | —        | Build split-view workspace               |
 | T-005  | Human correction loop              | opencode | planned     | —                      | —        | Correction → regression test             |
 | T-006  | Evaluation engine                  | opencode | planned     | —                      | —        | Run suite + graders                      |
@@ -71,6 +72,29 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | ORM             | Drizzle (not Prisma) | User preference                |
 | TypeScript      | Strict, no `any`     | AGENTS.md requirement          |
 | Formatter       | Prettier             | PRD recommendation             |
+| T-003 model provider | Gemini          | Reuses existing SDK, key, and retrieval integration |
+
+### T-003 Assignment
+
+- **Outcome:** The same auditable agent pipeline used by production audit runs can be invoked by
+  future evaluation runs and returns only evidence/rule-valid structured findings.
+- **Definition of done:** Every audit page is processed; duplicates are merged; retrieval is
+  version-scoped; invalid citations/rules/actions are rejected; valid findings and stage traces
+  persist atomically; focused and repository validation gates pass without warnings.
+- **Owner:** codex
+- **Branch/worktree:** `feat/agent-pipeline` at
+  `/Users/darshan/work/agent-eval-agent-pipeline`
+- **Owned paths:** `packages/agent/**`, `apps/pipeline/**`, pipeline-specific additions in
+  `packages/domain/**`, `packages/db/**`, `packages/test-fixtures/**`, and scoped dependency files.
+- **Dependencies:** T-002c and T-009 (complete). T-002d is non-overlapping and awaiting merge.
+- **Non-goals:** Evaluation grading, human corrections, version comparison, quality gates, and UI.
+- **Verified assumptions:** SQLite/in-memory retrieval remain MVP infrastructure; Gemini is the
+  real provider; tests inject a deterministic provider and do not require network credentials.
+- **Validation:** focused Vitest; touched-scope ESLint/Prettier; strict TypeScript; relevant
+  Turborepo build/tests; credentialed Gemini smoke test only when `GEMINI_API_KEY` is available.
+- **Started/checkpoint:** 2026-07-12T12:26:38Z / 2026-07-12T12:26:38Z
+- **Status/next action:** IN PROGRESS — publish this claim, create the worktree, append assignment
+  acceptance to the codemap, then implement domain and persistence contracts.
 
 ### Validation Commands
 
@@ -96,6 +120,8 @@ pnpm format:check     # PASS (after formatting)
 - 2026-07-12T18:30:00Z — T-002c COMPLETE. 6 schema fixes + 8 new schemas aligned to PRD. typecheck PASS, build PASS. PR #2 merged.
 - 2026-07-12T20:00:00Z — T-009 COMPLETE. Pre-seeded pipeline merged via PR #1. Documents + retrieval packages added.
 - 2026-07-12T20:15:00Z — T-002d claimed. UI foundation: Tailwind + shadcn/ui + tRPC + TanStack Query + React Hook Form.
+- 2026-07-12T12:26:38Z — T-003 claimed by codex with backend-only ownership; Gemini selected;
+  implementation and validation assigned to `feat/agent-pipeline` worktree.
 
 ### Blockers
 
@@ -103,5 +129,7 @@ None.
 
 ### Handoff
 
-**Current state:** T-002c + T-009 complete. All domain schemas aligned with PRD. Pre-seeded pipeline merged. T-002d claimed — building UI foundation.
-**Next exact action:** T-002d — Implement Tailwind + shadcn/ui + tRPC + TanStack Query + React Hook Form in feat/ui-foundation worktree.
+**Current state:** T-002c + T-009 complete. T-002d is complete on PR #3 and awaiting merge.
+T-003 is claimed with non-overlapping backend ownership.
+**Next exact action:** Publish the T-003 board claim, create its dedicated worktree, append the
+assignment acceptance to `.codex/codemap.md`, and implement the pipeline contracts.
