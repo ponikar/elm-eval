@@ -56,7 +56,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-002d | UI foundation (Tailwind+shadcn+tRPC) | opencode    | COMPLETE    | feat/ui-polish         | —                                             | Merged in PRs #3 and #5                       |
 | T-009  | Pre-seeded documentation pipeline    | opencode    | COMPLETE    | feat/pre-seed-pipeline | —                                             | Gemini extraction + fixtures + DB schema      |
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
-| T-004  | Audit review UI                      | unassigned  | planned     | —                      | —                                             | Verify fixture flow; add rule/review actions  |
+| T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
 | T-005  | Human correction loop                | codex       | IN PROGRESS | feat/human-correction-loop | /Users/darshan/work/agent-eval-human-correction | Persist correction → trusted regression test |
 | T-006  | Evaluation engine                    | opencode    | planned     | —                      | —                                             | Run suite + graders                           |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
@@ -170,6 +170,9 @@ pnpm build                       # PASS (pipeline + Next.js)
   test PASS (7/7), build PASS (2/2). Repo-wide validation gate fully operational.
 - 2026-07-12T17:57:55Z — T-005 claimed by codex for the durable correction-to-regression loop in
   a dedicated worktree, with evaluation execution and comparison explicitly out of scope.
+- 2026-07-12T23:30:00Z — T-004 COMPLETE. Added approve/reject/correct review actions to audit
+  finding detail view (tRPC mutations, inline edit form, action buttons). PR #7 created on
+  feat/audit-review-ui. Validation: format PASS, typecheck PASS (10/10), test PASS (7/7), build PASS.
 
 ### Blockers
 
@@ -177,9 +180,8 @@ pnpm build                       # PASS (pipeline + Next.js)
 
 ### Handoff
 
-**Current state:** `origin/main` contains the document/retrieval foundation, ten seed cases, the
-auditable agent pipeline, the fixture-backed review/eval UI, and a fully operational validation
-gate (Biome replaces ESLint+Prettier). The correction loop, evaluation runner/graders, version
-comparison/gates, and trace viewer remain.
-**Next exact action:** Implement and validate T-005 in its dedicated worktree, push the ticket
-branch, open a PR, then integrate and remove the worktree.
+**Current state:** `feat/audit-review-ui` branch contains T-004 (review actions). T-005 is in
+progress in a dedicated worktree. The evaluation runner, version comparison/gates, and trace viewer
+remain planned.
+**Next exact action:** Merge PR #7 (T-004), then implement T-005 in its dedicated worktree, push
+the ticket branch, open a PR, then integrate and remove the worktree.
