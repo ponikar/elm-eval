@@ -4,6 +4,7 @@ import { RuleExtractor } from '@repo/documents';
 import { ChunkBuilder } from '@repo/retrieval';
 import { RuleSearcher } from '@repo/retrieval';
 import { env } from '@repo/domain';
+import type { ComplianceRule } from '@repo/domain';
 import {
   AUDIT_FIXTURE_IDS,
   RULEBOOK_FIXTURE_IDS,
@@ -41,7 +42,7 @@ async function processRulebooks(): Promise<
     rulebookId: string;
     chunkCount: number;
     chunkBuilder: ChunkBuilder;
-    rules: Awaited<ReturnType<RuleExtractor['extractRules']>>;
+    rules: ComplianceRule[];
   }[]
 > {
   console.log(`\n--- Processing ${RULEBOOK_FIXTURE_IDS.length} rulebook fixtures ---`);
@@ -50,7 +51,7 @@ async function processRulebooks(): Promise<
     rulebookId: string;
     chunkCount: number;
     chunkBuilder: ChunkBuilder;
-    rules: Awaited<ReturnType<RuleExtractor['extractRules']>>;
+    rules: ComplianceRule[];
   }[] = [];
 
   const chunkBuilder = new ChunkBuilder();
@@ -67,7 +68,7 @@ async function processRulebooks(): Promise<
       `  [${rulebookId}] Loaded ${rules.length} rules for ${metadata.name} v${metadata.version}`,
     );
 
-    const chunks = chunkBuilder.buildChunksFromRules(rules, rulebookId);
+    const chunks = chunkBuilder.buildChunksFromRules(rules);
     console.log(`  [${rulebookId}] Built ${chunks.length} chunks`);
 
     results.push({ rulebookId, chunkCount: chunks.length, chunkBuilder, rules });
@@ -100,7 +101,7 @@ async function testSearch(
 
     if (topResult && topResult.score > 0.3) {
       console.log(
-        `  [PASS] "${query}" → score=${topResult.score.toFixed(3)} chunk="${topResult.chunk.chunkText.slice(0, 60)}..."`,
+        `  [PASS] "${query}" → score=${topResult.score.toFixed(3)} chunk="${topResult.chunk.text.slice(0, 60)}..."`,
       );
     } else {
       console.log(`  [WARN] "${query}" → low score (${topResult?.score.toFixed(3) ?? 'N/A'})`);
@@ -120,7 +121,7 @@ async function main(): Promise<void> {
   const rulebookResults = await processRulebooks();
 
   const allChunks = rulebookResults.flatMap((r) => {
-    return r.chunkBuilder.buildChunksFromRules(r.rules, r.rulebookId);
+    return r.chunkBuilder.buildChunksFromRules(r.rules);
   });
 
   console.log(`\nTotal chunks created: ${allChunks.length}`);

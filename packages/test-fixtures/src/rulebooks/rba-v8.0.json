@@ -13,7 +13,9 @@
         "Retention of identity documents",
         "Debt bondage or recruitment fees"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-2.2-1",
@@ -25,7 +27,9 @@
     "severityGuidance": {
       "defaultSeverity": "CRITICAL",
       "escalationConditions": ["Workers under 15", "Workers under 18 in hazardous work"]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-2.3-1",
@@ -41,7 +45,9 @@
         "Less than 1 day off per 7 days",
         "Mandatory overtime without worker consent"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-2.4-1",
@@ -57,7 +63,9 @@
         "Incomplete wage records",
         "Unauthorized wage deductions"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-2.5-1",
@@ -69,7 +77,9 @@
     "severityGuidance": {
       "defaultSeverity": "CRITICAL",
       "escalationConditions": ["Physical abuse", "Sexual harassment", "Systematic verbal abuse"]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-2.6-1",
@@ -84,7 +94,9 @@
         "Systematic exclusion of protected groups",
         "Discriminatory pay practices"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-3.1-1",
@@ -100,7 +112,9 @@
         "No drills conducted in 12 months",
         "Emergency exits blocked"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-3.2-1",
@@ -116,7 +130,9 @@
         "High-risk workers untrained",
         "No refresher training"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-3.3-1",
@@ -128,7 +144,9 @@
     "severityGuidance": {
       "defaultSeverity": "MEDIUM",
       "escalationConditions": ["PPE not provided", "PPE compliance below 80%", "No PPE training"]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-3.4-1",
@@ -144,7 +162,9 @@
         "SDS missing for any chemical",
         "Improper chemical storage"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-3.5-1",
@@ -161,7 +181,9 @@
         "Exit signage missing",
         "Exit door mechanism defective"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-3.6-1",
@@ -177,7 +199,9 @@
         "No trained first aid responders",
         "Emergency contacts not posted"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-4.1-1",
@@ -189,7 +213,9 @@
     "severityGuidance": {
       "defaultSeverity": "HIGH",
       "escalationConditions": ["Expired environmental permit", "Operations beyond permit scope"]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-4.2-1",
@@ -205,7 +231,9 @@
         "Waste stored beyond limits",
         "Unlicensed disposal contractor"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-4.3-1",
@@ -221,7 +249,9 @@
         "OEL exceedance for workers",
         "No monitoring conducted"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-5.1-1",
@@ -237,7 +267,9 @@
         "Undisclosed gifts above threshold",
         "Kickbacks or embezzlement"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-5.2-1",
@@ -253,7 +285,9 @@
         "Data shared without consent",
         "Biometric data collected without consent"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-6.1-1",
@@ -268,7 +302,9 @@
         "No documented management system",
         "No designated compliance representative"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-6.2-1",
@@ -285,7 +321,9 @@
         "No evidence of complaint resolution",
         "Retaliation against complainants"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   },
   {
     "id": "RULE-6.3-1",
@@ -301,6 +339,8 @@
         "No corrective action tracking system",
         "Repeated non-conformances"
       ]
-    }
+    },
+    "rulebookId": "rba-v8.0",
+    "rulebookVersion": "8.0"
   }
 ]

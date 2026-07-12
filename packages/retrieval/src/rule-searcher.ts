@@ -38,7 +38,7 @@ export class RuleSearcher {
   }
 
   async embedChunks(chunks: RuleChunk[]): Promise<RuleChunk[]> {
-    const texts = chunks.map((c) => c.chunkText);
+    const texts = chunks.map((c) => c.text);
     const embeddings = await this.embeddings.embedBatch(texts);
 
     return chunks.map((chunk, i) => ({

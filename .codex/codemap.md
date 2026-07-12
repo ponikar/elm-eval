@@ -46,35 +46,33 @@ Run `pnpm install` and verify the full build pipeline passes.
 
 ### Validation
 
-Pending — pnpm install + turbo pipeline not yet run.
+- pnpm install: PASS
+- turbo typecheck: PASS (8/8 packages)
+- turbo build: PASS (Next.js compiles)
+- pnpm format:check: PASS (after formatting)
+- git push: PASS (origin/main)
 
----
-
-## Entry 3 — 2026-07-12T17:00:00Z
+### Entry 2 — 2026-07-12T16:25:00Z
 
 - **Agent:** opencode
-- **Ticket:** T-009
-- **Branch:** feat/pre-seed-pipeline
-- **Worktree:** /Users/darshan/work/agent-eval-preseed
+- **Ticket:** T-001
+- **Branch:** main
+- **Worktree:** main
 - **Status:** COMPLETE
-- **Scope:** Pre-seeded documentation pipeline with Gemini integration
+- **Scope:** Monorepo scaffold
 
 ### Completed
 
-- Extended DB schema: `sourceDocument`, `rulebook`, `complianceRule`, `ruleChunk` tables + relations
-- Enriched `auditPage` with `normalizedText`, `extractionStatus`, `parserVersion`
-- Created `packages/documents`: AuditParser, RulebookParser, RuleExtractor (Gemini structured output)
-- Created `packages/retrieval`: GeminiEmbeddings, cosineSimilarity, ChunkBuilder, RuleSearcher
-- Authored 3 seed audit fixtures: audit-001 (Golden Electronics, 6 pages), audit-002 (Shenzhen Textiles, 5 pages), audit-003 (Vietnam Footwear, 6 pages)
-- Authored 2 seed rulebook fixtures: rba-v8.0 (20 rules), nike-coc-2025 (15 rules)
-- Wired pipeline worker: loads fixtures → builds chunks → optional Gemini embedding + search test
-- Installed `@google/genai`, `pdf-parse`, `zod` dependencies
+- Prisma removed, Drizzle ORM + better-sqlite3 installed
+- Drizzle schema: 7 tables (supplier_audit, audit_page, audit_finding, agent_version, eval_case, evaluation_run, test_execution) + relations
+- Zod validation schemas for all domain types
+- Commit: e90d164
+- Pushed to git@github.com:ponikar/elm-eval.git
 
 ### Pending
 
-- Set `GEMINI_API_KEY` to enable live embedding + search test
-- Wire DB insertion (pipeline loads fixtures but doesn't persist to SQLite yet)
-- Wire agent run in pipeline (uses fixtures but doesn't call the agent)
+- T-002: 10 seed evaluation cases
+- T-003 through T-008
 
 ### Blockers
 
@@ -82,22 +80,100 @@ None.
 
 ### Next Step
 
-Set GEMINI_API_KEY and test live embedding/search. Then wire DB insertion and agent invocation.
+T-002 — Complete 10 seed eval cases in test-fixtures package.
+
+### Entry 3 — 2026-07-12T18:30:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-002c
+- **Branch:** feat/schema-alignment
+- **Worktree:** worktrees/feat-schema-alignment
+- **Status:** COMPLETE
+- **Scope:** Domain schema alignment with PRD
+
+### Completed
+
+- Added CorrectiveActionPrioritySchema (LOW/MEDIUM/HIGH/URGENT) — separate from SeveritySchema
+- Fixed FailureTypeSchema: added INVALID_RULE_REFERENCE, renamed INVALID_CITATION → INVALID_AUDIT_CITATION, removed POLICY_MISMATCH
+- Added ApplicableRuleSchema { ruleId, rulebookVersion } — replaces PolicyReferenceSchema
+- Added AuditEvidenceSchema { pageNumber, textContains } — for TrustedExpectedFinding
+- Added SeverityGuidanceSchema — for ComplianceRule
+- Added RulebookSchema, ComplianceRuleSchema, RuleChunkSchema
+- Added EvaluationRunSchema, TestExecutionSchema, GraderResultSchema
+- Added ComparisonResultSchema, QualityGateResultSchema
+- Fixed AuditFindingSchema: policyReference → applicableRule, added agentVersionId
+- Fixed AgentVersionSchema: added rulebookVersionId, retrievalTopK, correctiveActionPromptVersion, timeoutMs, maxRetries
+- Fixed EvalCaseExpectedSchema: added applicableRule, nested auditEvidence
+- Fixed EvalCaseSchema.input: added rulebookVersionId, expected is now array
+- Updated DB schema: renamed policyName/policySection → ruleId/rulebookVersion, added new tables (rulebook, complianceRule, traceEvent)
+- Updated test-fixtures: 10 eval cases, 6 findings, 10 compliance rules, 2 agent versions, 1 rulebook
+- Updated evals: added evaluateQualityGate function, imported domain types
+- turbo typecheck: PASS (8/8)
+- turbo build: PASS
+- Committed: 3822868
+- Pushed: origin/feat/schema-alignment
+
+### Pending
+
+- Merge PR into main
+- Delete worktree
+
+### Blockers
+
+None.
+
+### Next Step
+
+Create PR and merge into main. Then clean up worktree.
 
 ### Changed Files
 
-- packages/db/src/schema.ts (extended with 4 new tables)
-- packages/documents/ (new package: audit-parser, rulebook-parser, rule-extractor)
-- packages/retrieval/ (new package: embeddings, cosine-similarity, chunk-builder, rule-searcher)
-- packages/test-fixtures/src/audits/ (3 new audit JSON fixtures)
-- packages/test-fixtures/src/rulebooks/ (2 new rulebook JSON fixtures)
-- packages/test-fixtures/src/index.ts (extended exports)
-- apps/pipeline/src/index.ts (full pipeline implementation)
-- apps/pipeline/package.json (added document + retrieval + test-fixtures deps)
+- packages/domain/src/schemas.ts (180 lines added)
+- packages/db/src/schema.ts (72 lines added)
+- packages/evals/src/index.ts (66 lines added)
+- packages/test-fixtures/src/index.ts (713 lines added)
+
+---
+
+## Entry 4 — 2026-07-12T20:10:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-009
+- **Branch:** feat/pre-seed-pipeline
+- **Worktree:** /Users/darshan/work/agent-eval-merge
+- **Status:** IN PROGRESS
+- **Scope:** Merge feat/pre-seed-pipeline with main (T-002c schema alignment)
+
+### Completed
+
+- Resolved schema conflict in `packages/db/src/schema.ts` — took T-002c's PRD-aligned base, added `sourceDocument` + `ruleChunk` tables, enriched `auditPage`, kept `traceEvent`
+- Resolved domain schemas conflict — took their PRD-aligned types, added `embedding` + `embeddingModel` to `RuleChunkSchema`
+- Resolved test-fixtures conflict — took their version, added rulebook fixture loaders
+- Updated `packages/retrieval/src/chunk-builder.ts` to match PRD's `RuleChunk` type (text, pageNumber, metadata, rulebookVersion, embeddingModel)
+- Updated `packages/retrieval/src/rule-searcher.ts` to use `c.text` instead of `c.chunkText`
+- Resolved `.codex/codemap.md` conflict
+- Fixed `apps/pipeline/src/index.ts` and `apps/pipeline/src/embed.ts` for new API
+- Patched rulebook fixture JSONs with `rulebookId` + `rulebookVersion` fields
+- Added `@types/node` to `@repo/agent`, `@repo/evals`, `@repo/ui` packages
+- Ran `pnpm format` to fix formatting
 
 ### Validation
 
-- pnpm typecheck: PASS (all 12 packages)
+- turbo typecheck: PASS (10/10 packages)
+- turbo build: PASS (Next.js compiles)
 - pnpm format: PASS (after formatting)
-- pnpm build: PASS (Next.js + pipeline)
-- Pipeline run: PASS (3 audits, 2 rulebooks, 35 chunks, 4ms without Gemini)
+- Pipeline dry-run: PASS (3 audits, 2 rulebooks, 35 chunks, 7ms)
+
+### Pending
+
+- Commit merge resolution
+- Push to origin/feat/pre-seed-pipeline
+- Create PR
+
+### Blockers
+
+None.
+
+### Next Step
+
+Commit and push. Create PR.

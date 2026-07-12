@@ -1,37 +1,35 @@
-import { z } from 'zod';
-
-const ComplianceRuleSchema = z.object({
-  id: z.string(),
-  sectionId: z.string(),
-  sectionTitle: z.string(),
-  category: z.string(),
-  requirementText: z.string(),
-  sourcePage: z.number(),
-  severityGuidance: z
-    .object({
-      defaultSeverity: z.string().optional(),
-      escalationConditions: z.array(z.string()).optional(),
-    })
-    .optional(),
-});
-
-export type ComplianceRule = z.infer<typeof ComplianceRuleSchema>;
+import type { ComplianceRule } from '@repo/domain';
 
 export interface RuleChunk {
   id: string;
   ruleId: string;
   rulebookId: string;
-  chunkText: string;
+  rulebookVersion: string;
+  text: string;
+  pageNumber: number;
+  metadata: {
+    sectionId: string;
+    sectionTitle: string;
+    category: string;
+  };
   embedding?: number[];
+  embeddingModel?: string;
 }
 
 export class ChunkBuilder {
-  buildChunksFromRules(rules: ComplianceRule[], rulebookId: string): RuleChunk[] {
+  buildChunksFromRules(rules: ComplianceRule[]): RuleChunk[] {
     return rules.map((rule) => ({
-      id: `chunk-${rulebookId}-${rule.id}`,
+      id: `chunk-${rule.rulebookId}-${rule.id}`,
       ruleId: rule.id,
-      rulebookId,
-      chunkText: this.formatChunkText(rule),
+      rulebookId: rule.rulebookId,
+      rulebookVersion: rule.rulebookVersion,
+      text: this.formatChunkText(rule),
+      pageNumber: rule.sourcePage,
+      metadata: {
+        sectionId: rule.sectionId,
+        sectionTitle: rule.sectionTitle,
+        category: rule.category,
+      },
     }));
   }
 

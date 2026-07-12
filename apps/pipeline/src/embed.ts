@@ -33,7 +33,7 @@ async function main() {
     const rules = await loadRulebookFixture(rulebookId);
     console.log(`  Rules loaded: ${rules.length}`);
 
-    const chunks = chunkBuilder.buildChunksFromRules(rules, rulebookId);
+    const chunks = chunkBuilder.buildChunksFromRules(rules);
     console.log(`  Chunks built: ${chunks.length}`);
 
     const embedded = await searcher.embedChunks(chunks);
