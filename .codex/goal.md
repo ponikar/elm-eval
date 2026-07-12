@@ -51,7 +51,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | ----- | ---------------------------------- | -------- | ----------- | ------ | -------- | ---------------------------------- |
 | T-001 | Monorepo scaffold                  | opencode | COMPLETE    | main   | main     | Done                               |
 | T-002 | Domain schemas + seed data         | opencode | IN PROGRESS | main   | main     | Create Zod schemas + seed fixtures |
-| T-002c| Schema alignment to PRD            | opencode | IN PROGRESS | feat/schema-alignment | worktrees/feat-schema-alignment | Align domain schemas with PRD types |
+| T-002c| Schema alignment to PRD            | opencode | COMPLETE    | feat/schema-alignment | — | Align domain schemas with PRD types |
 | T-009 | Pre-seeded documentation pipeline  | opencode | IN PROGRESS | feat/pre-seed-pipeline | — | Gemini extraction + fixtures + DB schema |
 | T-003 | Agent pipeline                     | opencode | planned     | —      | —        | Implement pipeline stages          |
 | T-004 | Audit review UI                    | opencode | planned     | —      | —        | Build split-view workspace         |
@@ -92,6 +92,7 @@ pnpm format:check     # PASS (after formatting)
 - 2026-07-12T16:12:00Z — pnpm install complete. Prisma removed, Drizzle installed.
 - 2026-07-12T16:15:00Z — Drizzle schema created (supplier_audit, audit_page, audit_finding, agent_version, eval_case, evaluation_run, test_execution + relations).
 - 2026-07-12T16:18:00Z — T-001 COMPLETE. turbo typecheck PASS (8/8). turbo build PASS. format PASS.
+- 2026-07-12T18:30:00Z — T-002c COMPLETE. 6 schema fixes + 8 new schemas aligned to PRD. typecheck PASS, build PASS. PR #2 merged.
 
 ### Blockers
 
@@ -99,5 +100,5 @@ None.
 
 ### Handoff
 
-**Current state:** T-002c in progress. Aligning domain Zod schemas with PRD types — 6 fixes + 8 new schemas. After this, T-002 seed data updates, then UI work.
-**Next exact action:** T-002c — Implement schema alignment in packages/domain/src/schemas.ts.
+**Current state:** T-002c complete. All domain schemas aligned with PRD. 24 schemas total (12 original + 8 new + 4 new enums). DB schema updated. 10 seed eval cases, 6 findings, 10 rules, 2 agent versions, 1 rulebook.
+**Next exact action:** T-004 — Build UI foundation (Tailwind + shadcn + tRPC) or T-003 — Agent pipeline implementation.
