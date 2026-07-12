@@ -81,3 +81,54 @@ None.
 ### Next Step
 
 T-002 — Complete 10 seed eval cases in test-fixtures package.
+
+### Entry 3 — 2026-07-12T18:30:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-002c
+- **Branch:** feat/schema-alignment
+- **Worktree:** worktrees/feat-schema-alignment
+- **Status:** COMPLETE
+- **Scope:** Domain schema alignment with PRD
+
+### Completed
+
+- Added CorrectiveActionPrioritySchema (LOW/MEDIUM/HIGH/URGENT) — separate from SeveritySchema
+- Fixed FailureTypeSchema: added INVALID_RULE_REFERENCE, renamed INVALID_CITATION → INVALID_AUDIT_CITATION, removed POLICY_MISMATCH
+- Added ApplicableRuleSchema { ruleId, rulebookVersion } — replaces PolicyReferenceSchema
+- Added AuditEvidenceSchema { pageNumber, textContains } — for TrustedExpectedFinding
+- Added SeverityGuidanceSchema — for ComplianceRule
+- Added RulebookSchema, ComplianceRuleSchema, RuleChunkSchema
+- Added EvaluationRunSchema, TestExecutionSchema, GraderResultSchema
+- Added ComparisonResultSchema, QualityGateResultSchema
+- Fixed AuditFindingSchema: policyReference → applicableRule, added agentVersionId
+- Fixed AgentVersionSchema: added rulebookVersionId, retrievalTopK, correctiveActionPromptVersion, timeoutMs, maxRetries
+- Fixed EvalCaseExpectedSchema: added applicableRule, nested auditEvidence
+- Fixed EvalCaseSchema.input: added rulebookVersionId, expected is now array
+- Updated DB schema: renamed policyName/policySection → ruleId/rulebookVersion, added new tables (rulebook, complianceRule, traceEvent)
+- Updated test-fixtures: 10 eval cases, 6 findings, 10 compliance rules, 2 agent versions, 1 rulebook
+- Updated evals: added evaluateQualityGate function, imported domain types
+- turbo typecheck: PASS (8/8)
+- turbo build: PASS
+- Committed: 3822868
+- Pushed: origin/feat/schema-alignment
+
+### Pending
+
+- Merge PR into main
+- Delete worktree
+
+### Blockers
+
+None.
+
+### Next Step
+
+Create PR and merge into main. Then clean up worktree.
+
+### Changed Files
+
+- packages/domain/src/schemas.ts (180 lines added)
+- packages/db/src/schema.ts (72 lines added)
+- packages/evals/src/index.ts (66 lines added)
+- packages/test-fixtures/src/index.ts (713 lines added)
