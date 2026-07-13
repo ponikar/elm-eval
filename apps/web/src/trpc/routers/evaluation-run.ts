@@ -5,6 +5,7 @@ import {
   freezeEvalSuite,
   getEvaluationRunDetails,
   listEvaluationRuns,
+  listRunSummaries,
 } from '@repo/db/eval-store';
 import { z } from 'zod';
 import { ensureReviewWorkspace } from '../../server/review-workspace';
@@ -52,6 +53,10 @@ export const evaluationRunRouter = createTRPCRouter({
   list: publicProcedure.query(async () => {
     await ensureReviewWorkspace();
     return listEvaluationRuns();
+  }),
+  listSummaries: publicProcedure.query(async () => {
+    await ensureReviewWorkspace();
+    return listRunSummaries();
   }),
   get: publicProcedure.input(z.object({ id: z.string().min(1) })).query(async ({ input }) => {
     await ensureReviewWorkspace();

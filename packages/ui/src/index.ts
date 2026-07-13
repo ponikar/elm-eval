@@ -27,6 +27,7 @@ export {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './components/ui/dropdown-menu';
+export { Progress } from './components/ui/progress';
 export { ScrollArea, ScrollBar } from './components/ui/scroll-area';
 export {
   Select,
