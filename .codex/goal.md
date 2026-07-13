@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T06:56:44Z
+**Updated:** 2026-07-13T07:23:32Z
 
 ### Outcome
 
@@ -62,7 +62,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
 | T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
 | T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
-| T-006  | Evaluation engine                    | codex       | IN PROGRESS | feat/evaluation-engine | /Users/darshan/work/agent-eval-evaluation-engine | Implement pure grader/runner without Neon-owned DB infrastructure |
+| T-006  | Evaluation engine                    | codex       | IN PROGRESS | feat/evaluation-engine | /Users/darshan/work/agent-eval-evaluation-engine | Draft PR #11 open; do not merge; port adapter after Neon finalizes |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
@@ -195,10 +195,11 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Validation:** focused grader/runner tests; eval-store transaction/idempotency tests against an
   isolated database; scripted worker integration for all approved cases; touched-scope Biome;
   strict TypeScript; full tests and production build; repeat affected checks after final edits.
-- **Started/checkpoint:** 2026-07-13T06:56:44Z / 2026-07-13T06:56:44Z
-- **Status/next action:** IN PROGRESS — publish this board claim, create the fresh worktree, append
-  acceptance to the codemap, then implement domain contracts and the pure deterministic grader
-  before touching persistence integration.
+- **Started/checkpoint:** 2026-07-13T06:56:44Z / 2026-07-13T07:20:15Z
+- **Status/next action:** IN PROGRESS / REMOTE HANDOFF — implementation commit `a535993` is pushed
+  and draft PR #11 is open with explicit no-merge instructions. Wait for PR #10's Neon contract to
+  stabilize, then port the concrete adapter/API/tests if Neon lands first and rerun every gate
+  before requesting user merge approval.
 
 ### T-012 Assignment
 
@@ -249,6 +250,27 @@ pnpm build                       # PASS (pipeline + Next.js)
 - Files changed: canonical Drizzle schema, migration bootstrap, correction persistence,
   `0002_youthful_slyde.sql`, generated snapshot/journal, migration/invariant tests, and codemap.
 
+### T-006 Validation
+
+- `pnpm install --frozen-lockfile` — PASS.
+- Touched-scope `biome check` across domain, evals, DB store, pipeline adapters, web routers, and
+  coordination files — PASS with zero warnings/errors.
+- `pnpm typecheck` — PASS, 10/10 tasks.
+- `pnpm test` — PASS: agent 7/7, DB 11/11, evals 19/19, and web 2/2.
+- Scripted end-to-end evaluation — PASS: nine approved seed cases plus one explicitly
+  reviewer-approved correction froze and executed as 10 trusted cases; 10/10 executions and
+  graders completed and passed with separate agent/evaluator usage.
+- `pnpm build` — PASS for the pipeline worker and production Next.js application.
+- `pnpm format:check` — PASS exit 0 with the same 22 pre-existing warnings outside T-006 touched
+  files; touched scope has no diagnostics.
+- Credentialed Gemini/indexing smoke test — not run because it requires a billable external API
+  call; provider-free runner integration exercises the same orchestration/persistence boundary.
+- Neon compatibility — PR #10 appeared after the T-006 claim and replaces synchronous SQLite
+  stores with asynchronous Postgres stores. T-006 intentionally does not include or merge PR #10;
+  its pure grader/runner is portable, while `eval-store`, tRPC awaits, and DB-backed tests require a
+  focused port after PR #10's contract is finalized.
+- Remote Vercel and Vercel Preview Comments checks — PASS on draft PR #11; PR is CLEAN.
+
 ### Progress Log
 
 - 2026-07-12T16:00:00Z — GOAL-001 created. T-001 claimed.
@@ -286,15 +308,30 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-13T05:52:14Z — T-011 merged via PR #9 at `271da86`; the canonical Drizzle schema now
   persists frozen suites, reproducible runs, queryable grader metrics, comparisons, and versioned
   quality-gate decisions. Empty and populated upgrades plus all repository gates pass.
+- 2026-07-13T06:56:44Z — T-006 claimed on published main commit `680efa6`; fresh
+  `feat/evaluation-engine` worktree created with Neon-owned schema/migration/bootstrap paths
+  excluded.
+- 2026-07-13T07:20:15Z — T-006 implementation validated end to end: immutable trusted suites,
+  idempotent runs/executions, deterministic maximum matching and PRD metrics, partial-failure
+  runner, durable outputs/graders/traces/usage, rulebook indexing command, worker adapter, and tRPC
+  APIs. The tenth trusted case is a human correction; `eval-010` remains pending and excluded.
+  PR #10 Neon support is now visible and requires a post-finalization async adapter port.
+- 2026-07-13T07:23:32Z — Pushed T-006 implementation `a535993` and opened draft PR #11 with an
+  explicit no-merge notice and PR #10 Neon compatibility dependency; local gates pass and remote
+  Vercel checks subsequently passed and the draft PR is CLEAN.
 
 ### Blockers
 
-- None. T-010 is complete. Repository validation gate is fully operational.
+- T-006 can be published and reviewed against current `main`. Integration sequencing depends on
+  PR #10: if Neon lands first, port T-006's DB adapter/API calls to its async Postgres contract and
+  rerun the full gate before merging either dependent change.
 
 ### Handoff
 
-**Current state:** `feat/audit-review-ui` branch contains T-004 (review actions). T-005 is in
-progress in a dedicated worktree. The evaluation runner, version comparison/gates, and trace viewer
-remain planned.
-**Next exact action:** Merge PR #7 (T-004), then implement T-005 in its dedicated worktree, push
-the ticket branch, open a PR, then integrate and remove the worktree.
+**Current state:** T-006 is implemented and fully validated in the dedicated
+`feat/evaluation-engine` worktree. It freezes only trusted snapshots, executes cases sequentially
+through an injected production-pipeline adapter, persists deterministic grades and observability,
+and exposes run creation/read APIs. T-007 comparison/gates and T-008 detailed trace UI remain
+planned. PR #10 independently migrates the database runtime to Neon and is not integrated here.
+**Next exact action:** Do not merge draft PR #11. Monitor its remote checks, then reconcile the
+async Neon adapter after PR #10 stabilizes and only merge when the user explicitly instructs it.

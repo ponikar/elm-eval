@@ -1,5 +1,8 @@
 import type { QualityGateResult } from '@repo/domain';
 
+export * from './grader.js';
+export * from './runner.js';
+
 export const QUALITY_GATES = {
   minimumCriticalFindingRecall: 0.95,
   minimumFindingPrecision: 0.9,

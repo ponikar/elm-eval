@@ -253,6 +253,19 @@ export const EvalCaseSchema = z.object({
   parentCaseId: z.string().optional(),
 });
 
+export const FrozenEvalCaseSchema = EvalCaseSchema.extend({
+  status: z.literal('TRUSTED'),
+});
+
+export const EvalSuiteSnapshotSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  version: z.number().int().positive(),
+  contentHash: z.string().min(1),
+  cases: z.array(FrozenEvalCaseSchema).min(1),
+  frozenAt: z.string(),
+});
+
 // ─── Human review types ─────────────────────────────────────────────────────
 
 export const FindingCorrectionInputSchema = AuditFindingSchema.omit({
@@ -286,39 +299,106 @@ export const CreateCorrectionInputSchema = z.object({
 
 // ─── Pipeline types ──────────────────────────────────────────────────────────
 
+export const EvaluationRunStatusSchema = z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']);
+
 export const EvaluationRunSchema = z.object({
-  id: z.string(),
-  agentVersionId: z.string(),
-  suiteId: z.string(),
-  status: z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']),
-  startedAt: z.string(),
+  id: z.string().min(1),
+  agentVersionId: z.string().min(1),
+  suiteId: z.string().min(1),
+  rulebookVersionId: z.string().min(1),
+  idempotencyKey: z.string().min(1),
+  suiteContentHash: z.string().min(1),
+  suiteSnapshot: EvalSuiteSnapshotSchema,
+  agentVersionSnapshot: AgentVersionSchema,
+  status: EvaluationRunStatusSchema,
+  errorCode: z.string().optional(),
+  errorMessage: z.string().optional(),
+  createdAt: z.string(),
+  startedAt: z.string().optional(),
   completedAt: z.string().optional(),
 });
 
+export const EvaluationAgentOutputSchema = z.object({
+  findings: z.array(AuditFindingSchema),
+  rejectedFindings: z.array(
+    z.object({
+      code: z.string().min(1),
+      message: z.string().min(1),
+      title: z.string().optional(),
+    }),
+  ),
+});
+
+export const TestExecutionStatusSchema = z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']);
+
 export const TestExecutionSchema = z.object({
-  id: z.string(),
-  runId: z.string(),
-  evalCaseId: z.string(),
-  status: z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']),
-  agentOutput: z.string(),
-  graderResult: z.string(),
-  passed: z.boolean(),
-  costUsd: z.number().min(0),
+  id: z.string().min(1),
+  runId: z.string().min(1),
+  evalCaseId: z.string().min(1),
+  status: TestExecutionStatusSchema,
+  agentOutput: EvaluationAgentOutputSchema.optional(),
+  passed: z.boolean().optional(),
+  agentCostUsd: z.number().min(0),
+  evaluatorCostUsd: z.number().min(0),
+  tokenInput: z.number().int().min(0),
+  tokenOutput: z.number().int().min(0),
   latencyMs: z.number().int().min(0),
-  startedAt: z.string(),
+  errorCode: z.string().optional(),
+  errorMessage: z.string().optional(),
+  createdAt: z.string(),
+  startedAt: z.string().optional(),
   completedAt: z.string().optional(),
+});
+
+const OptionalRatioSchema = z.number().min(0).max(1).optional();
+
+export const GraderMetricCountsSchema = z.object({
+  expectedFindingCount: z.number().int().min(0),
+  expectedCriticalFindingCount: z.number().int().min(0),
+  actualFindingCount: z.number().int().min(0),
+  matchedFindingCount: z.number().int().min(0),
+  matchedCriticalFindingCount: z.number().int().min(0),
+  correctCategoryCount: z.number().int().min(0),
+  correctSeverityCount: z.number().int().min(0),
+  criticalUnderclassificationCount: z.number().int().min(0),
+  supportedCitationCount: z.number().int().min(0),
+  correctRuleReferenceCount: z.number().int().min(0),
+  completeCorrectiveActionCount: z.number().int().min(0),
+  hallucinatedFindingCount: z.number().int().min(0),
+  schemaValidOutputCount: z.number().int().min(0),
+  outputCount: z.number().int().min(0),
 });
 
 export const GraderResultSchema = z.object({
-  findingRecallPassed: z.boolean(),
-  categoryPassed: z.boolean(),
-  severityPassed: z.boolean(),
-  auditCitationPassed: z.boolean(),
-  ruleReferencePassed: z.boolean(),
-  correctiveActionPassed: z.boolean(),
-  schemaPassed: z.boolean(),
-  hasHallucination: z.boolean(),
-  details: z.record(z.string()).optional(),
+  id: z.string().min(1),
+  executionId: z.string().min(1),
+  graderVersion: z.string().min(1),
+  passed: z.boolean(),
+  deterministicPassed: z.boolean(),
+  findingRecall: OptionalRatioSchema,
+  criticalFindingRecall: OptionalRatioSchema,
+  findingPrecision: OptionalRatioSchema,
+  categoryAccuracy: OptionalRatioSchema,
+  severityAccuracy: OptionalRatioSchema,
+  criticalUnderclassificationCount: z.number().int().min(0),
+  auditCitationPrecision: OptionalRatioSchema,
+  ruleReferenceAccuracy: OptionalRatioSchema,
+  hallucinatedFindingRate: OptionalRatioSchema,
+  correctiveActionCompleteness: OptionalRatioSchema,
+  schemaValidity: OptionalRatioSchema,
+  failureTypes: z.array(FailureTypeSchema),
+  details: z.object({
+    counts: GraderMetricCountsSchema,
+    messages: z.array(z.string()),
+    matches: z.array(
+      z.object({
+        expectedIndex: z.number().int().min(0),
+        actualFindingId: z.string().min(1),
+      }),
+    ),
+  }),
+  judgeModel: z.string().optional(),
+  createdAt: z.string(),
 });
 
 export const TraceEventSchema = z.object({
@@ -398,12 +478,18 @@ export type PipelineStage = z.infer<typeof PipelineStageSchema>;
 export type PipelineFailureCode = z.infer<typeof PipelineFailureCodeSchema>;
 export type PipelineJob = z.infer<typeof PipelineJobSchema>;
 export type EvalCase = z.infer<typeof EvalCaseSchema>;
+export type FrozenEvalCase = z.infer<typeof FrozenEvalCaseSchema>;
+export type EvalSuiteSnapshot = z.infer<typeof EvalSuiteSnapshotSchema>;
 export type FindingCorrectionInput = z.infer<typeof FindingCorrectionInputSchema>;
 export type HumanCorrection = z.infer<typeof HumanCorrectionSchema>;
 export type CreateCorrectionInput = z.infer<typeof CreateCorrectionInputSchema>;
 export type EvaluationRun = z.infer<typeof EvaluationRunSchema>;
+export type EvaluationRunStatus = z.infer<typeof EvaluationRunStatusSchema>;
+export type EvaluationAgentOutput = z.infer<typeof EvaluationAgentOutputSchema>;
 export type TestExecution = z.infer<typeof TestExecutionSchema>;
+export type TestExecutionStatus = z.infer<typeof TestExecutionStatusSchema>;
 export type GraderResult = z.infer<typeof GraderResultSchema>;
+export type GraderMetricCounts = z.infer<typeof GraderMetricCountsSchema>;
 export type TraceEvent = z.infer<typeof TraceEventSchema>;
 export type ComparisonResult = z.infer<typeof ComparisonResultSchema>;
 export type QualityGateResult = z.infer<typeof QualityGateResultSchema>;
