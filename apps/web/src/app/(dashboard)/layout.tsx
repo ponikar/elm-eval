@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/site-header';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider
+      className="min-h-0 h-full"
       style={
         {
           '--sidebar-width': '17rem',
@@ -13,7 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     >
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="min-h-0 overflow-y-auto">
         <SiteHeader />
         <main className="flex flex-1 flex-col">{children}</main>
       </SidebarInset>
