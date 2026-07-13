@@ -10,7 +10,7 @@ import type {
   SupplierAudit,
 } from '@repo/domain';
 import { AuditFindingSchema, HumanCorrectionSchema } from '@repo/domain';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, sql } from 'drizzle-orm';
 import { db } from './index.js';
 import {
   agentVersion,
@@ -565,4 +565,27 @@ export async function convertCorrectionToRegressionTest(
     if (!created) throw new Error('Regression case was not persisted');
     return created;
   });
+}
+
+export async function countAuditsWithPendingFindings(database: ReviewDatabase = db) {
+  const result = await database
+    .select({ count: sql<number>`cast(count(distinct ${supplierAudit.id}) as int)` })
+    .from(supplierAudit)
+    .innerJoin(auditFinding, eq(supplierAudit.id, auditFinding.auditId))
+    .where(eq(auditFinding.reviewStatus, 'PENDING'));
+  return result[0]?.count ?? 0;
+}
+
+export async function countEvalCases(database: ReviewDatabase = db) {
+  const result = await database
+    .select({ count: sql<number>`cast(count(*) as int)` })
+    .from(evalCase);
+  return result[0]?.count ?? 0;
+}
+
+export async function countAgentVersions(database: ReviewDatabase = db) {
+  const result = await database
+    .select({ count: sql<number>`cast(count(*) as int)` })
+    .from(agentVersion);
+  return result[0]?.count ?? 0;
 }

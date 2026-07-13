@@ -5,6 +5,7 @@ import { comparisonRouter } from './comparison';
 import { correctionRouter } from './correction';
 import { evalCaseRouter } from './eval-case';
 import { evaluationRunRouter } from './evaluation-run';
+import { sidebarRouter } from './sidebar';
 import { traceRouter } from './trace';
 
 export const appRouter = createTRPCRouter({
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   evalCase: evalCaseRouter,
   evaluationRun: evaluationRunRouter,
   trace: traceRouter,
+  sidebar: sidebarRouter,
 });
 
 export type AppRouter = typeof appRouter;

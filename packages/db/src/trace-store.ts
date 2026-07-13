@@ -14,7 +14,7 @@ import {
   TestExecutionSchema,
   TraceEventSchema,
 } from '@repo/domain';
-import { asc, desc, eq, inArray } from 'drizzle-orm';
+import { asc, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from './index.js';
 import { evaluationRun, graderResult, testExecution, traceEvent } from './schema.js';
 
@@ -315,4 +315,13 @@ export async function getExecutionTraceDetails(
     grader: graderRows[0] ? parseGrader(graderRows[0]) : undefined,
     traces: traceRows.map(parseTrace),
   };
+}
+
+export async function countFailedTraceRuns(database: TraceDatabase = db) {
+  const result = await database
+    .select({ count: sql<number>`cast(count(distinct ${evaluationRun.id}) as int)` })
+    .from(evaluationRun)
+    .innerJoin(testExecution, eq(evaluationRun.id, testExecution.runId))
+    .where(eq(testExecution.status, 'FAILED'));
+  return result[0]?.count ?? 0;
 }
