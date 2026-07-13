@@ -190,6 +190,33 @@ export const evalCase = sqliteTable('eval_case', {
   updatedAt: text('updated_at').notNull(),
 });
 
+export const humanCorrection = sqliteTable(
+  'human_correction',
+  {
+    id: text('id').primaryKey(),
+    findingId: text('finding_id')
+      .notNull()
+      .references(() => auditFinding.id, { onDelete: 'cascade' }),
+    auditId: text('audit_id')
+      .notNull()
+      .references(() => supplierAudit.id, { onDelete: 'cascade' }),
+    agentVersionId: text('agent_version_id')
+      .notNull()
+      .references(() => agentVersion.id),
+    failureType: text('failure_type').notNull(),
+    reason: text('reason').notNull(),
+    originalFindingJson: text('original_finding_json').notNull(),
+    correctedFindingJson: text('corrected_finding_json').notNull(),
+    regressionEvalCaseId: text('regression_eval_case_id').references(() => evalCase.id),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    index('human_correction_finding_idx').on(table.findingId),
+    uniqueIndex('human_correction_regression_case_unique').on(table.regressionEvalCaseId),
+  ],
+);
+
 export const evaluationRun = sqliteTable('evaluation_run', {
   id: text('id').primaryKey(),
   agentVersionId: text('agent_version_id')
@@ -319,6 +346,25 @@ export const auditFindingRelations = relations(auditFinding, ({ one }) => ({
   pipelineJob: one(pipelineJob, {
     fields: [auditFinding.pipelineJobId],
     references: [pipelineJob.id],
+  }),
+}));
+
+export const humanCorrectionRelations = relations(humanCorrection, ({ one }) => ({
+  finding: one(auditFinding, {
+    fields: [humanCorrection.findingId],
+    references: [auditFinding.id],
+  }),
+  audit: one(supplierAudit, {
+    fields: [humanCorrection.auditId],
+    references: [supplierAudit.id],
+  }),
+  agentVersion: one(agentVersion, {
+    fields: [humanCorrection.agentVersionId],
+    references: [agentVersion.id],
+  }),
+  regressionEvalCase: one(evalCase, {
+    fields: [humanCorrection.regressionEvalCaseId],
+    references: [evalCase.id],
   }),
 }));
 

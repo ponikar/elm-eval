@@ -6,42 +6,19 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { AuditPageViewer } from '@/components/audit-page-viewer';
 import { DashboardHeader } from '@/components/dashboard-header';
-import { type CorrectFields, FindingDetail } from '@/components/finding-detail';
+import { FindingDetail } from '@/components/finding-detail';
 import { FindingsTable } from '@/components/findings-table';
 import { trpc } from '@/trpc/react';
 
 export default function AuditDetailPage() {
-  const params = useParams();
-  const auditId = params['id'] as string;
+  const params = useParams<{ id: string }>();
+  const auditId = params.id;
   const [selectedFindingId, setSelectedFindingId] = useState<string | null>(null);
 
-  const utils = trpc.useUtils();
   const audit = trpc.audit.get.useQuery({ id: auditId });
   const findings = trpc.audit.getFindings.useQuery({ auditId });
 
-  const approveMutation = trpc.audit.approveFinding.useMutation({
-    onSuccess: () => utils.audit.getFindings.invalidate({ auditId }),
-  });
-  const rejectMutation = trpc.audit.rejectFinding.useMutation({
-    onSuccess: () => utils.audit.getFindings.invalidate({ auditId }),
-  });
-  const correctMutation = trpc.audit.correctFinding.useMutation({
-    onSuccess: () => utils.audit.getFindings.invalidate({ auditId }),
-  });
-
   const selectedFinding = findings.data?.find((f) => f.id === selectedFindingId);
-
-  function handleApprove(findingId: string) {
-    approveMutation.mutate({ findingId });
-  }
-
-  function handleReject(findingId: string) {
-    rejectMutation.mutate({ findingId });
-  }
-
-  function handleCorrect(findingId: string, fields: CorrectFields) {
-    correctMutation.mutate({ findingId, ...fields });
-  }
 
   if (audit.isLoading || findings.isLoading) {
     return (
@@ -108,13 +85,7 @@ export default function AuditDetailPage() {
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto p-6">
-                <FindingDetail
-                  finding={selectedFinding}
-                  onApprove={handleApprove}
-                  onReject={handleReject}
-                  onCorrect={handleCorrect}
-                  isPending={selectedFinding.reviewStatus === 'PENDING'}
-                />
+                <FindingDetail finding={selectedFinding} />
               </div>
             </div>
           ) : (
