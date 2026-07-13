@@ -880,3 +880,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** No T-016 blocker. Root typecheck/build remain blocked by the pre-existing T-006 SQLite-to-Neon adapter mismatch; broader tests require `DATABASE_URL`.
 - **Next Step:** Commit and push the reviewed scope, then verify the remote PR remains draft, conflict-free, and unmerged.
 - **Changed Files and Evidence:** `packages/agent/src/model-pricing.ts` replaces `gemini-pricing.ts`; provider/test imports use generic APIs; `.codex/goal.md` and append-only `.codex/codemap.md`; format and touched Biome PASS; agent typecheck PASS; agent tests 11/11 PASS; diff check PASS; root blockers reproduced unchanged.
+
+---
+
+## Entry 39 — 2026-07-13T09:16:30Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-016
+- **Branch:** fix/gemini-cost-accounting
+- **Worktree:** /Users/darshan/work/agent-eval-model-pricing
+- **Status:** BLOCKED / VERIFIED REMOTE HANDOFF
+- **Scope:** Publish and verify the generic model-pricing rename and PR conflict repair without merging.
+- **Completed:** Pushed merge reconciliation and generic rename through `0c9e675`; updated PR #12 description; verified GitHub reports OPEN, DRAFT, and MERGEABLE; preserved current `main` board state and both codemap histories; performed no merge.
+- **Pending:** Delete this worktree, then rerun full repository gates after T-006 Neon repair and test DB setup before any user-authorized integration.
+- **Blockers:** Root typecheck/build fail on the pre-existing T-006 SQLite-shaped calls against Neon; broader DB/eval/web tests require `DATABASE_URL`. No focused T-016 blocker remains.
+- **Next Step:** Commit and push this final handoff entry, verify the remote hash and draft PR state once more, then remove the T-016 worktree.
+- **Changed Files and Evidence:** Commits `681d377` and `0c9e675`; draft PR https://github.com/ponikar/elm-eval/pull/12; MERGEABLE at head `0c9e675`; focused validation and independent review PASS; no merge performed.

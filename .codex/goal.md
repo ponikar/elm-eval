@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T09:14:57Z
+**Updated:** 2026-07-13T09:16:30Z
 
 ### Outcome
 
@@ -81,7 +81,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-013  | Real Gemini cost accounting          | codex       | SUPERSEDED  | fix/gemini-cost-accounting | —                                             | Deferred by user in favor of UI repair        |
 | T-014  | Dashboard UI repair + shadcn alignment | codex     | IN PROGRESS | feat/dashboard-ui-repair   | /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair | Claim worktree, then replace the custom shell with shadcn dashboard patterns |
 | T-015  | Eval run cost + model visibility     | codex       | planned     | —                           | —                                             | After T-014/T-006, expose run summaries and render Runs table |
-| T-016  | Generic model pricing + PR repair    | codex       | IN PROGRESS | fix/gemini-cost-accounting  | /Users/darshan/work/agent-eval-model-pricing  | Commit, push, and verify draft PR #12 is conflict-free |
+| T-016  | Generic model pricing + PR repair    | codex       | BLOCKED     | fix/gemini-cost-accounting  | /Users/darshan/work/agent-eval-model-pricing  | PR #12 is mergeable; integration gates await T-006 Neon repair |
 
 ### Decisions
 
@@ -340,10 +340,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   rewriting the already-published PR branch.
 - **Validation:** Pricing/provider focused tests; touched-scope Biome; agent strict typecheck and
   tests; inspect final diff; push and verify PR #12 mergeability and draft state.
-- **Started/checkpoint:** 2026-07-13T09:09:38Z / 2026-07-13T09:14:57Z
-- **Status/next action:** IN PROGRESS — generic pricing names, conflict resolution, focused gates,
-  and independent review pass. Commit and push the scoped changes, then verify draft PR #12 is
-  conflict-free and remains unmerged.
+- **Started/checkpoint:** 2026-07-13T09:09:38Z / 2026-07-13T09:16:30Z
+- **Status/next action:** BLOCKED / REMOTE HANDOFF — implementation, conflict repair, focused
+  validation, review, push, and PR verification are complete. Draft PR #12 is MERGEABLE and remains
+  open/unmerged; rerun full repository gates after the separate T-006 Neon adapter repair.
 
 ### Validation Commands
 
@@ -429,6 +429,8 @@ pnpm build                       # PASS (pipeline + Next.js)
   usage against Neon in `packages/db/src/eval-store.ts` and pipeline evaluation/indexing adapters.
 - `pnpm test` — agent tests pass; broader DB/eval/web suites are BLOCKED because no test
   `DATABASE_URL` is configured.
+- Draft PR #12 — OPEN/DRAFT/MERGEABLE at `0c9e675`; description updated; Vercel Preview Comments
+  PASS and Vercel deployment pending after the push; no merge performed.
 
 ### Progress Log
 
@@ -488,6 +490,9 @@ pnpm build                       # PASS (pipeline + Next.js)
   codemap conflicts while preserving both histories, renamed the pricing boundary to generic model
   terminology, passed focused gates, and passed independent review. Remote push verification is
   the remaining step; no merge is authorized.
+- 2026-07-13T09:16:30Z — Pushed T-016 through `0c9e675`, updated draft PR #12, and verified GitHub
+  reports it MERGEABLE rather than conflicting. The PR remains open, draft, and unmerged; broader
+  integration remains blocked only by the recorded T-006 Neon adapter and test-database issues.
 
 ### Blockers
 
@@ -498,9 +503,10 @@ pnpm build                       # PASS (pipeline + Next.js)
 
 ### Handoff
 
-**Current state:** The active local work item is now T-014. The dashboard still uses a custom
-sidebar/header shell and several dashboard routes are placeholders instead of official shadcn
-dashboard patterns, though Tailwind v4 itself is loading and shared shadcn classes are compiling.
-**Next exact action:** Commit this board claim on `main`, create
-`feat/dashboard-ui-repair` in a fresh worktree, append the assignment acceptance to
-`.codex/codemap.md`, and keep the implementation strictly on the UI side.
+**Current state:** T-016 is published in draft PR #12 with generic model-pricing names and no merge
+conflict. T-014 continues independently in its existing UI worktree. Repository-wide gates remain
+blocked by T-006 synchronous SQLite-shaped evaluation adapters against Neon and missing test DB
+configuration; PR #12 remains intentionally unmerged.
+**Next exact action:** Remove the completed T-016 worktree. After T-006 repairs the Neon adapters
+and provides an isolated test `DATABASE_URL`, rerun full gates on PR #12 before any user-authorized
+merge; continue T-014 separately without touching the pricing branch.
