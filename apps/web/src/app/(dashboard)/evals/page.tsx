@@ -106,12 +106,12 @@ export default function EvalsPage() {
   const draft = evalCases.data?.filter((c) => c.status === 'DRAFT') ?? [];
 
   return (
-    <div>
+    <div className="flex flex-1 flex-col">
       <DashboardHeader
         title="Eval Suite"
-        description="Trusted evaluation cases for agent quality gates"
+        description="Trusted evaluation cases, pending variations, and suite composition."
       />
-      <div className="p-8">
+      <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
         {evalCases.isLoading ? (
           <div className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-4">
@@ -136,7 +136,7 @@ export default function EvalsPage() {
         ) : (
           <>
             {/* Summary cards */}
-            <div className="mb-6 grid gap-4 sm:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <StatCard
                 icon={FlaskConical}
                 label="Total Cases"

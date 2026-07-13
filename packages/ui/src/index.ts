@@ -1,5 +1,14 @@
 export { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
 export { Badge, type BadgeProps, badgeVariants } from './components/ui/badge';
+export {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from './components/ui/breadcrumb';
 export { Button, type ButtonProps, buttonVariants } from './components/ui/button';
 export {
   Card,
@@ -40,6 +49,25 @@ export {
   SheetTitle,
   SheetTrigger,
 } from './components/ui/sheet';
+export {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+  useSidebar,
+} from './components/ui/sidebar';
 export { Skeleton } from './components/ui/skeleton';
 export { Toaster } from './components/ui/sonner';
 export { Spinner } from './components/ui/spinner';

@@ -23,12 +23,12 @@ export default function AgentsPage() {
   const agents = trpc.agentVersion.list.useQuery();
 
   return (
-    <div>
+    <div className="flex flex-1 flex-col">
       <DashboardHeader
         title="Agent Versions"
-        description="Compare agent configurations and track baseline vs candidate"
+        description="Review the exact configuration currently wired into baseline and candidate agents."
       />
-      <div className="p-8">
+      <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
         {agents.isLoading ? (
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">

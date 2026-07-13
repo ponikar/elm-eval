@@ -87,6 +87,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-014  | Dashboard UI repair + shadcn alignment | codex     | IN PROGRESS | feat/dashboard-ui-repair   | /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair | Claim worktree, then replace the custom shell with shadcn dashboard patterns |
 | T-015  | Eval run cost + model visibility     | codex       | planned     | —                           | —                                             | After T-014/T-006, expose run summaries and render Runs table |
 | T-016  | Generic model pricing + PR repair    | codex       | BLOCKED     | fix/gemini-cost-accounting  | /Users/darshan/work/agent-eval-model-pricing  | PR #12 is mergeable; integration gates await T-006 Neon repair |
+| T-017  | Review action UX: loading states + toasts | opencode | COMPLETE | fix/review-action-loading | /Users/darshan/work/agent-eval/worktrees/review-action-loading | PR ready; spinners + toasts added |
 
 ### Decisions
 
