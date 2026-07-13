@@ -16,12 +16,21 @@ export function createDatabase(
   filename = auditDbPath ?? path.join(workspaceRoot, 'audit-reliability.db'),
 ) {
   const sqlite = new Database(filename);
-  sqlite.pragma('foreign_keys = ON');
   const database = drizzle(sqlite, { schema });
-  migrate(database, {
-    migrationsFolder: path.join(workspaceRoot, 'packages/db/drizzle'),
-  });
-  return database;
+  try {
+    sqlite.pragma('foreign_keys = OFF');
+    migrate(database, {
+      migrationsFolder: path.join(workspaceRoot, 'packages/db/drizzle'),
+    });
+    sqlite.pragma('foreign_keys = ON');
+    const violations = sqlite.pragma('foreign_key_check') as unknown[];
+    if (violations.length > 0)
+      throw new Error(`Database migration left ${violations.length} foreign-key violation(s)`);
+    return database;
+  } catch (error) {
+    sqlite.close();
+    throw error;
+  }
 }
 
 export const db = createDatabase();

@@ -560,3 +560,51 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** None.
 - **Next Step:** Commit and push the conflict resolution, verify PR #8 checks and mergeability, then integrate it before claiming the new schema scope.
 - **Changed Files and Evidence:** `apps/web/src/app/(dashboard)/audits/[id]/page.tsx`, `apps/web/src/components/finding-detail.tsx`, merge reconciliation in `apps/web/src/trpc/routers/audit.ts`, and this journal entry. Touched Biome PASS; web strict typecheck PASS; web test 1/1 PASS; DB tests 5/5 PASS; `git diff --check` PASS.
+
+---
+
+## Entry 20 — 2026-07-13T05:36:14Z
+
+- **Agent:** codex
+- **Ticket:** T-011
+- **Branch:** feat/eval-schema-foundation
+- **Worktree:** /Users/darshan/work/agent-eval-schema-foundation
+- **Status:** IN PROGRESS / ACCEPTED
+- **Scope:** Centralized Drizzle eval persistence schema, forward migration, integrity constraints, and migration/invariant tests.
+- **Completed:** Published board claim `43d3f30` on `main`; merged T-005 dependency through PR #8; removed the completed T-005 worktree; created and verified this fresh ticket worktree.
+- **Pending:** Inspect Drizzle configuration/call sites, implement canonical schema additions and constraints, generate migration, validate empty/current database upgrades, and run repository gates.
+- **Blockers:** None.
+- **Next Step:** Characterize existing schema consumers and migration tooling, then implement the smallest durable model supporting T-006 and T-007.
+- **Changed Files and Evidence:** `.codex/codemap.md`; branch/worktree verified at published main commit `43d3f30`.
+
+---
+
+## Entry 21 — 2026-07-13T05:48:47Z
+
+- **Agent:** codex
+- **Ticket:** T-011
+- **Branch:** feat/eval-schema-foundation
+- **Worktree:** /Users/darshan/work/agent-eval-schema-foundation
+- **Status:** IN PROGRESS / IMPLEMENTED
+- **Scope:** Canonical Drizzle eval persistence model and safe upgrade path.
+- **Completed:** Added frozen suite/membership snapshots, reproducible runs, unique executions, queryable grader metrics, per-case/run comparisons, versioned quality gates and durable decisions; added rulebook/self references, correction rulebook snapshots, history-safe deletion behavior, unique trace ordering, migration bootstrap foreign-key validation, and a forward migration preserving legacy runs/costs/corrections. Drizzle reports no schema drift.
+- **Pending:** Final diff review, repeat repository gates after this journal update, commit/push, PR verification, and main-board handoff.
+- **Blockers:** None. Root Biome retains 22 pre-existing warnings outside T-011; touched scope has zero warnings/errors.
+- **Next Step:** Run final frozen install, touched Biome, strict TypeScript, full tests/build, root Biome comparison, then commit and publish.
+- **Changed Files and Evidence:** Canonical schema, DB bootstrap, correction insert, migration `0002`, generated snapshot/journal, migration/invariant tests, and codemap. Empty migration PASS; populated 0000+0001 upgrade PASS with no FK violations; DB tests 7/7 PASS; root tests 15/15 PASS; typecheck 10/10 PASS; build PASS; touched Biome PASS; migration drift check reports no changes.
+
+---
+
+## Entry 22 — 2026-07-13T05:50:01Z
+
+- **Agent:** codex
+- **Ticket:** T-011
+- **Branch:** feat/eval-schema-foundation
+- **Worktree:** /Users/darshan/work/agent-eval-schema-foundation
+- **Status:** COMPLETE / READY FOR REMOTE HANDOFF
+- **Scope:** Final review and validation of the centralized eval persistence schema.
+- **Completed:** Reviewed the full diff and repeated all gates after the final test/journal edits. The canonical schema is drift-free, both migration paths preserve referential integrity, and T-006/T-007 now have durable suite, grader, comparison, and gate persistence contracts.
+- **Pending:** Commit, push, open/verify PR, coordinator merge, main-board completion update, then remove this worktree.
+- **Blockers:** None. Root Biome exits successfully with 22 known warnings outside owned paths; touched scope is clean with no warnings or errors.
+- **Next Step:** Commit the scoped diff, push `feat/eval-schema-foundation`, open a PR, and verify remote checks/mergeability.
+- **Changed Files and Evidence:** `.codex/codemap.md`, `packages/db/src/{schema,index,review-store}.ts`, `packages/db/src/schema-migration.test.ts`, and Drizzle migration/snapshot/journal. Frozen install PASS; touched Biome PASS; `db:generate` reports no drift; strict typecheck 10/10 PASS; tests 15/15 PASS; production build PASS; root Biome exit 0 with 22 pre-existing warnings; `git diff --check` PASS.

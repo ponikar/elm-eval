@@ -1,8 +1,10 @@
 import { relations, sql } from 'drizzle-orm';
 import {
+  type AnySQLiteColumn,
   check,
   index,
   integer,
+  primaryKey,
   real,
   sqliteTable,
   text,
@@ -74,19 +76,23 @@ export const sourceDocument = sqliteTable('source_document', {
   createdAt: text('created_at').notNull(),
 });
 
-export const rulebook = sqliteTable('rulebook', {
-  id: text('id').primaryKey(),
-  sourceDocumentId: text('source_document_id').references(() => sourceDocument.id),
-  name: text('name').notNull(),
-  version: text('version').notNull(),
-  standard: text('standard').notNull(),
-  effectiveFrom: text('effective_from').notNull(),
-  effectiveTo: text('effective_to'),
-  language: text('language').notNull().default('en'),
-  indexStatus: text('index_status').notNull().default('PENDING'),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
-});
+export const rulebook = sqliteTable(
+  'rulebook',
+  {
+    id: text('id').primaryKey(),
+    sourceDocumentId: text('source_document_id').references(() => sourceDocument.id),
+    name: text('name').notNull(),
+    version: text('version').notNull(),
+    standard: text('standard').notNull(),
+    effectiveFrom: text('effective_from').notNull(),
+    effectiveTo: text('effective_to'),
+    language: text('language').notNull().default('en'),
+    indexStatus: text('index_status').notNull().default('PENDING'),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [uniqueIndex('rulebook_standard_version_unique').on(table.standard, table.version)],
+);
 
 export const complianceRule = sqliteTable('compliance_rule', {
   id: text('id').primaryKey(),
@@ -135,7 +141,7 @@ export const auditFinding = sqliteTable(
       .notNull()
       .references(() => agentVersion.id),
     pipelineJobId: text('pipeline_job_id').references(() => pipelineJob.id, {
-      onDelete: 'cascade',
+      onDelete: 'set null',
     }),
     title: text('title').notNull(),
     description: text('description').notNull(),
@@ -163,7 +169,9 @@ export const agentVersion = sqliteTable('agent_version', {
   promptVersion: text('prompt_version').notNull(),
   systemPrompt: text('system_prompt').notNull(),
   temperature: real('temperature').notNull(),
-  rulebookVersionId: text('rulebook_version_id').notNull(),
+  rulebookVersionId: text('rulebook_version_id')
+    .notNull()
+    .references(() => rulebook.id),
   retrievalTopK: integer('retrieval_top_k').notNull(),
   extractionSchemaVersion: text('extraction_schema_version').notNull(),
   correctiveActionPromptVersion: text('corrective_action_prompt_version').notNull(),
@@ -175,20 +183,66 @@ export const agentVersion = sqliteTable('agent_version', {
 
 // ─── Eval tables ─────────────────────────────────────────────────────────────
 
-export const evalCase = sqliteTable('eval_case', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  category: text('category').notNull(),
-  criticality: text('criticality').notNull().default('NORMAL'),
-  inputAuditPages: text('input_audit_pages').notNull(),
-  inputRulebookVersionId: text('input_rulebook_version_id').notNull(),
-  expectedJson: text('expected_json').notNull(),
-  source: text('source').notNull().default('HUMAN_CREATED'),
-  status: text('status').notNull().default('DRAFT'),
-  parentCaseId: text('parent_case_id'),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
-});
+export const evalCase = sqliteTable(
+  'eval_case',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    category: text('category').notNull(),
+    criticality: text('criticality').notNull().default('NORMAL'),
+    inputAuditPages: text('input_audit_pages').notNull(),
+    inputRulebookVersionId: text('input_rulebook_version_id')
+      .notNull()
+      .references(() => rulebook.id),
+    expectedJson: text('expected_json').notNull(),
+    source: text('source').notNull().default('HUMAN_CREATED'),
+    status: text('status').notNull().default('DRAFT'),
+    parentCaseId: text('parent_case_id').references((): AnySQLiteColumn => evalCase.id),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [index('eval_case_parent_idx').on(table.parentCaseId)],
+);
+
+export const evalSuite = sqliteTable(
+  'eval_suite',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    version: integer('version').notNull(),
+    description: text('description'),
+    status: text('status').notNull().default('DRAFT'),
+    contentHash: text('content_hash').notNull(),
+    createdAt: text('created_at').notNull(),
+    frozenAt: text('frozen_at'),
+  },
+  (table) => [
+    uniqueIndex('eval_suite_name_version_unique').on(table.name, table.version),
+    uniqueIndex('eval_suite_content_hash_unique').on(table.contentHash),
+    check('eval_suite_positive_version', sql`${table.version} > 0`),
+  ],
+);
+
+export const evalSuiteCase = sqliteTable(
+  'eval_suite_case',
+  {
+    suiteId: text('suite_id')
+      .notNull()
+      .references(() => evalSuite.id),
+    evalCaseId: text('eval_case_id')
+      .notNull()
+      .references(() => evalCase.id),
+    ordinal: integer('ordinal').notNull(),
+    caseContentHash: text('case_content_hash').notNull(),
+    caseSnapshotJson: text('case_snapshot_json').notNull(),
+    addedAt: text('added_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.suiteId, table.evalCaseId] }),
+    uniqueIndex('eval_suite_case_ordinal_unique').on(table.suiteId, table.ordinal),
+    check('eval_suite_case_nonnegative_ordinal', sql`${table.ordinal} >= 0`),
+  ],
+);
 
 export const humanCorrection = sqliteTable(
   'human_correction',
@@ -196,13 +250,16 @@ export const humanCorrection = sqliteTable(
     id: text('id').primaryKey(),
     findingId: text('finding_id')
       .notNull()
-      .references(() => auditFinding.id, { onDelete: 'cascade' }),
+      .references(() => auditFinding.id),
     auditId: text('audit_id')
       .notNull()
-      .references(() => supplierAudit.id, { onDelete: 'cascade' }),
+      .references(() => supplierAudit.id),
     agentVersionId: text('agent_version_id')
       .notNull()
       .references(() => agentVersion.id),
+    rulebookVersionId: text('rulebook_version_id')
+      .notNull()
+      .references(() => rulebook.id),
     failureType: text('failure_type').notNull(),
     reason: text('reason').notNull(),
     originalFindingJson: text('original_finding_json').notNull(),
@@ -217,34 +274,217 @@ export const humanCorrection = sqliteTable(
   ],
 );
 
-export const evaluationRun = sqliteTable('evaluation_run', {
-  id: text('id').primaryKey(),
-  agentVersionId: text('agent_version_id')
-    .notNull()
-    .references(() => agentVersion.id),
-  suiteId: text('suite_id').notNull(),
-  status: text('status').notNull().default('PENDING'),
-  startedAt: text('started_at').notNull(),
-  completedAt: text('completed_at'),
-});
+export const evaluationRun = sqliteTable(
+  'evaluation_run',
+  {
+    id: text('id').primaryKey(),
+    agentVersionId: text('agent_version_id')
+      .notNull()
+      .references(() => agentVersion.id),
+    suiteId: text('suite_id')
+      .notNull()
+      .references(() => evalSuite.id),
+    rulebookVersionId: text('rulebook_version_id')
+      .notNull()
+      .references(() => rulebook.id),
+    idempotencyKey: text('idempotency_key').notNull(),
+    suiteContentHash: text('suite_content_hash').notNull(),
+    suiteSnapshotJson: text('suite_snapshot_json').notNull(),
+    agentVersionSnapshotJson: text('agent_version_snapshot_json').notNull(),
+    status: text('status').notNull().default('PENDING'),
+    errorCode: text('error_code'),
+    errorMessage: text('error_message'),
+    createdAt: text('created_at').notNull(),
+    startedAt: text('started_at'),
+    completedAt: text('completed_at'),
+  },
+  (table) => [
+    uniqueIndex('evaluation_run_idempotency_unique').on(table.idempotencyKey),
+    index('evaluation_run_suite_status_idx').on(table.suiteId, table.status),
+  ],
+);
 
-export const testExecution = sqliteTable('test_execution', {
-  id: text('id').primaryKey(),
-  runId: text('run_id')
-    .notNull()
-    .references(() => evaluationRun.id, { onDelete: 'cascade' }),
-  evalCaseId: text('eval_case_id')
-    .notNull()
-    .references(() => evalCase.id),
-  status: text('status').notNull().default('PENDING'),
-  agentOutput: text('agent_output').notNull(),
-  graderResult: text('grader_result').notNull(),
-  passed: integer('passed', { mode: 'boolean' }).notNull().default(false),
-  costUsd: real('cost_usd').notNull().default(0),
-  latencyMs: integer('latency_ms').notNull().default(0),
-  startedAt: text('started_at').notNull(),
-  completedAt: text('completed_at'),
-});
+export const testExecution = sqliteTable(
+  'test_execution',
+  {
+    id: text('id').primaryKey(),
+    runId: text('run_id')
+      .notNull()
+      .references(() => evaluationRun.id, { onDelete: 'cascade' }),
+    evalCaseId: text('eval_case_id')
+      .notNull()
+      .references(() => evalCase.id),
+    status: text('status').notNull().default('PENDING'),
+    agentOutput: text('agent_output'),
+    passed: integer('passed', { mode: 'boolean' }),
+    agentCostUsd: real('agent_cost_usd').notNull().default(0),
+    evaluatorCostUsd: real('evaluator_cost_usd').notNull().default(0),
+    tokenInput: integer('token_input').notNull().default(0),
+    tokenOutput: integer('token_output').notNull().default(0),
+    latencyMs: integer('latency_ms').notNull().default(0),
+    errorCode: text('error_code'),
+    errorMessage: text('error_message'),
+    createdAt: text('created_at').notNull(),
+    startedAt: text('started_at'),
+    completedAt: text('completed_at'),
+  },
+  (table) => [
+    uniqueIndex('test_execution_run_case_unique').on(table.runId, table.evalCaseId),
+    index('test_execution_run_status_idx').on(table.runId, table.status),
+    check(
+      'test_execution_nonnegative_usage',
+      sql`${table.agentCostUsd} >= 0 and ${table.evaluatorCostUsd} >= 0 and ${table.tokenInput} >= 0 and ${table.tokenOutput} >= 0 and ${table.latencyMs} >= 0`,
+    ),
+  ],
+);
+
+export const graderResult = sqliteTable(
+  'grader_result',
+  {
+    id: text('id').primaryKey(),
+    executionId: text('execution_id')
+      .notNull()
+      .references(() => testExecution.id, { onDelete: 'cascade' }),
+    graderVersion: text('grader_version').notNull(),
+    passed: integer('passed', { mode: 'boolean' }).notNull(),
+    deterministicPassed: integer('deterministic_passed', { mode: 'boolean' }).notNull(),
+    findingRecall: real('finding_recall'),
+    criticalFindingRecall: real('critical_finding_recall'),
+    findingPrecision: real('finding_precision'),
+    categoryAccuracy: real('category_accuracy'),
+    severityAccuracy: real('severity_accuracy'),
+    criticalUnderclassificationCount: integer('critical_underclassification_count')
+      .notNull()
+      .default(0),
+    auditCitationPrecision: real('audit_citation_precision'),
+    ruleReferenceAccuracy: real('rule_reference_accuracy'),
+    hallucinatedFindingRate: real('hallucinated_finding_rate'),
+    correctiveActionCompleteness: real('corrective_action_completeness'),
+    schemaValidity: real('schema_validity'),
+    failureTypesJson: text('failure_types_json').notNull(),
+    detailsJson: text('details_json').notNull(),
+    judgeModel: text('judge_model'),
+    createdAt: text('created_at').notNull(),
+  },
+  (table) => [
+    uniqueIndex('grader_result_execution_unique').on(table.executionId),
+    check(
+      'grader_result_nonnegative_underclassification',
+      sql`${table.criticalUnderclassificationCount} >= 0`,
+    ),
+  ],
+);
+
+export const runComparison = sqliteTable(
+  'run_comparison',
+  {
+    id: text('id').primaryKey(),
+    baselineRunId: text('baseline_run_id')
+      .notNull()
+      .references(() => evaluationRun.id),
+    candidateRunId: text('candidate_run_id')
+      .notNull()
+      .references(() => evaluationRun.id),
+    status: text('status').notNull().default('PENDING'),
+    stablePassCount: integer('stable_pass_count').notNull().default(0),
+    improvementCount: integer('improvement_count').notNull().default(0),
+    regressionCount: integer('regression_count').notNull().default(0),
+    stableFailureCount: integer('stable_failure_count').notNull().default(0),
+    criticalRegressionCount: integer('critical_regression_count').notNull().default(0),
+    metricDeltaJson: text('metric_delta_json'),
+    costDeltaUsd: real('cost_delta_usd'),
+    latencyDeltaMs: integer('latency_delta_ms'),
+    errorCode: text('error_code'),
+    errorMessage: text('error_message'),
+    createdAt: text('created_at').notNull(),
+    completedAt: text('completed_at'),
+  },
+  (table) => [
+    uniqueIndex('run_comparison_pair_unique').on(table.baselineRunId, table.candidateRunId),
+    check('run_comparison_distinct_runs', sql`${table.baselineRunId} <> ${table.candidateRunId}`),
+    check(
+      'run_comparison_nonnegative_counts',
+      sql`${table.stablePassCount} >= 0 and ${table.improvementCount} >= 0 and ${table.regressionCount} >= 0 and ${table.stableFailureCount} >= 0 and ${table.criticalRegressionCount} >= 0`,
+    ),
+  ],
+);
+
+export const caseComparison = sqliteTable(
+  'case_comparison',
+  {
+    id: text('id').primaryKey(),
+    comparisonId: text('comparison_id')
+      .notNull()
+      .references(() => runComparison.id, { onDelete: 'cascade' }),
+    evalCaseId: text('eval_case_id')
+      .notNull()
+      .references(() => evalCase.id),
+    baselineExecutionId: text('baseline_execution_id')
+      .notNull()
+      .references(() => testExecution.id),
+    candidateExecutionId: text('candidate_execution_id')
+      .notNull()
+      .references(() => testExecution.id),
+    classification: text('classification').notNull(),
+    isCritical: integer('is_critical', { mode: 'boolean' }).notNull(),
+    metricDeltaJson: text('metric_delta_json'),
+  },
+  (table) => [
+    uniqueIndex('case_comparison_case_unique').on(table.comparisonId, table.evalCaseId),
+    check(
+      'case_comparison_distinct_executions',
+      sql`${table.baselineExecutionId} <> ${table.candidateExecutionId}`,
+    ),
+  ],
+);
+
+export const qualityGate = sqliteTable(
+  'quality_gate',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    version: integer('version').notNull(),
+    status: text('status').notNull().default('ACTIVE'),
+    minimumCriticalFindingRecall: real('minimum_critical_finding_recall').notNull().default(0.95),
+    minimumFindingPrecision: real('minimum_finding_precision').notNull().default(0.9),
+    minimumAuditCitationPrecision: real('minimum_audit_citation_precision').notNull().default(0.98),
+    minimumRuleReferenceAccuracy: real('minimum_rule_reference_accuracy').notNull().default(0.98),
+    minimumSchemaValidity: real('minimum_schema_validity').notNull().default(1),
+    minimumCapCompleteness: real('minimum_cap_completeness').notNull().default(0.95),
+    maximumCriticalRegressions: integer('maximum_critical_regressions').notNull().default(0),
+    maximumHallucinatedFindingRate: real('maximum_hallucinated_finding_rate')
+      .notNull()
+      .default(0.02),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    uniqueIndex('quality_gate_name_version_unique').on(table.name, table.version),
+    check('quality_gate_positive_version', sql`${table.version} > 0`),
+    check('quality_gate_nonnegative_regressions', sql`${table.maximumCriticalRegressions} >= 0`),
+  ],
+);
+
+export const qualityGateEvaluation = sqliteTable(
+  'quality_gate_evaluation',
+  {
+    id: text('id').primaryKey(),
+    qualityGateId: text('quality_gate_id')
+      .notNull()
+      .references(() => qualityGate.id),
+    comparisonId: text('comparison_id')
+      .notNull()
+      .references(() => runComparison.id),
+    decision: text('decision').notNull(),
+    reasonsJson: text('reasons_json').notNull(),
+    qualityGateSnapshotJson: text('quality_gate_snapshot_json').notNull(),
+    metricsSnapshotJson: text('metrics_snapshot_json').notNull(),
+    evaluatedAt: text('evaluated_at').notNull(),
+  },
+  (table) => [
+    uniqueIndex('quality_gate_evaluation_unique').on(table.qualityGateId, table.comparisonId),
+  ],
+);
 
 export const traceEvent = sqliteTable(
   'trace_event',
@@ -269,8 +509,8 @@ export const traceEvent = sqliteTable(
     costUsd: real('cost_usd'),
   },
   (table) => [
-    index('trace_event_job_sequence_idx').on(table.pipelineJobId, table.sequence),
-    index('trace_event_execution_sequence_idx').on(table.executionId, table.sequence),
+    uniqueIndex('trace_event_job_sequence_unique').on(table.pipelineJobId, table.sequence),
+    uniqueIndex('trace_event_execution_sequence_unique').on(table.executionId, table.sequence),
     check(
       'trace_event_exactly_one_owner',
       sql`(${table.executionId} is not null and ${table.pipelineJobId} is null) or (${table.executionId} is null and ${table.pipelineJobId} is not null)`,
@@ -362,16 +602,56 @@ export const humanCorrectionRelations = relations(humanCorrection, ({ one }) => 
     fields: [humanCorrection.agentVersionId],
     references: [agentVersion.id],
   }),
+  rulebook: one(rulebook, {
+    fields: [humanCorrection.rulebookVersionId],
+    references: [rulebook.id],
+  }),
   regressionEvalCase: one(evalCase, {
     fields: [humanCorrection.regressionEvalCaseId],
     references: [evalCase.id],
   }),
 }));
 
-export const agentVersionRelations = relations(agentVersion, ({ many }) => ({
+export const agentVersionRelations = relations(agentVersion, ({ one, many }) => ({
+  rulebook: one(rulebook, {
+    fields: [agentVersion.rulebookVersionId],
+    references: [rulebook.id],
+  }),
   findings: many(auditFinding),
   evaluationRuns: many(evaluationRun),
   pipelineJobs: many(pipelineJob),
+}));
+
+export const evalCaseRelations = relations(evalCase, ({ one, many }) => ({
+  rulebook: one(rulebook, {
+    fields: [evalCase.inputRulebookVersionId],
+    references: [rulebook.id],
+  }),
+  parent: one(evalCase, {
+    fields: [evalCase.parentCaseId],
+    references: [evalCase.id],
+    relationName: 'eval_case_parent',
+  }),
+  variations: many(evalCase, { relationName: 'eval_case_parent' }),
+  suiteMemberships: many(evalSuiteCase),
+  testExecutions: many(testExecution),
+  caseComparisons: many(caseComparison),
+}));
+
+export const evalSuiteRelations = relations(evalSuite, ({ many }) => ({
+  cases: many(evalSuiteCase),
+  evaluationRuns: many(evaluationRun),
+}));
+
+export const evalSuiteCaseRelations = relations(evalSuiteCase, ({ one }) => ({
+  suite: one(evalSuite, {
+    fields: [evalSuiteCase.suiteId],
+    references: [evalSuite.id],
+  }),
+  evalCase: one(evalCase, {
+    fields: [evalSuiteCase.evalCaseId],
+    references: [evalCase.id],
+  }),
 }));
 
 export const evaluationRunRelations = relations(evaluationRun, ({ one, many }) => ({
@@ -379,7 +659,17 @@ export const evaluationRunRelations = relations(evaluationRun, ({ one, many }) =
     fields: [evaluationRun.agentVersionId],
     references: [agentVersion.id],
   }),
+  suite: one(evalSuite, {
+    fields: [evaluationRun.suiteId],
+    references: [evalSuite.id],
+  }),
+  rulebook: one(rulebook, {
+    fields: [evaluationRun.rulebookVersionId],
+    references: [rulebook.id],
+  }),
   testExecutions: many(testExecution),
+  baselineComparisons: many(runComparison, { relationName: 'comparison_baseline_run' }),
+  candidateComparisons: many(runComparison, { relationName: 'comparison_candidate_run' }),
 }));
 
 export const testExecutionRelations = relations(testExecution, ({ one, many }) => ({
@@ -392,6 +682,67 @@ export const testExecutionRelations = relations(testExecution, ({ one, many }) =
     references: [evalCase.id],
   }),
   traceEvents: many(traceEvent),
+  graderResult: one(graderResult),
+  baselineCaseComparisons: many(caseComparison, { relationName: 'case_comparison_baseline' }),
+  candidateCaseComparisons: many(caseComparison, { relationName: 'case_comparison_candidate' }),
+}));
+
+export const graderResultRelations = relations(graderResult, ({ one }) => ({
+  execution: one(testExecution, {
+    fields: [graderResult.executionId],
+    references: [testExecution.id],
+  }),
+}));
+
+export const runComparisonRelations = relations(runComparison, ({ one, many }) => ({
+  baselineRun: one(evaluationRun, {
+    fields: [runComparison.baselineRunId],
+    references: [evaluationRun.id],
+    relationName: 'comparison_baseline_run',
+  }),
+  candidateRun: one(evaluationRun, {
+    fields: [runComparison.candidateRunId],
+    references: [evaluationRun.id],
+    relationName: 'comparison_candidate_run',
+  }),
+  cases: many(caseComparison),
+  gateEvaluations: many(qualityGateEvaluation),
+}));
+
+export const caseComparisonRelations = relations(caseComparison, ({ one }) => ({
+  comparison: one(runComparison, {
+    fields: [caseComparison.comparisonId],
+    references: [runComparison.id],
+  }),
+  evalCase: one(evalCase, {
+    fields: [caseComparison.evalCaseId],
+    references: [evalCase.id],
+  }),
+  baselineExecution: one(testExecution, {
+    fields: [caseComparison.baselineExecutionId],
+    references: [testExecution.id],
+    relationName: 'case_comparison_baseline',
+  }),
+  candidateExecution: one(testExecution, {
+    fields: [caseComparison.candidateExecutionId],
+    references: [testExecution.id],
+    relationName: 'case_comparison_candidate',
+  }),
+}));
+
+export const qualityGateRelations = relations(qualityGate, ({ many }) => ({
+  evaluations: many(qualityGateEvaluation),
+}));
+
+export const qualityGateEvaluationRelations = relations(qualityGateEvaluation, ({ one }) => ({
+  qualityGate: one(qualityGate, {
+    fields: [qualityGateEvaluation.qualityGateId],
+    references: [qualityGate.id],
+  }),
+  comparison: one(runComparison, {
+    fields: [qualityGateEvaluation.comparisonId],
+    references: [runComparison.id],
+  }),
 }));
 
 export const traceEventRelations = relations(traceEvent, ({ one }) => ({
