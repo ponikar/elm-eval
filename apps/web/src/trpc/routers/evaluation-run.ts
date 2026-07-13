@@ -20,7 +20,7 @@ export const evaluationRunRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      ensureReviewWorkspace();
+      await ensureReviewWorkspace();
       const trustedCaseIds = (await listEvalCases())
         .filter((item) => item.status === 'TRUSTED')
         .map((item) => item.id);
@@ -42,7 +42,7 @@ export const evaluationRunRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      ensureReviewWorkspace();
+      await ensureReviewWorkspace();
       return createEvaluationRun({
         id: randomUUID(),
         ...input,
@@ -50,11 +50,11 @@ export const evaluationRunRouter = createTRPCRouter({
       });
     }),
   list: publicProcedure.query(async () => {
-    ensureReviewWorkspace();
+    await ensureReviewWorkspace();
     return listEvaluationRuns();
   }),
   get: publicProcedure.input(z.object({ id: z.string().min(1) })).query(async ({ input }) => {
-    ensureReviewWorkspace();
+    await ensureReviewWorkspace();
     return getEvaluationRunDetails(input.id);
   }),
 });

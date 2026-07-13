@@ -24,7 +24,7 @@ export default function AuditDetailPage() {
     return (
       <div>
         <DashboardHeader title="Audit Review" description="Loading..." />
-        <div className="flex h-[calc(100vh-57px)] items-center justify-center">
+        <div className="flex h-[calc(100svh-8rem)] items-center justify-center">
           <div className="space-y-3 text-center">
             <Skeleton className="mx-auto h-8 w-48" />
             <Skeleton className="mx-auto h-4 w-72" />
@@ -38,7 +38,7 @@ export default function AuditDetailPage() {
     return (
       <div>
         <DashboardHeader title="Audit Review" description="Not found" />
-        <div className="flex h-[calc(100vh-57px)] items-center justify-center">
+        <div className="flex h-[calc(100svh-8rem)] items-center justify-center">
           <p className="text-sm text-muted-foreground">Audit not found.</p>
         </div>
       </div>
@@ -46,15 +46,15 @@ export default function AuditDetailPage() {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-1 flex-col">
       <DashboardHeader
         title={audit.data.supplierName}
         description={`${audit.data.factoryName} · ${audit.data.documentName}`}
         actions={<Badge variant="outline">{audit.data.auditStandard}</Badge>}
       />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden p-4 md:p-6">
         {/* Left panel: Audit pages */}
-        <div className="w-1/2 border-r bg-muted/20">
+        <div className="w-1/2 rounded-l-xl border border-r-0 bg-muted/20">
           <AuditPageViewer
             pages={audit.data.pages}
             highlightPage={selectedFinding?.auditEvidence.pageNumber}
@@ -62,7 +62,7 @@ export default function AuditDetailPage() {
         </div>
 
         {/* Right panel: Findings */}
-        <div className="flex w-1/2 flex-col overflow-hidden">
+        <div className="flex w-1/2 flex-col overflow-hidden rounded-r-xl border">
           <div className="flex items-center justify-between border-b px-6 py-4">
             <h2 className="text-sm font-semibold">
               Findings
