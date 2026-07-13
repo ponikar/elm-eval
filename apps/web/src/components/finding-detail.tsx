@@ -119,7 +119,16 @@ export function FindingDetail({ finding }: FindingDetailProps) {
           </div>
         </CardContent>
       </Card>
-      <FindingReviewActions finding={finding as AuditFinding} />
+      {finding.reviewStatus === 'PENDING' ? (
+        <FindingReviewActions finding={finding as AuditFinding} />
+      ) : (
+        <Card>
+          <CardContent className="flex items-center gap-3 py-4">
+            <ReviewStatusBadge status={finding.reviewStatus as never} />
+            <p className="text-sm text-muted-foreground">This finding has already been reviewed.</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
