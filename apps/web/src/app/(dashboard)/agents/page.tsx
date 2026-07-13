@@ -97,6 +97,20 @@ export default function AgentsPage() {
                           <p className="font-medium">{agent.timeoutMs}ms</p>
                         </div>
                       </div>
+                      <div className="col-span-3 grid gap-3 md:grid-cols-3">
+                        <div className="rounded-lg border bg-muted/20 p-3 text-sm">
+                          <p className="text-[11px] text-muted-foreground/60">Rulebook</p>
+                          <p className="mt-1 font-medium">{agent.rulebookVersionId}</p>
+                        </div>
+                        <div className="rounded-lg border bg-muted/20 p-3 text-sm">
+                          <p className="text-[11px] text-muted-foreground/60">Schema Version</p>
+                          <p className="mt-1 font-medium">{agent.extractionSchemaVersion}</p>
+                        </div>
+                        <div className="rounded-lg border bg-muted/20 p-3 text-sm">
+                          <p className="text-[11px] text-muted-foreground/60">CAP Prompt</p>
+                          <p className="mt-1 font-medium">{agent.correctiveActionPromptVersion}</p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -129,6 +143,8 @@ export default function AgentsPage() {
                         label: 'Rulebook Version',
                         key: 'rulebookVersionId',
                       },
+                      { label: 'Schema Version', key: 'extractionSchemaVersion' },
+                      { label: 'CAP Prompt Version', key: 'correctiveActionPromptVersion' },
                       { label: 'Timeout (ms)', key: 'timeoutMs' },
                       { label: 'Max Retries', key: 'maxRetries' },
                     ].map((row) => (

@@ -18,5 +18,6 @@ export function createDatabase(databaseUrl?: string) {
 }
 
 export const db = createDatabase();
+export * from './comparison-store.js';
 export * from './pipeline-store.js';
 export * from './review-store.js';

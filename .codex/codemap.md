@@ -1005,3 +1005,51 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Changed Files and Evidence:** packages/db/src/eval-store.ts, apps/web/src/trpc/routers/evaluation-run.ts, apps/web/src/app/(dashboard)/runs/page.tsx, packages/ui/src/components/ui/progress.tsx, packages/ui/src/index.ts. Typecheck 10/10 PASS; build PASS; Biome PASS on touched scope. PR: https://github.com/ponikar/elm-eval/pull/17
 
 ---
+
+## Entry 41 — 2026-07-13T12:25:17Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-007
+- **Branch:** feat/version-compare-quality-gates
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/version-compare-quality-gates
+- **Status:** IN PROGRESS / ACCEPTED
+- **Scope:** Persist baseline-vs-candidate comparisons, persist quality-gate decisions, and surface the required comparison metadata across compare/evals/agents/traces.
+- **Completed:** Verified the branch/worktree was created from the published T-007 claim on `main` and confirmed the existing foundations: durable evaluation runs, per-case grader results, trace-store reads, and schema support for `run_comparison`, `case_comparison`, `quality_gate`, and `quality_gate_evaluation`.
+- **Pending:** Implement the comparison store and tests, expose it through tRPC, then wire the dashboard pages in dependency order.
+- **Blockers:** None.
+- **Next Step:** Read the current DB exports, seed/runtime surfaces, and trace payload shapes, then implement an idempotent comparison persistence/query module before editing the UI pages.
+- **Changed Files and Evidence:** `.codex/codemap.md` only. Evidence: published claim on `origin/main`, clean worktree on branch `feat/version-compare-quality-gates`, and current store/schema inspection in `packages/db/src/schema.ts`, `eval-store.ts`, and `trace-store.ts`.
+
+---
+
+## Entry 42 — 2026-07-13T12:40:44Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-007
+- **Branch:** feat/version-compare-quality-gates
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/version-compare-quality-gates
+- **Status:** IN PROGRESS / BACKEND-AND-UI INTEGRATED
+- **Scope:** End-to-end comparison persistence plus the PRD-required comparison metadata surfacing on `compare`, `evals`, `agents`, and `traces`.
+- **Completed:** Added `packages/db/src/comparison-store.ts` with idempotent baseline/candidate comparison persistence, case classifications, aggregate metric/cost/latency deltas, default quality-gate persistence/evaluation, latest/list/read APIs, and focused comparison tests. Added `apps/web/src/trpc/routers/comparison.ts` and registered it in the app router. Replaced the placeholder compare page with a persisted comparison workspace, upgraded the eval suite table with latest baseline/candidate result columns, expanded the agent versions page with schema/rulebook/CAP prompt metadata, and extended the traces output tab with input pages, retrieved rules, and expected output beside actual output.
+- **Pending:** Review the final diff, decide whether to commit/push this checkpoint now or continue into any follow-on polish. Repository-wide tests remain blocked by the current Neon `:memory:` test harness mismatch, so no passing root test run exists yet for this branch.
+- **Blockers:** `pnpm --filter @repo/db test` fails for pre-existing reasons outside the T-007 logic itself: the DB test suite still constructs `createDatabase(':memory:')` against the Neon serverless driver, which throws `ERR_INVALID_URL`, and the review/schema tests also expect a reachable Postgres instance. Root `pnpm test` is therefore not currently a meaningful validation gate in this environment.
+- **Next Step:** If this checkpoint is acceptable, commit the T-007 branch and push it; otherwise continue with targeted UI polish using the new comparison router as the stable data contract.
+- **Changed Files and Evidence:** `.codex/codemap.md`, `packages/db/package.json`, `packages/db/src/index.ts`, new `packages/db/src/comparison-store.ts`, new `packages/db/src/comparison-store.test.ts`, new `apps/web/src/trpc/routers/comparison.ts`, `apps/web/src/trpc/routers/_app.ts`, `apps/web/src/app/(dashboard)/compare/page.tsx`, `evals/page.tsx`, `agents/page.tsx`, `traces/page.tsx`, and `pnpm-lock.yaml`. Validation: `pnpm format` PASS with only pre-existing repo warnings outside owned scope; `pnpm --filter @repo/db typecheck` PASS; `pnpm --filter web typecheck` PASS; root `pnpm typecheck` PASS; `DATABASE_URL=postgres://user:pass@127.0.0.1:5432/agent_eval GEMINI_API_KEY=dummy pnpm --filter web build` PASS; root `DATABASE_URL=... GEMINI_API_KEY=dummy pnpm build` PASS; `git diff --check` PASS; `DATABASE_URL=postgres://user:pass@127.0.0.1:5432/agent_eval pnpm --filter @repo/db test` FAILS on the pre-existing Neon/`:memory:` DB test harness.
+
+---
+
+## Entry 43 — 2026-07-13T12:46:00Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-007
+- **Branch:** feat/version-compare-quality-gates
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/version-compare-quality-gates
+- **Status:** READY TO PUBLISH
+- **Scope:** Final validation, review, and remote handoff for the comparison/gate implementation.
+- **Completed:** Reran the required formatter and root typecheck immediately before handoff. `pnpm format` completed with the same pre-existing repository warnings only; no new T-007-specific formatter errors were introduced. Root `pnpm typecheck` passed from the worktree after removing the temporary `@repo/db -> @repo/evals` cycle. The branch is ready for commit, push, and PR creation.
+- **Pending:** Commit the T-007 changes, push `feat/version-compare-quality-gates`, and open the PR. Root DB tests remain blocked by the existing Neon `:memory:` harness and are not newly introduced by this branch.
+- **Blockers:** `pnpm --filter @repo/db test` still fails outside T-007 due to the existing `createDatabase(':memory:')` / Neon serverless mismatch and missing live Postgres test environment.
+- **Next Step:** Review the staged diff, create the intentional commit, push the branch, and open a PR with the validation and blocker summary.
+- **Changed Files and Evidence:** `.codex/codemap.md` plus the T-007 source files already listed in Entry 42. Validation: `pnpm format` PASS with 29 pre-existing warnings; `pnpm typecheck` PASS; no new diff-check issues.
+
+---
