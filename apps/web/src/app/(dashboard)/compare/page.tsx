@@ -44,6 +44,22 @@ const metricLabels: Record<string, string> = {
   hallucinatedFindingRate: 'Hallucinated Finding Rate',
 };
 
+const metricDescriptions: Record<string, string> = {
+  findingRecall: 'How many expected findings the agent actually found',
+  criticalFindingRecall: 'How many expected critical findings were detected',
+  findingPrecision: 'Share of produced findings that are valid (not false positives)',
+  categoryAccuracy: 'How often the assigned category matches the expected one',
+  severityAccuracy: 'How often the assigned severity matches the expected one',
+  auditCitationPrecision: 'Share of audit citations that genuinely support the finding',
+  ruleReferenceAccuracy: 'Share of rule references that are valid and applicable',
+  capCompleteness: 'Corrective actions with owner, deadline, verification, and priority',
+  schemaValidity: 'Outputs that pass structured-schema validation on first attempt',
+  averageExecutionCostUsd: 'Mean model token cost per evaluated case',
+  p95PipelineLatencyMs: '95th-percentile end-to-end pipeline latency',
+  criticalUnderclassificationCount: 'Critical findings the agent rated below critical',
+  hallucinatedFindingRate: 'Share of findings with no supporting audit evidence',
+};
+
 function formatPercent(value: number) {
   return `${Math.round(value * 100)}%`;
 }
@@ -94,12 +110,14 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
 
 function AgentCard({
   title,
+  description,
   icon: Icon,
   agent,
   onRun,
   isRunning,
 }: {
   title: string;
+  description: string;
   icon: React.ElementType;
   agent:
     | {
@@ -121,12 +139,12 @@ function AgentCard({
           <Icon className="size-4" />
           {title}
         </CardTitle>
-        <CardDescription>{agent?.name ?? 'Unavailable'}</CardDescription>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <SummaryRow label="Model" value={agent?.model ?? '—'} />
-        <SummaryRow label="Prompt" value={agent?.promptVersion ?? '—'} />
-        <SummaryRow label="Rulebook" value={agent?.rulebookVersionId ?? '—'} />
+        <SummaryRow label="Prompt version" value={agent?.promptVersion ?? '—'} />
+        <SummaryRow label="Rulebook version" value={agent?.rulebookVersionId ?? '—'} />
         <SummaryRow label="Retrieval top K" value={String(agent?.retrievalTopK ?? '—')} />
         {onRun && (
           <Button size="sm" className="mt-2 w-full" disabled={!agent || isRunning} onClick={onRun}>
@@ -248,6 +266,7 @@ export default function ComparePage() {
         <div className="grid gap-4 xl:grid-cols-[1.1fr_1.1fr_0.8fr]">
           <AgentCard
             title="Baseline"
+            description="The current production agent version — the known-good reference point"
             icon={ShieldCheck}
             agent={baselineAgent}
             onRun={() => {
@@ -257,6 +276,7 @@ export default function ComparePage() {
           />
           <AgentCard
             title="Candidate"
+            description="The new agent version being evaluated for release readiness"
             icon={GitCompare}
             agent={candidateAgent}
             onRun={() => {
@@ -266,15 +286,16 @@ export default function ComparePage() {
           />
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Suite readiness</CardTitle>
+              <CardTitle className="text-base">Suite Readiness</CardTitle>
               <CardDescription>
-                Trusted coverage available for persisted comparison runs.
+                Number of human-approved test cases available for comparison runs. Both baseline and
+                candidate run against this identical frozen suite.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <SummaryRow label="Trusted cases" value={String(trusted.length)} />
-              <SummaryRow label="Critical cases" value={String(critical.length)} />
-              <SummaryRow label="Completed runs" value={String(runs.data?.length ?? 0)} />
+              <SummaryRow label="Trusted test cases" value={String(trusted.length)} />
+              <SummaryRow label="Critical-risk cases" value={String(critical.length)} />
+              <SummaryRow label="Completed eval runs" value={String(runs.data?.length ?? 0)} />
             </CardContent>
           </Card>
         </div>
@@ -284,8 +305,8 @@ export default function ComparePage() {
             <CardHeader>
               <CardTitle>Persisted Comparison</CardTitle>
               <CardDescription>
-                Compare two completed runs over the same frozen suite and persist the release
-                decision.
+                Select two completed evaluation runs and save a permanent record of how the
+                candidate version compares to the baseline across all trusted test cases.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -360,7 +381,8 @@ export default function ComparePage() {
             <CardHeader>
               <CardTitle>Quality Gate</CardTitle>
               <CardDescription>
-                Persisted gate result from the latest selected comparison.
+                Automated release decision based on configured thresholds for critical recall,
+                precision, regressions, and hallucination rate.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -371,22 +393,29 @@ export default function ComparePage() {
                       {activeComparison.qualityGate.decision}
                     </Badge>
                     <Badge variant="outline">
-                      {activeComparison.summary.criticalRegressionCount} critical regressions
+                      {activeComparison.summary.criticalRegressionCount} critical regression
+                      {activeComparison.summary.criticalRegressionCount !== 1 ? 's' : ''}
                     </Badge>
                   </div>
-                  {activeComparison.qualityGate.reasons.length > 0 ? (
+                  {activeComparison.qualityGate.decision === 'APPROVED' ? (
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
+                      All quality thresholds met — candidate is safe to release.
+                    </div>
+                  ) : activeComparison.qualityGate.reasons.length > 0 ? (
                     <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Blocked for the following reasons:
+                      </p>
                       {activeComparison.qualityGate.reasons.map((reason) => (
-                        <div key={reason} className="rounded-lg border px-3 py-2 text-sm">
+                        <div
+                          key={reason}
+                          className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+                        >
                           {reason}
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
-                      Candidate meets the configured release gate.
-                    </div>
-                  )}
+                  ) : null}
                 </>
               ) : (
                 <div className="flex items-center gap-2 rounded-lg border p-3 text-sm">
@@ -408,34 +437,54 @@ export default function ComparePage() {
             <div className="grid gap-4 xl:grid-cols-4">
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-semibold">
+                  <div className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
                     {activeComparison.summary.improvementCount}
                   </div>
-                  <p className="text-xs text-muted-foreground">Improvements</p>
+                  <p className="text-xs font-medium text-muted-foreground">Improvements</p>
+                  <p className="text-xs text-muted-foreground">
+                    Cases the candidate now passes that the baseline failed
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-semibold">
+                  <div className="text-2xl font-semibold text-destructive">
                     {activeComparison.summary.regressionCount}
                   </div>
-                  <p className="text-xs text-muted-foreground">Regressions</p>
+                  <p className="text-xs font-medium text-muted-foreground">Regressions</p>
+                  <p className="text-xs text-muted-foreground">
+                    Cases the candidate now fails that the baseline passed
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-semibold">
+                  <div className="text-2xl font-semibold text-destructive">
                     {activeComparison.summary.criticalRegressionCount}
                   </div>
-                  <p className="text-xs text-muted-foreground">Critical Regressions</p>
+                  <p className="text-xs font-medium text-muted-foreground">Critical Regressions</p>
+                  <p className="text-xs text-muted-foreground">
+                    Regressions on critical-risk cases — blocks release if &gt; 0
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-semibold">
+                  <div
+                    className={`text-2xl font-semibold ${
+                      activeComparison.costDeltaUsd > 0
+                        ? 'text-destructive'
+                        : activeComparison.costDeltaUsd < 0
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : ''
+                    }`}
+                  >
                     {formatMetric('averageExecutionCostUsd', activeComparison.costDeltaUsd)}
                   </div>
-                  <p className="text-xs text-muted-foreground">Average Cost Delta</p>
+                  <p className="text-xs font-medium text-muted-foreground">Cost Delta</p>
+                  <p className="text-xs text-muted-foreground">
+                    Difference in average per-case execution cost between versions
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -445,8 +494,8 @@ export default function ComparePage() {
                 <CardHeader>
                   <CardTitle>Metric Deltas</CardTitle>
                   <CardDescription>
-                    Candidate metrics are evaluated from persisted grader counts and execution
-                    usage.
+                    Side-by-side metrics computed from persisted grader results and execution usage.
+                    Green means the candidate improved; red means it regressed.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -454,18 +503,27 @@ export default function ComparePage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Metric</TableHead>
-                        <TableHead>Baseline</TableHead>
-                        <TableHead>Candidate</TableHead>
-                        <TableHead>Delta</TableHead>
+                        <TableHead className="text-right">Baseline</TableHead>
+                        <TableHead className="text-right">Candidate</TableHead>
+                        <TableHead className="text-right">Delta</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {Object.entries(activeComparison.metrics).map(([key, value]) => (
                         <TableRow key={key}>
-                          <TableCell className="font-medium">{metricLabels[key] ?? key}</TableCell>
-                          <TableCell>{formatMetric(key, value.baseline)}</TableCell>
-                          <TableCell>{formatMetric(key, value.candidate)}</TableCell>
                           <TableCell>
+                            <div className="font-medium">{metricLabels[key] ?? key}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {metricDescriptions[key] ?? ''}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatMetric(key, value.baseline)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatMetric(key, value.candidate)}
+                          </TableCell>
+                          <TableCell className="text-right">
                             <span
                               className={
                                 value.delta > 0
@@ -489,7 +547,8 @@ export default function ComparePage() {
                 <CardHeader>
                   <CardTitle>Case Outcomes</CardTitle>
                   <CardDescription>
-                    Improvements and regressions are persisted per trusted case.
+                    Only cases where the baseline and candidate disagree are shown. Regressions
+                    indicate the candidate failed a case the baseline passed.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -545,6 +604,9 @@ export default function ComparePage() {
         <Card>
           <CardHeader>
             <CardTitle>Default Quality Gate Thresholds</CardTitle>
+            <CardDescription>
+              A candidate version is blocked from release if any of these thresholds are not met.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
