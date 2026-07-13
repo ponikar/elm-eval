@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T09:01:31Z
+**Updated:** 2026-07-13T09:09:38Z
 
 ### Outcome
 
@@ -55,6 +55,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   boundary instead of issuing per-run UI queries or recalculating price in the browser.
 - `frontend-skill` — selected for T-015 to present model, cost, progress, and status as a restrained
   operational table consistent with the active shadcn dashboard repair.
+- `senior-software-architecture` — selected for T-016 to make the pricing boundary provider-neutral
+  without expanding the existing Gemini-only price catalog or changing runtime behavior.
+- `github:github` and `github:yeet` — selected for T-016 to inspect, update, and verify draft PR #12
+  after resolving its conflict; merging remains explicitly out of scope.
 
 ### Subgoals
 
@@ -77,6 +81,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-013  | Real Gemini cost accounting          | codex       | SUPERSEDED  | fix/gemini-cost-accounting | —                                             | Deferred by user in favor of UI repair        |
 | T-014  | Dashboard UI repair + shadcn alignment | codex     | IN PROGRESS | feat/dashboard-ui-repair   | /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair | Claim worktree, then replace the custom shell with shadcn dashboard patterns |
 | T-015  | Eval run cost + model visibility     | codex       | planned     | —                           | —                                             | After T-014/T-006, expose run summaries and render Runs table |
+| T-016  | Generic model pricing + PR repair    | codex       | IN PROGRESS | fix/gemini-cost-accounting  | /Users/darshan/work/agent-eval-model-pricing  | Merge current main, preserve board history, and update generic pricing names |
 
 ### Decisions
 
@@ -310,6 +315,35 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   typecheck, tests, and build after T-006 repair.
 - **Status/next action:** PLANNED — do not start or create a worktree while T-014 and T-006 own the
   required paths. Implement immediately after both dependencies publish their handoffs.
+
+### T-016 Assignment
+
+- **Outcome:** Draft PR #12 exposes provider-neutral model-pricing module and API names and is
+  reconciled with current `main` without losing newer goal-board or append-only codemap history.
+- **Definition of done:** The pricing file and exported pricing types/functions use generic model
+  terminology; Gemini provider behavior, supported rates, and focused tests remain unchanged;
+  current `main` is merged into the PR branch; all conflict sides and newer T-014/T-015 state are
+  preserved; focused agent gates pass; the pushed draft PR is no longer conflicting.
+- **Owner:** codex
+- **Branch/worktree:** `fix/gemini-cost-accounting` at
+  `/Users/darshan/work/agent-eval-model-pricing`.
+- **Owned paths:** `packages/agent/src/gemini-pricing.ts`, replacement
+  `packages/agent/src/model-pricing.ts`, `packages/agent/src/gemini-provider.ts`, focused agent
+  tests, and conflict-resolution updates to `.codex/goal.md` and `.codex/codemap.md`. No web,
+  database, eval-engine, fixture, manifest, or lockfile changes.
+- **Dependencies:** Draft PR #12 and current `main`; T-014 continues independently in a separate
+  worktree with non-overlapping UI ownership.
+- **Non-goals:** Adding providers or rates, changing pricing semantics, T-015 cost display work,
+  repairing the separate T-006 Neon adapter, or merging PR #12.
+- **Verified assumptions:** Generic naming is an API/module organization request; the price catalog
+  may still contain only the two currently supported Gemini models; a normal merge commit avoids
+  rewriting the already-published PR branch.
+- **Validation:** Pricing/provider focused tests; touched-scope Biome; agent strict typecheck and
+  tests; inspect final diff; push and verify PR #12 mergeability and draft state.
+- **Started/checkpoint:** 2026-07-13T09:09:38Z / 2026-07-13T09:09:38Z
+- **Status/next action:** IN PROGRESS — publish this isolated board claim, create the fresh
+  worktree, merge current `main`, resolve coordination-file conflicts, and perform the generic
+  pricing rename without touching T-014 paths.
 
 ### Validation Commands
 
