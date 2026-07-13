@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T10:53:32Z
+**Updated:** 2026-07-13T12:16:24Z
 
 ### Outcome
 
@@ -20,7 +20,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - [x] Agent v1 extracts structured findings
 - [x] Evidence validation catches invalid citations
 - [x] Human correction converts to regression test
-- [ ] Evaluation suite runs 10 trusted cases
+- [x] Evaluation suite runs 10 trusted cases
 - [ ] Version comparison shows stable/improvements/regressions
 - [ ] Quality gate approves or blocks candidate
 - [ ] Trace viewer shows pipeline stages for failures
@@ -78,14 +78,14 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
 | T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
 | T-006  | Evaluation engine                    | codex       | COMPLETE    | main                   | —                                             | Neon adapter repair merged on main            |
-| T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
+| T-007  | Version comparison + quality gates   | codex       | IN PROGRESS | feat/version-compare-quality-gates | /Users/darshan/work/agent-eval/worktrees/version-compare-quality-gates | Publish board claim, create worktree, implement comparison store first |
 | T-008  | Trace viewer + demo validation       | codex       | COMPLETE    | feat/trace-viewer      | —                                             | Merged via PR #14                             |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
 | T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
 | T-013  | Real Gemini cost accounting          | codex       | SUPERSEDED  | fix/gemini-cost-accounting | —                                             | Deferred by user in favor of UI repair        |
 | T-014  | Dashboard UI repair + shadcn alignment | codex     | COMPLETE    | feat/dashboard-ui-repair   | —                                             | Merged via PR #13                             |
-| T-015  | Eval run cost + model visibility     | opencode    | IN PROGRESS | feat/run-cost-visibility  | —                                             | Server-aggregated run summaries + Runs table  |
+| T-015  | Eval run cost + model visibility     | opencode    | COMPLETE    | feat/run-cost-visibility  | —                                             | PR #17 open for review                        |
 | T-016  | Generic model pricing + PR repair    | codex       | COMPLETE    | fix/gemini-cost-accounting  | —                                             | Merged via PR #12                             |
 | T-017  | Review action UX: loading states + toasts | opencode | COMPLETE | fix/review-action-loading | /Users/darshan/work/agent-eval/worktrees/review-action-loading | PR ready; spinners + toasts added |
 
@@ -350,6 +350,70 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   validation, review, push, and PR verification are complete. Draft PR #12 is MERGEABLE and remains
   open/unmerged; rerun full repository gates after the separate T-006 Neon adapter repair.
 
+### T-007 Assignment
+
+- **Outcome:** Baseline and candidate evaluation runs can be compared durably and explained
+  operationally: the system persists per-case and per-run comparison results, evaluates a
+  versioned quality gate, and surfaces the resulting evidence across the Eval Suite, Agent
+  Versions, Version Compare, and Failure Traces screens.
+- **Definition of done:** A completed baseline run and candidate run over the same frozen suite can
+  be compared idempotently; every trusted case is classified as stable pass, improvement,
+  regression, or stable failure; critical regressions are counted separately; aggregate metric,
+  cost, and latency deltas persist; a versioned quality gate evaluation persists APPROVED or
+  BLOCKED with concrete reasons; the compare UI shows improvements, regressions, critical
+  regressions, metric deltas, cost/latency deltas, and gate result; the eval suite UI shows
+  trusted/pending/source/criticality/last result plus baseline/candidate status; the agent version
+  UI shows model, prompt version, rulebook version, retrieval settings, and schema version; the
+  traces UI shows input pages, retrieved rules, actual vs expected output, grader results, token
+  usage, cost, and stage latency for failed cases; focused and repository validation gates pass.
+- **Owner:** codex
+- **Branch/worktree:** `feat/version-compare-quality-gates` at
+  `/Users/darshan/work/agent-eval/worktrees/version-compare-quality-gates`
+- **Owned paths:** comparison-specific additions in `packages/db/src/**`, `packages/evals/src/**`,
+  `apps/web/src/trpc/routers/**`, and the non-overlapping dashboard routes for `compare`, `evals`,
+  `agents`, and `traces`, plus focused tests and coordination files.
+- **Dependencies:** T-006 evaluation execution, T-008 trace-query foundation, T-014 dashboard
+  shell, and T-015 run summaries are already in place. PR #17 should land or be consciously
+  reconciled before editing `packages/db/src/eval-store.ts` again.
+- **Non-goals:** New model providers, live experiment orchestration, synthetic case generation,
+  generic analytics, auth, billing, or redesigning the seeded audit/rulebook fixtures beyond what
+  comparison coverage requires.
+- **Verified assumptions:** The canonical source of truth for comparison inputs is the immutable
+  `evaluation_run` snapshot plus persisted `test_execution`, `grader_result`, and `trace_event`
+  rows; seeded agent versions remain the current version catalog; quality gate defaults should come
+  from the persisted `quality_gate` table, not hard-coded UI constants; comparison must be
+  database-backed and idempotent rather than recomputed in the browser.
+- **Implementation plan:**
+  1. Add a comparison read/write store that loads two completed runs, validates same frozen suite,
+     same ordered case set, and distinct baseline/candidate identities, computes per-case
+     classifications and aggregate deltas, and persists `run_comparison`, `case_comparison`, and
+     `quality_gate_evaluation` idempotently.
+  2. Promote the current `evaluateQualityGate()` helper into a persisted quality-gate flow: seed or
+     upsert one active default gate, evaluate against comparison metrics, and return APPROVED or
+     BLOCKED with PRD-readable reasons.
+  3. Expose comparison queries/mutations through tRPC: create comparison, list available runs,
+     fetch a comparison summary, fetch case-level comparison rows, and fetch the latest gate result
+     for the selected comparison.
+  4. Upgrade the `compare` page from configuration preview to an operational comparison workspace
+     with baseline/candidate run selection, top-line counts, metric/cost/latency deltas, critical
+     regression callouts, and gate decision evidence.
+  5. Upgrade the `evals` page to include last-result, baseline status, and candidate status per
+     case using persisted comparison data rather than static case metadata only.
+  6. Upgrade the `agents` page to surface the full PRD-required version metadata already present in
+     the agent schema, especially schema version and corrective-action prompt version.
+  7. Expand the trace workspace to show the missing PRD 17.7 payloads explicitly: input pages,
+     retrieved rules from trace summaries, expected output beside actual output, grader result
+     details, token usage, cost, and per-stage latency.
+- **Validation:** targeted unit tests for comparison classification and gate decisions; DB store
+  tests for idempotent persistence and suite/run mismatch rejection; router tests for comparison
+  creation and query surfaces; dashboard rendering tests where available; `pnpm format`; strict
+  typecheck for affected packages; focused tests; root `pnpm typecheck`, `pnpm test`, and
+  `pnpm build`.
+- **Started/checkpoint:** 2026-07-13T12:24:00Z / 2026-07-13T12:24:00Z
+- **Status/next action:** IN PROGRESS — publish the board claim on `main`, create the dedicated
+  worktree, append the assignment acceptance to `.codex/codemap.md`, then implement the comparison
+  persistence/query layer before touching the dashboard UI.
+
 ### Validation Commands
 
 ```bash
@@ -500,17 +564,28 @@ pnpm build                       # PASS (pipeline + Next.js)
   integration remains blocked only by the recorded T-006 Neon adapter and test-database issues.
 - 2026-07-13T14:00:00Z — Synced main with all merged PRs. Marked T-006, T-008, T-014, T-016
   complete. Claimed T-015 (eval run cost + model visibility) on main. All dependencies resolved.
+- 2026-07-13T12:16:24Z — Reconciled the remaining PRD gaps against current code and the active
+  ledger. Verified that the unfinished product work is concentrated in T-007: persisted run
+  comparison, quality-gate evaluation, and metadata surfacing across compare/evals/agents/traces.
+  Added a backend-first T-007 implementation plan and updated stale board state to reflect the
+  already-validated 10 trusted-case run criterion and the PR #17 T-015 handoff.
+- 2026-07-13T12:24:00Z — Claimed T-007 for codex with a dedicated `feat/version-compare-quality-gates`
+  branch and worktree path. The first implementation increment will be the idempotent comparison
+  persistence/query layer so UI work consumes durable results rather than recomputing deltas in the
+  browser.
 
 ### Blockers
 
-- None. All dependencies for T-015 are merged. Root validation may have pre-existing Neon test
-  configuration issues but T-015 scope is focused on UI + aggregation.
+- None for planning. T-007 implementation should reconcile with the open T-015 PR branch before
+  re-editing shared DB/router files to avoid overlapping changes.
 
 ### Handoff
 
-**Current state:** All prior tickets (T-006, T-008, T-012, T-014, T-016, T-017) are merged.
-The Runs page exists but shows only basic fields (ID, status, suite, agent, created). T-015 is
-claimed and ready to implement server-aggregated run summaries with model, cost, progress, and
-latency.
-**Next exact action:** Implement `listRunSummaries` in eval-store, wire it through tRPC, and
-enhance the Runs page table. Commit, push, create PR.
+**Current state:** The remaining user-visible gaps map to T-007. The repo already has durable
+evaluation runs, grader results, trace events, comparison tables, and quality-gate tables, plus
+working Runs and Traces dashboards. What is missing is the glue: persisted baseline-vs-candidate
+comparison logic, persisted gate evaluation, and the PRD-required metadata/result surfacing across
+the compare/evals/agents/traces screens.
+**Next exact action:** Commit and push this `.codex/goal.md` claim on `main`, create the
+ `feat/version-compare-quality-gates` worktree, append the acceptance entry to
+ `.codex/codemap.md`, and start the comparison store.
