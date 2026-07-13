@@ -989,3 +989,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** Same as Entry 33 — pre-existing `packages/db/src/eval-store.ts` Neon type failures block web build/typecheck, and `apps/web` tests require a valid `DATABASE_URL`.
 - **Next Step:** Review branch `feat/dashboard-ui-repair` or open a PR after deciding whether to first clear the external Neon/DB blockers.
 - **Changed Files and Evidence:** Commit `6f64f0f`; `git push -u origin feat/dashboard-ui-repair` PASS; remote branch created at `origin/feat/dashboard-ui-repair`.
+
+## Entry 40 — 2026-07-13T17:35:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-015
+- **Branch:** feat/run-cost-visibility
+- **Worktree:** main (direct)
+- **Status:** COMPLETE / REMOTE HANDOFF
+- **Scope:** Server-aggregated run summaries with model, cost, progress, and latency on the Runs page.
+- **Completed:** Added listRunSummaries() to eval-store with progress/cost/token/latency aggregation; added listSummaries tRPC procedure; created Progress component in @repo/ui; replaced barebones Runs table with enriched summary view; all validation gates pass (format, typecheck 10/10, build).
+- **Pending:** PR review and merge.
+- **Blockers:** None.
+- **Next Step:** Review and merge PR #17.
+- **Changed Files and Evidence:** packages/db/src/eval-store.ts, apps/web/src/trpc/routers/evaluation-run.ts, apps/web/src/app/(dashboard)/runs/page.tsx, packages/ui/src/components/ui/progress.tsx, packages/ui/src/index.ts. Typecheck 10/10 PASS; build PASS; Biome PASS on touched scope. PR: https://github.com/ponikar/elm-eval/pull/17
+
+---
