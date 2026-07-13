@@ -8,6 +8,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./eval-store": "./src/eval-store.ts",
+    "./trace-store": "./src/trace-store.ts",
     "./schema": "./src/schema.ts",
     "./pipeline-store": "./src/pipeline-store.ts"
   },

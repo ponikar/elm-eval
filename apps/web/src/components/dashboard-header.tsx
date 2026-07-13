@@ -1,36 +1,8 @@
 'use client';
 
-import { Button } from '@repo/ui';
-import { ChevronRight, Moon, Sun } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const initial = stored ?? preferred;
-    setTheme(initial);
-    document.documentElement.classList.toggle('dark', initial === 'dark');
-  }, []);
-
-  const toggle = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
-    localStorage.setItem('theme', next);
-  };
-
-  return (
-    <Button variant="ghost" size="icon" onClick={toggle} className="h-8 w-8">
-      {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
-  );
-}
 
 function Breadcrumbs() {
   const pathname = usePathname();
@@ -75,10 +47,7 @@ export function DashboardHeader({ title, description, actions }: DashboardHeader
           {description && <span className="text-sm text-muted-foreground">{description}</span>}
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        {actions}
-        <ThemeToggle />
-      </div>
+      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
     </header>
   );
 }
