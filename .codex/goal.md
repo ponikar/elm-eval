@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T07:23:32Z
+**Updated:** 2026-07-13T08:14:28Z
 
 ### Outcome
 
@@ -49,6 +49,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   snapshots, referential integrity, deletion policies, durable grading, and gate persistence.
 - `senior-software-architecture` — selected for T-006 deterministic grading, idempotent execution,
   partial-failure recovery, dependency direction, and observable worker boundaries.
+- `senior-software-architecture` — selected for T-013 to keep Gemini pricing at the provider
+  boundary and avoid unnecessary evaluation-schema or billing-system expansion.
 
 ### Subgoals
 
@@ -62,12 +64,13 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
 | T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
 | T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
-| T-006  | Evaluation engine                    | codex       | IN PROGRESS | feat/evaluation-engine | /Users/darshan/work/agent-eval-evaluation-engine | Draft PR #11 open; do not merge; port adapter after Neon finalizes |
+| T-006  | Evaluation engine                    | codex       | IN PROGRESS | main                   | —                                             | PR #11 merged; repair async Neon adapter compatibility |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
-| T-012  | SQLite → Neon Postgres migration     | opencode    | IN PROGRESS | feat/neon-postgres        | /Users/darshan/work/agent-eval-neon-postgres | Replace better-sqlite3 with @neondatabase/serverless |
+| T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
+| T-013  | Real Gemini cost accounting          | codex       | IN PROGRESS | fix/gemini-cost-accounting | /Users/darshan/work/agent-eval-gemini-cost | Calculate standard paid-list cost from token usage |
 
 ### Decisions
 
@@ -196,10 +199,9 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   isolated database; scripted worker integration for all approved cases; touched-scope Biome;
   strict TypeScript; full tests and production build; repeat affected checks after final edits.
 - **Started/checkpoint:** 2026-07-13T06:56:44Z / 2026-07-13T07:20:15Z
-- **Status/next action:** IN PROGRESS / REMOTE HANDOFF — implementation commit `a535993` is pushed
-  and draft PR #11 is open with explicit no-merge instructions. Wait for PR #10's Neon contract to
-  stabilize, then port the concrete adapter/API/tests if Neon lands first and rerun every gate
-  before requesting user merge approval.
+- **Status/next action:** IN PROGRESS / MERGED BUT VALIDATION BLOCKED — PR #11 was merged as
+  `14951fa` after PR #10, but its synchronous SQLite eval adapter was not ported to Neon. Repair the
+  async eval store, pipeline adapters, routers, and DB-backed tests before completing T-006.
 
 ### T-012 Assignment
 
@@ -213,6 +215,36 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Verified assumptions:** User has a Neon project and DATABASE_URL. Tests will use Neon branching. Numeric columns use `mode: 'number'` to preserve existing JS number behavior.
 - **Validation:** `pnpm install`, `pnpm format`, `pnpm typecheck` (10/10), `pnpm test`, `pnpm build`.
 - **Started:** 2026-07-13T12:00:00Z
+
+### T-013 Assignment
+
+- **Outcome:** Gemini-backed pipeline and evaluation runs persist a truthful standard paid-tier
+  USD cost estimate instead of always recording zero.
+- **Definition of done:** `gemini-2.5-flash` and `gemini-2.5-flash-lite` costs use the official
+  standard per-million input/output token rates; thinking tokens count as billable output; unknown
+  models fail before a billable request; existing pipeline/eval aggregation receives the computed
+  value without schema changes; focused agent checks pass; repository gates are rerun and any
+  pre-existing Neon/T-006 failures are recorded without suppression.
+- **Owner:** codex
+- **Branch/worktree:** `fix/gemini-cost-accounting` at
+  `/Users/darshan/work/agent-eval-gemini-cost`
+- **Owned paths:** `packages/agent/src/gemini-provider.ts`, one small pricing module, focused agent
+  tests, `.codex/codemap.md`, and this T-013 ledger section. No DB, eval schema, pipeline adapter,
+  UI, fixture, manifest, or lockfile changes.
+- **Dependencies:** Current `main` includes PR #10 and PR #11. Provider-local work is unblocked;
+  repository-wide completion remains dependent on the separate T-006 Neon compatibility repair.
+- **Non-goals:** Account invoice reconciliation, free-tier detection, caching/batch/priority rates,
+  grounding fees, pricing tables in the database, dashboards, and quality-gate cost thresholds.
+- **Verified assumptions:** `costUsd` is a standard paid-list estimate; the current seeded agents
+  use only the two supported stable Gemini model IDs; generation uses the standard API; no response
+  caching or grounding is configured; missing usage metadata represents zero recorded tokens.
+- **Validation:** pricing/provider unit tests; `pnpm format`; touched agent Biome; agent strict
+  typecheck and tests; repository typecheck, tests, and build; repeat affected checks after final
+  edits. No credentialed Gemini call is required.
+- **Started/checkpoint:** 2026-07-13T08:14:28Z / 2026-07-13T08:14:28Z
+- **Status/next action:** IN PROGRESS — publish this board claim, preserve the stale T-006 audit
+  journal, remove its worktree, then create the fresh T-013 worktree and implement provider-local
+  standard-rate cost calculation.
 
 ### Validation Commands
 
