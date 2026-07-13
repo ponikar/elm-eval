@@ -94,11 +94,14 @@ function AgentCard({
   title,
   icon: Icon,
   agent,
+  onRun,
+  isRunning,
 }: {
   title: string;
   icon: React.ElementType;
   agent:
     | {
+        id: string;
         name: string;
         model: string;
         promptVersion: string;
@@ -106,6 +109,8 @@ function AgentCard({
         retrievalTopK: number;
       }
     | undefined;
+  onRun?: () => void;
+  isRunning?: boolean;
 }) {
   return (
     <Card>
@@ -121,6 +126,18 @@ function AgentCard({
         <SummaryRow label="Prompt" value={agent?.promptVersion ?? '—'} />
         <SummaryRow label="Rulebook" value={agent?.rulebookVersionId ?? '—'} />
         <SummaryRow label="Retrieval top K" value={String(agent?.retrievalTopK ?? '—')} />
+        {onRun && (
+          <Button size="sm" className="mt-2 w-full" disabled={!agent || isRunning} onClick={onRun}>
+            {isRunning ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                Running...
+              </>
+            ) : (
+              `Run ${title}`
+            )}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
@@ -131,11 +148,43 @@ export default function ComparePage() {
   const evalCases = trpc.evalCase.list.useQuery();
   const agents = trpc.agentVersion.list.useQuery();
   const runs = trpc.comparison.listRuns.useQuery();
+  const runSummaries = trpc.evaluationRun.listSummaries.useQuery();
   const comparisons = trpc.comparison.listComparisons.useQuery();
   const latestComparison = trpc.comparison.getLatest.useQuery();
   const [selectedComparisonId, setSelectedComparisonId] = useState('');
   const [baselineRunId, setBaselineRunId] = useState('');
   const [candidateRunId, setCandidateRunId] = useState('');
+  const [pollingRunId, setPollingRunId] = useState<string | null>(null);
+
+  const hasActiveRun =
+    runSummaries.data?.some((r) => r.status === 'PENDING' || r.status === 'RUNNING') ?? false;
+
+  useEffect(() => {
+    if (!hasActiveRun) {
+      setPollingRunId(null);
+      return;
+    }
+    const activeRun = runSummaries.data?.find(
+      (r) => r.status === 'PENDING' || r.status === 'RUNNING',
+    );
+    if (activeRun) setPollingRunId(activeRun.id);
+  }, [hasActiveRun, runSummaries.data]);
+
+  useEffect(() => {
+    if (!pollingRunId) return;
+    const interval = setInterval(() => {
+      runSummaries.refetch();
+      runs.refetch();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [pollingRunId, runSummaries, runs]);
+
+  const triggerRun = trpc.evaluationRun.triggerRun.useMutation({
+    onSuccess: async (data) => {
+      setPollingRunId(data.runId);
+      await runSummaries.refetch();
+    },
+  });
 
   const comparisonDetail = trpc.comparison.get.useQuery(
     { comparisonId: selectedComparisonId },
@@ -194,8 +243,24 @@ export default function ComparePage() {
 
       <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
         <div className="grid gap-4 xl:grid-cols-[1.1fr_1.1fr_0.8fr]">
-          <AgentCard title="Baseline" icon={ShieldCheck} agent={baselineAgent} />
-          <AgentCard title="Candidate" icon={GitCompare} agent={candidateAgent} />
+          <AgentCard
+            title="Baseline"
+            icon={ShieldCheck}
+            agent={baselineAgent}
+            onRun={() => {
+              if (baselineAgent) triggerRun.mutate({ agentVersionId: baselineAgent.id });
+            }}
+            isRunning={triggerRun.isPending}
+          />
+          <AgentCard
+            title="Candidate"
+            icon={GitCompare}
+            agent={candidateAgent}
+            onRun={() => {
+              if (candidateAgent) triggerRun.mutate({ agentVersionId: candidateAgent.id });
+            }}
+            isRunning={triggerRun.isPending}
+          />
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Suite readiness</CardTitle>

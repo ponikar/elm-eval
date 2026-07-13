@@ -662,3 +662,28 @@ export async function countRunningEvaluationRuns(database: EvalDatabase = db) {
     .where(eq(evaluationRun.status, 'RUNNING'));
   return result[0]?.count ?? 0;
 }
+
+export interface FrozenSuiteSummary {
+  id: string;
+  name: string;
+  version: number;
+  description: string | null;
+  contentHash: string;
+  frozenAt: string | null;
+}
+
+export async function listFrozenSuites(database: EvalDatabase = db): Promise<FrozenSuiteSummary[]> {
+  const rows = await database
+    .select()
+    .from(evalSuite)
+    .where(eq(evalSuite.status, 'FROZEN'))
+    .orderBy(asc(evalSuite.createdAt));
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    version: row.version,
+    description: row.description,
+    contentHash: row.contentHash,
+    frozenAt: row.frozenAt,
+  }));
+}

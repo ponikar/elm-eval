@@ -12,6 +12,7 @@
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
+    "server": "tsx src/server.ts",
     "clean": "rm -rf dist node_modules .turbo"
   },
   "dependencies": {
