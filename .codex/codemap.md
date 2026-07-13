@@ -816,3 +816,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** Same external root-gate blockers recorded in Entry 34; no focused T-013 blocker.
 - **Next Step:** After T-006 repair, recreate a clean worktree from this branch, rebase on main, run all root gates with an isolated `DATABASE_URL`, and only then mark ready for merge.
 - **Changed Files and Evidence:** Commit `05c5acaa3896afbb265e34ecfaf47206bf5b7930`; draft PR https://github.com/ponikar/elm-eval/pull/12; branch/remote hashes match; no merge performed.
+
+---
+
+## Entry 36 — 2026-07-13T09:09:38Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-016
+- **Branch:** fix/gemini-cost-accounting
+- **Worktree:** /Users/darshan/work/agent-eval-model-pricing
+- **Status:** IN PROGRESS / ACCEPTED
+- **Scope:** Provider-neutral model-pricing names and draft PR #12 conflict repair.
+- **Completed:** Published the isolated T-016 board claim on `main` as `10a0a65` and verified a fresh clean worktree on the existing PR branch.
+- **Pending:** Merge current `main`, preserve both coordination histories, rename the pricing module/API, validate, push, and verify the draft PR is no longer conflicting.
+- **Blockers:** None. T-014 continues in its separate non-overlapping UI worktree.
+- **Next Step:** Merge `origin/main` normally and inspect the exact conflicts before resolving them.
+- **Changed Files and Evidence:** `.codex/codemap.md`; clean branch matched `origin/fix/gemini-cost-accounting` at `0e7c9b9`; board claim `10a0a65` is published on `origin/main`.
