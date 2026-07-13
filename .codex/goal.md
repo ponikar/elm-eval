@@ -254,6 +254,7 @@ pnpm build                       # PASS (pipeline + Next.js)
   stores with asynchronous Postgres stores. T-006 intentionally does not include or merge PR #10;
   its pure grader/runner is portable, while `eval-store`, tRPC awaits, and DB-backed tests require a
   focused port after PR #10's contract is finalized.
+- Remote Vercel and Vercel Preview Comments checks — PASS on draft PR #11; PR is CLEAN.
 
 ### Progress Log
 
@@ -302,7 +303,7 @@ pnpm build                       # PASS (pipeline + Next.js)
   PR #10 Neon support is now visible and requires a post-finalization async adapter port.
 - 2026-07-13T07:23:32Z — Pushed T-006 implementation `a535993` and opened draft PR #11 with an
   explicit no-merge notice and PR #10 Neon compatibility dependency; local gates pass and remote
-  Vercel deployment is pending.
+  Vercel checks subsequently passed and the draft PR is CLEAN.
 
 ### Blockers
 
