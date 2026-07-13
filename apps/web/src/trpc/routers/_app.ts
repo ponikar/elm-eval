@@ -1,6 +1,7 @@
 import { createTRPCRouter, publicProcedure } from '../init';
 import { agentVersionRouter } from './agent-version';
 import { auditRouter } from './audit';
+import { comparisonRouter } from './comparison';
 import { correctionRouter } from './correction';
 import { evalCaseRouter } from './eval-case';
 import { evaluationRunRouter } from './evaluation-run';
@@ -12,6 +13,7 @@ export const appRouter = createTRPCRouter({
   }),
   audit: auditRouter,
   correction: correctionRouter,
+  comparison: comparisonRouter,
   agentVersion: agentVersionRouter,
   evalCase: evalCaseRouter,
   evaluationRun: evaluationRunRouter,

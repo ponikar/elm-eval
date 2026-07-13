@@ -152,6 +152,14 @@ function JsonBlock({ value }: { value: unknown }) {
   );
 }
 
+function extractRetrievedRules(traces: Array<{ stage: string; outputSummary?: unknown }>) {
+  const retrievalTrace = traces.find((trace) => trace.stage === 'RULE_RETRIEVAL');
+  const summary = retrievalTrace?.outputSummary;
+  if (!summary || typeof summary !== 'object' || !('rules' in summary)) return [];
+  const rules = (summary as { rules?: unknown }).rules;
+  return Array.isArray(rules) ? rules : [];
+}
+
 export default function TracesPage() {
   const runs = trpc.trace.listRuns.useQuery();
   const [selectedRunId, setSelectedRunId] = useState<string>('');
@@ -193,6 +201,7 @@ export default function TracesPage() {
     () => runOverview.data?.cases.find((item) => item.execution.id === selectedExecutionId),
     [runOverview.data, selectedExecutionId],
   );
+  const retrievedRules = execution.data ? extractRetrievedRules(execution.data.traces) : [];
 
   return (
     <div>
@@ -606,10 +615,35 @@ export default function TracesPage() {
                               <div className="grid gap-6 xl:grid-cols-2">
                                 <Card>
                                   <CardHeader>
-                                    <CardTitle className="text-base">Expected Case</CardTitle>
+                                    <CardTitle className="text-base">Input Pages</CardTitle>
                                   </CardHeader>
                                   <CardContent>
-                                    <JsonBlock value={execution.data.evalCase} />
+                                    <JsonBlock value={execution.data.evalCase.input.auditPages} />
+                                  </CardContent>
+                                </Card>
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle className="text-base">Retrieved Rules</CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <JsonBlock
+                                      value={
+                                        retrievedRules.length > 0
+                                          ? retrievedRules
+                                          : {
+                                              message:
+                                                'No retrieved rules were captured in the trace.',
+                                            }
+                                      }
+                                    />
+                                  </CardContent>
+                                </Card>
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle className="text-base">Expected Output</CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <JsonBlock value={execution.data.evalCase.expected} />
                                   </CardContent>
                                 </Card>
                                 <Card>

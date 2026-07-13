@@ -100,10 +100,14 @@ function StatCard({
 
 export default function EvalsPage() {
   const evalCases = trpc.evalCase.list.useQuery();
+  const latestComparison = trpc.comparison.getLatest.useQuery();
 
   const trusted = evalCases.data?.filter((c) => c.status === 'TRUSTED') ?? [];
   const pending = evalCases.data?.filter((c) => c.status === 'PENDING_REVIEW') ?? [];
   const draft = evalCases.data?.filter((c) => c.status === 'DRAFT') ?? [];
+  const caseComparisonById = new Map(
+    (latestComparison.data?.cases ?? []).map((item) => [item.evalCase.id, item]),
+  );
 
   return (
     <div className="flex flex-1 flex-col">
@@ -178,16 +182,36 @@ export default function EvalsPage() {
                   </TabsList>
 
                   <TabsContent value="all">
-                    <CasesTable cases={evalCases.data ?? []} />
+                    <CasesTable
+                      cases={(evalCases.data ?? []).map((item) => ({
+                        ...item,
+                        comparison: caseComparisonById.get(item.id),
+                      }))}
+                    />
                   </TabsContent>
                   <TabsContent value="trusted">
-                    <CasesTable cases={trusted} />
+                    <CasesTable
+                      cases={trusted.map((item) => ({
+                        ...item,
+                        comparison: caseComparisonById.get(item.id),
+                      }))}
+                    />
                   </TabsContent>
                   <TabsContent value="pending">
-                    <CasesTable cases={pending} />
+                    <CasesTable
+                      cases={pending.map((item) => ({
+                        ...item,
+                        comparison: caseComparisonById.get(item.id),
+                      }))}
+                    />
                   </TabsContent>
                   <TabsContent value="draft">
-                    <CasesTable cases={draft} />
+                    <CasesTable
+                      cases={draft.map((item) => ({
+                        ...item,
+                        comparison: caseComparisonById.get(item.id),
+                      }))}
+                    />
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -213,6 +237,11 @@ function CasesTable({
       findingShouldExist: boolean;
       severity?: string;
     }>;
+    comparison?: {
+      classification: string;
+      baselineExecution: { status: string; passed?: boolean };
+      candidateExecution: { status: string; passed?: boolean };
+    };
   }>;
 }) {
   return (
@@ -225,6 +254,9 @@ function CasesTable({
           <TableHead>Expected</TableHead>
           <TableHead>Source</TableHead>
           <TableHead>Status</TableHead>
+          <TableHead>Last Result</TableHead>
+          <TableHead>Baseline</TableHead>
+          <TableHead>Candidate</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -257,6 +289,56 @@ function CasesTable({
             </TableCell>
             <TableCell>
               <StatusBadge status={c.status} />
+            </TableCell>
+            <TableCell>
+              {c.comparison ? (
+                <Badge
+                  variant={
+                    c.comparison.classification === 'REGRESSION'
+                      ? 'destructive'
+                      : c.comparison.classification === 'IMPROVEMENT'
+                        ? 'default'
+                        : 'outline'
+                  }
+                  className="text-xs"
+                >
+                  {c.comparison.classification.replaceAll('_', ' ')}
+                </Badge>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </TableCell>
+            <TableCell>
+              {c.comparison ? (
+                <Badge
+                  variant={c.comparison.baselineExecution.passed ? 'secondary' : 'outline'}
+                  className="text-xs"
+                >
+                  {c.comparison.baselineExecution.status === 'FAILED'
+                    ? 'FAILED'
+                    : c.comparison.baselineExecution.passed
+                      ? 'PASS'
+                      : 'FAIL'}
+                </Badge>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </TableCell>
+            <TableCell>
+              {c.comparison ? (
+                <Badge
+                  variant={c.comparison.candidateExecution.passed ? 'secondary' : 'outline'}
+                  className="text-xs"
+                >
+                  {c.comparison.candidateExecution.status === 'FAILED'
+                    ? 'FAILED'
+                    : c.comparison.candidateExecution.passed
+                      ? 'PASS'
+                      : 'FAIL'}
+                </Badge>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
             </TableCell>
           </TableRow>
         ))}
