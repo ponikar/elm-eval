@@ -184,8 +184,8 @@ function parseGrader(row: typeof graderResult.$inferSelect): GraderResult {
     hallucinatedFindingRate: row.hallucinatedFindingRate ?? undefined,
     correctiveActionCompleteness: row.correctiveActionCompleteness ?? undefined,
     schemaValidity: row.schemaValidity ?? undefined,
-    failureTypes: JSON.parse(row.failureTypesJson as string),
-    details: JSON.parse(row.detailsJson as string),
+    failureTypes: row.failureTypesJson as GraderResult['failureTypes'],
+    details: row.detailsJson as GraderResult['details'],
     judgeModel: row.judgeModel ?? undefined,
     createdAt: row.createdAt,
   });

@@ -297,14 +297,9 @@ export async function getRules(
     category: row.category as ComplianceRule['category'],
     requirementText: row.requirementText,
     sourcePage: row.sourcePage,
-    severityGuidance: row.severityGuidance
-      ? (JSON.parse(row.severityGuidance as string) as ComplianceRule['severityGuidance'])
-      : undefined,
-    correctiveActionGuidance: row.correctiveActionGuidance
-      ? (JSON.parse(
-          row.correctiveActionGuidance as string,
-        ) as ComplianceRule['correctiveActionGuidance'])
-      : undefined,
+    severityGuidance: (row.severityGuidance as ComplianceRule['severityGuidance']) ?? undefined,
+    correctiveActionGuidance:
+      (row.correctiveActionGuidance as ComplianceRule['correctiveActionGuidance']) ?? undefined,
   }));
 }
 

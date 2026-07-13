@@ -55,7 +55,6 @@ export interface ExecutionTraceDetails {
 }
 
 function parseStoredJson<T>(value: unknown): T {
-  if (typeof value === 'string') return JSON.parse(value) as T;
   return value as T;
 }
 
