@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T08:24:15Z
+**Updated:** 2026-07-13T09:01:31Z
 
 ### Outcome
 
@@ -51,6 +51,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   partial-failure recovery, dependency direction, and observable worker boundaries.
 - `senior-software-architecture` — selected for T-013 to keep Gemini pricing at the provider
   boundary and avoid unnecessary evaluation-schema or billing-system expansion.
+- `senior-software-architecture` — selected for T-015 to aggregate run cost at the persistence
+  boundary instead of issuing per-run UI queries or recalculating price in the browser.
+- `frontend-skill` — selected for T-015 to present model, cost, progress, and status as a restrained
+  operational table consistent with the active shadcn dashboard repair.
 
 ### Subgoals
 
@@ -72,6 +76,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
 | T-013  | Real Gemini cost accounting          | codex       | SUPERSEDED  | fix/gemini-cost-accounting | —                                             | Deferred by user in favor of UI repair        |
 | T-014  | Dashboard UI repair + shadcn alignment | codex     | IN PROGRESS | feat/dashboard-ui-repair   | /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair | Claim worktree, then replace the custom shell with shadcn dashboard patterns |
+| T-015  | Eval run cost + model visibility     | codex       | planned     | —                           | —                                             | After T-014/T-006, expose run summaries and render Runs table |
 
 ### Decisions
 
@@ -278,6 +283,33 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Status/next action:** IN PROGRESS — publish this board claim on `main`, create the dedicated
   worktree, append the assignment acceptance to `.codex/codemap.md`, then implement the shadcn
   sidebar/dashboard shell and Tailwind source hardening.
+
+### T-015 Assignment
+
+- **Outcome:** After every evaluation run, the Runs screen shows the frozen Gemini model used and
+  the persisted USD cost produced by that model, alongside run status and progress.
+- **Definition of done:** The run-list API returns one server-aggregated summary per run containing
+  frozen agent version name/model, progress counts, summed agent cost, summed evaluator cost, and
+  latency; the Runs page renders loading/error/empty states and a shadcn table with model and cost
+  visible without opening a run; small non-zero costs do not round to `$0.00`; focused and root
+  validation gates pass.
+- **Owner:** codex
+- **Branch/worktree:** To be claimed after T-014 releases the Runs page and T-006 releases eval
+  persistence/router paths.
+- **Owned paths:** evaluation summary query in `packages/db/src/eval-store.ts`, the evaluation-run
+  tRPC router, `apps/web/src/app/(dashboard)/runs/page.tsx`, focused tests, and coordination files.
+- **Dependencies:** T-013 pricing branch supplies `agentCostUsd`; T-006 must first port eval storage
+  and routers to async Neon; T-014 currently owns the Runs page and must complete or hand it off.
+- **Non-goals:** Recalculating model prices in the browser, invoice reconciliation, cost-based
+  quality gates, comparison charts, schema changes, or per-trace cost visualization.
+- **Verified assumptions:** Display the model from the immutable `agentVersionSnapshot.model`, not
+  the mutable live agent record; sum persisted execution costs server-side; show agent and evaluator
+  costs separately; format USD to six fractional digits so MVP-scale token costs remain visible.
+- **Validation:** DB summary aggregation tests; evaluation-run router test; Runs page loading/error/
+  empty/data rendering coverage where supported; touched Biome; DB/web typecheck and tests; root
+  typecheck, tests, and build after T-006 repair.
+- **Status/next action:** PLANNED — do not start or create a worktree while T-014 and T-006 own the
+  required paths. Implement immediately after both dependencies publish their handoffs.
 
 ### Validation Commands
 
