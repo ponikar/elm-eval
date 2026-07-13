@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T09:23:57Z
+**Updated:** 2026-07-13T09:24:51Z
 
 ### Outcome
 
@@ -285,11 +285,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   and `pnpm --filter web build`; local dev-server HTML/CSS checks for shared classes and dashboard
   rendering; then full `pnpm typecheck`, `pnpm test`, and `pnpm build`.
 - **Started/checkpoint:** 2026-07-13T08:24:15Z / 2026-07-13T09:18:42Z
-- **Status/next action:** IN PROGRESS / IMPLEMENTED WITH EXTERNAL VALIDATION BLOCKERS — the
-  shadcn sidebar/dashboard shell, Tailwind source hardening, and dashboard page conversions are in
-  place in `feat/dashboard-ui-repair`. Commit and push the scoped UI branch, then resume only after
-  the pre-existing `packages/db/src/eval-store.ts` Neon type break and the missing test
-  `DATABASE_URL` are addressed or explicitly waived.
+- **Status/next action:** BLOCKED / REMOTE HANDOFF — the scoped UI implementation is committed as
+  `6f64f0f` and pushed to `origin/feat/dashboard-ui-repair`. Resume only after the pre-existing
+  `packages/db/src/eval-store.ts` Neon type break and the missing test `DATABASE_URL` are
+  addressed or explicitly waived.
 
 ### T-015 Assignment
 
@@ -503,6 +502,9 @@ pnpm build                       # PASS (pipeline + Next.js)
   Local dev-server HTML confirms the new shell renders. Validation remains blocked outside T-014 by
   the pre-existing `packages/db/src/eval-store.ts` type errors surfaced through web build and by
   missing `DATABASE_URL` for web tests.
+- 2026-07-13T09:24:51Z — T-014 branch handoff published: committed as `6f64f0f` (`feat: align
+  dashboard ui with shadcn shell`) and pushed to `origin/feat/dashboard-ui-repair`. No PR opened
+  yet because repository validation remains externally blocked.
 
 ### Blockers
 
@@ -524,7 +526,6 @@ renders the new shell and updated routes. T-016 is already published separately 
 with generic model-pricing names and no merge conflict. Final app/package validation remains
 blocked externally by the merged Neon/T-006 database typing regression and missing test
 `DATABASE_URL`.
-**Next exact action:** Finish rebasing `feat/dashboard-ui-repair` onto current `main`, push the
-synced UI branch, then resume broader validation only after the external
-`packages/db/src/eval-store.ts` Neon typing break is repaired and a test `DATABASE_URL` is
-available.
+**Next exact action:** Push the rebased `feat/dashboard-ui-repair` branch, then either repair the
+external `packages/db/src/eval-store.ts` Neon typing break and provide a test `DATABASE_URL`, or
+explicitly accept those external blockers and review the synced UI branch as-is.

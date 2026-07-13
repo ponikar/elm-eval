@@ -928,3 +928,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** `pnpm --filter web build` is blocked by pre-existing Neon typing failures in `packages/db/src/eval-store.ts` (`unknown` JSON fields and stale sync query helpers), and `pnpm --filter web test` is blocked because `DATABASE_URL` is required but unset in this environment. Focused `pnpm --filter web typecheck` also traverses the same external DB break. These are not introduced by T-014.
 - **Next Step:** Commit the UI branch and push it. Resume final validation only after the external `packages/db/src/eval-store.ts` Neon repair lands and a test `DATABASE_URL` is available.
 - **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`, `apps/web/components.json`, `apps/web/src/app/globals.css`, dashboard route files, `apps/web/src/components/app-sidebar.tsx`, `apps/web/src/components/site-header.tsx`, `apps/web/src/components/dashboard-header.tsx`, `apps/web/src/trpc/routers/evaluation-run.ts`, `packages/ui/src/components/ui/breadcrumb.tsx`, `packages/ui/src/components/ui/sidebar.tsx`, and `packages/ui/src/index.ts`. Validation: `pnpm install` PASS in worktree; `pnpm format` PASS (root still reports 28 pre-existing warnings outside T-014-owned scope); targeted `biome` on changed sidebar/router files PASS; local dev server on `http://127.0.0.1:3002` renders the new shell and route markup (`/audits`, `/rulebooks`) with shadcn sidebar/inset structure confirmed via `curl`; `pnpm --filter web build` FAILS on pre-existing `packages/db/src/eval-store.ts`; `pnpm --filter web test` FAILS because `DATABASE_URL` is unset; `git diff --check` PASS.
+
+---
+
+## Entry 42 — 2026-07-13T09:24:51Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-014
+- **Branch:** feat/dashboard-ui-repair
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair
+- **Status:** BLOCKED / REMOTE HANDOFF
+- **Scope:** Preserve the completed UI branch with exact push and blocker evidence.
+- **Completed:** Committed the scoped dashboard UI work as `6f64f0f` (`feat: align dashboard ui with shadcn shell`) and pushed it to `origin/feat/dashboard-ui-repair`.
+- **Pending:** External validation repair only. No further UI implementation is pending in this ticket.
+- **Blockers:** Same as Entry 33 — pre-existing `packages/db/src/eval-store.ts` Neon type failures block web build/typecheck, and `apps/web` tests require a valid `DATABASE_URL`.
+- **Next Step:** Review branch `feat/dashboard-ui-repair` or open a PR after deciding whether to first clear the external Neon/DB blockers.
+- **Changed Files and Evidence:** Commit `6f64f0f`; `git push -u origin feat/dashboard-ui-repair` PASS; remote branch created at `origin/feat/dashboard-ui-repair`.
