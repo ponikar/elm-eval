@@ -19,9 +19,9 @@ export const evaluationRunRouter = createTRPCRouter({
         description: z.string().optional(),
       }),
     )
-    .mutation(({ input }) => {
-      ensureReviewWorkspace();
-      const trustedCaseIds = listEvalCases()
+    .mutation(async ({ input }) => {
+      await ensureReviewWorkspace();
+      const trustedCaseIds = (await listEvalCases())
         .filter((item) => item.status === 'TRUSTED')
         .map((item) => item.id);
       return freezeEvalSuite({
@@ -41,20 +41,20 @@ export const evaluationRunRouter = createTRPCRouter({
         idempotencyKey: z.string().min(1),
       }),
     )
-    .mutation(({ input }) => {
-      ensureReviewWorkspace();
+    .mutation(async ({ input }) => {
+      await ensureReviewWorkspace();
       return createEvaluationRun({
         id: randomUUID(),
         ...input,
         createdAt: new Date().toISOString(),
       });
     }),
-  list: publicProcedure.query(() => {
-    ensureReviewWorkspace();
+  list: publicProcedure.query(async () => {
+    await ensureReviewWorkspace();
     return listEvaluationRuns();
   }),
-  get: publicProcedure.input(z.object({ id: z.string().min(1) })).query(({ input }) => {
-    ensureReviewWorkspace();
+  get: publicProcedure.input(z.object({ id: z.string().min(1) })).query(async ({ input }) => {
+    await ensureReviewWorkspace();
     return getEvaluationRunDetails(input.id);
   }),
 });

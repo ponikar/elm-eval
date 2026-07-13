@@ -896,3 +896,35 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** Root typecheck/build fail on the pre-existing T-006 SQLite-shaped calls against Neon; broader DB/eval/web tests require `DATABASE_URL`. No focused T-016 blocker remains.
 - **Next Step:** Commit and push this final handoff entry, verify the remote hash and draft PR state once more, then remove the T-016 worktree.
 - **Changed Files and Evidence:** Commits `681d377` and `0c9e675`; draft PR https://github.com/ponikar/elm-eval/pull/12; MERGEABLE at head `0c9e675`; focused validation and independent review PASS; no merge performed.
+
+---
+
+## Entry 40 — 2026-07-13T08:59:18Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-014
+- **Branch:** feat/dashboard-ui-repair
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair
+- **Status:** IN PROGRESS / ACCEPTED
+- **Scope:** Next.js dashboard UI repair only — shadcn dashboard shell adoption, Tailwind v4 shared-source hardening, and replacement of ad hoc placeholder dashboard surfaces with ready-to-use shadcn patterns.
+- **Completed:** Published the T-014 board claim on `main` as commit `d51205a` and pushed it to `origin/main`; created and verified the dedicated `feat/dashboard-ui-repair` worktree from that claim.
+- **Pending:** Inspect the current web/dashboard component inventory, add the missing official shadcn dashboard/sidebar primitives needed by the chosen pattern, implement the new shell and page surfaces, then run focused and repository validation.
+- **Blockers:** None.
+- **Next Step:** Audit the existing `apps/web` and `packages/ui` component surface against the official shadcn sidebar/dashboard pattern, then patch the UI and Tailwind source wiring in this worktree only.
+- **Changed Files and Evidence:** `.codex/goal.md` published on `main`; this `.codex/codemap.md` entry; `git push origin main` PASS; `git worktree add -b feat/dashboard-ui-repair /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair main` PASS; `pwd`, branch, and clean status verified in the new worktree.
+
+---
+
+## Entry 41 — 2026-07-13T09:18:42Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-014
+- **Branch:** feat/dashboard-ui-repair
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair
+- **Status:** IN PROGRESS / IMPLEMENTED WITH EXTERNAL VALIDATION BLOCKERS
+- **Scope:** Deliver the requested Next.js/shadcn dashboard repair end to end without changing backend behavior.
+- **Completed:** Added shadcn-style `breadcrumb` and `sidebar` primitives to `packages/ui`, exported them through `@repo/ui`, created `apps/web/components.json`, and added `@source "../../../../packages/ui/src";` to `apps/web/src/app/globals.css` so shared shadcn classes are explicitly sourced in Tailwind v4. Replaced the custom dashboard shell with `AppSidebar` + `SiteHeader` + `SidebarInset`, updated the page header pattern, and upgraded the audits, audit detail, evals, agents, rulebooks, runs, compare, and traces routes to a consistent dashboard composition. Also fixed `apps/web/src/trpc/routers/evaluation-run.ts` to await async review-store calls after the Neon migration because that app-side bug blocked web build immediately.
+- **Pending:** Commit/push the scoped branch. Full validation completion still depends on external repo fixes outside the UI scope.
+- **Blockers:** `pnpm --filter web build` is blocked by pre-existing Neon typing failures in `packages/db/src/eval-store.ts` (`unknown` JSON fields and stale sync query helpers), and `pnpm --filter web test` is blocked because `DATABASE_URL` is required but unset in this environment. Focused `pnpm --filter web typecheck` also traverses the same external DB break. These are not introduced by T-014.
+- **Next Step:** Commit the UI branch and push it. Resume final validation only after the external `packages/db/src/eval-store.ts` Neon repair lands and a test `DATABASE_URL` is available.
+- **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`, `apps/web/components.json`, `apps/web/src/app/globals.css`, dashboard route files, `apps/web/src/components/app-sidebar.tsx`, `apps/web/src/components/site-header.tsx`, `apps/web/src/components/dashboard-header.tsx`, `apps/web/src/trpc/routers/evaluation-run.ts`, `packages/ui/src/components/ui/breadcrumb.tsx`, `packages/ui/src/components/ui/sidebar.tsx`, and `packages/ui/src/index.ts`. Validation: `pnpm install` PASS in worktree; `pnpm format` PASS (root still reports 28 pre-existing warnings outside T-014-owned scope); targeted `biome` on changed sidebar/router files PASS; local dev server on `http://127.0.0.1:3002` renders the new shell and route markup (`/audits`, `/rulebooks`) with shadcn sidebar/inset structure confirmed via `curl`; `pnpm --filter web build` FAILS on pre-existing `packages/db/src/eval-store.ts`; `pnpm --filter web test` FAILS because `DATABASE_URL` is unset; `git diff --check` PASS.

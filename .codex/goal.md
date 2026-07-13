@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T09:16:30Z
+**Updated:** 2026-07-13T09:23:57Z
 
 ### Outcome
 
@@ -284,10 +284,12 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Validation:** `pnpm format`; focused `pnpm --filter web typecheck`, `pnpm --filter web test`,
   and `pnpm --filter web build`; local dev-server HTML/CSS checks for shared classes and dashboard
   rendering; then full `pnpm typecheck`, `pnpm test`, and `pnpm build`.
-- **Started/checkpoint:** 2026-07-13T08:24:15Z / 2026-07-13T08:24:15Z
-- **Status/next action:** IN PROGRESS — publish this board claim on `main`, create the dedicated
-  worktree, append the assignment acceptance to `.codex/codemap.md`, then implement the shadcn
-  sidebar/dashboard shell and Tailwind source hardening.
+- **Started/checkpoint:** 2026-07-13T08:24:15Z / 2026-07-13T09:18:42Z
+- **Status/next action:** IN PROGRESS / IMPLEMENTED WITH EXTERNAL VALIDATION BLOCKERS — the
+  shadcn sidebar/dashboard shell, Tailwind source hardening, and dashboard page conversions are in
+  place in `feat/dashboard-ui-repair`. Commit and push the scoped UI branch, then resume only after
+  the pre-existing `packages/db/src/eval-store.ts` Neon type break and the missing test
+  `DATABASE_URL` are addressed or explicitly waived.
 
 ### T-015 Assignment
 
@@ -493,6 +495,14 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-13T09:16:30Z — Pushed T-016 through `0c9e675`, updated draft PR #12, and verified GitHub
   reports it MERGEABLE rather than conflicting. The PR remains open, draft, and unmerged; broader
   integration remains blocked only by the recorded T-006 Neon adapter and test-database issues.
+- 2026-07-13T09:18:42Z — T-014 implementation pass complete in the dedicated worktree: added
+  shadcn-style `sidebar` and `breadcrumb` primitives to `@repo/ui`, created `apps/web/components.json`,
+  explicitly sourced `packages/ui/src` from `apps/web/src/app/globals.css`, replaced the custom
+  dashboard shell with shadcn sidebar/inset/header composition, and upgraded the audits, rulebooks,
+  runs, compare, traces, evals, agents, and audit-detail surfaces to a consistent dashboard layout.
+  Local dev-server HTML confirms the new shell renders. Validation remains blocked outside T-014 by
+  the pre-existing `packages/db/src/eval-store.ts` type errors surfaced through web build and by
+  missing `DATABASE_URL` for web tests.
 
 ### Blockers
 
@@ -500,13 +510,21 @@ pnpm build                       # PASS (pipeline + Next.js)
   adapters still use synchronous SQLite calls against Neon Postgres. Root DB tests also require a
   test `DATABASE_URL`. T-013 focused behavior passes but cannot be marked complete until those
   external gates are repaired and rerun.
+- T-014 focused web validation is blocked by the same external Neon/T-006 break:
+  `packages/db/src/eval-store.ts` fails web build/type validation after the Neon migration, and
+  `apps/web` tests abort without a `DATABASE_URL`. The UI work itself renders in the local dev
+  server and `git diff --check` passes.
 
 ### Handoff
 
-**Current state:** T-016 is published in draft PR #12 with generic model-pricing names and no merge
-conflict. T-014 continues independently in its existing UI worktree. Repository-wide gates remain
-blocked by T-006 synchronous SQLite-shaped evaluation adapters against Neon and missing test DB
-configuration; PR #12 remains intentionally unmerged.
-**Next exact action:** Remove the completed T-016 worktree. After T-006 repairs the Neon adapters
-and provides an isolated test `DATABASE_URL`, rerun full gates on PR #12 before any user-authorized
-merge; continue T-014 separately without touching the pricing branch.
+**Current state:** `feat/dashboard-ui-repair` now contains the requested UI-only repair: official
+shadcn-style dashboard shell primitives in `@repo/ui`, explicit Tailwind v4 shared-source wiring,
+and upgraded dashboard pages in `apps/web`. The local worktree dev server on `127.0.0.1:3002`
+renders the new shell and updated routes. T-016 is already published separately in draft PR #12
+with generic model-pricing names and no merge conflict. Final app/package validation remains
+blocked externally by the merged Neon/T-006 database typing regression and missing test
+`DATABASE_URL`.
+**Next exact action:** Finish rebasing `feat/dashboard-ui-repair` onto current `main`, push the
+synced UI branch, then resume broader validation only after the external
+`packages/db/src/eval-store.ts` Neon typing break is repaired and a test `DATABASE_URL` is
+available.
