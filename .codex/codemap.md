@@ -899,6 +899,19 @@ https://github.com/ponikar/elm-eval/pull/5
 
 ---
 
+## Entry 40 — 2026-07-13T17:10:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-017
+- **Branch:** fix/review-action-loading
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/review-action-loading
+- **Status:** COMPLETE
+- **Scope:** Review action UX: loading states + toast notifications
+- **Completed:** Added Spinner component to @repo/ui using Loader2 from lucide-react. Added Toaster component to @repo/ui using sonner. Updated FindingReviewActions to show spinners during pending mutations and display success/error toast notifications for approve/reject/correct actions. Wired Toaster into app Providers.
+- **Pending:** Create PR, merge, and clean up worktree.
+- **Blockers:** None.
+- **Next Step:** Create PR and merge.
+- **Changed Files and Evidence:** `packages/ui/src/components/ui/spinner.tsx` (new), `packages/ui/src/components/ui/sonner.tsx` (new), `packages/ui/src/index.ts` (exports), `apps/web/package.json` (sonner dep), `apps/web/src/app/providers.tsx` (Toaster), `apps/web/src/components/finding-review-actions.tsx` (spinners + toasts), `pnpm-lock.yaml`. Typecheck PASS (UI + web), format PASS (27 pre-existing warnings), web tests blocked by pre-existing DATABASE_URL requirement.
 ## Entry 40 — 2026-07-13T10:54:37Z
 
 - **Agent:** codex (coordinator)
