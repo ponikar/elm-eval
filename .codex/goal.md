@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T05:52:14Z
+**Updated:** 2026-07-13T06:56:44Z
 
 ### Outcome
 
@@ -47,6 +47,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   idempotency, persistence, and observability design. No repository-local skill is available.
 - `senior-software-architecture` — selected for T-011 schema ownership, immutable suite/run
   snapshots, referential integrity, deletion policies, durable grading, and gate persistence.
+- `senior-software-architecture` — selected for T-006 deterministic grading, idempotent execution,
+  partial-failure recovery, dependency direction, and observable worker boundaries.
 
 ### Subgoals
 
@@ -60,7 +62,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
 | T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
 | T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
-| T-006  | Evaluation engine                    | opencode    | planned     | —                      | —                                             | Run suite + graders                           |
+| T-006  | Evaluation engine                    | codex       | IN PROGRESS | feat/evaluation-engine | /Users/darshan/work/agent-eval-evaluation-engine | Implement pure grader/runner without Neon-owned DB infrastructure |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
@@ -156,6 +158,45 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Started/checkpoint:** 2026-07-13T05:36:14Z / 2026-07-13T05:36:14Z
 - **Status/next action:** COMPLETE — merged by PR #9 at `271da86`; T-006 can now implement frozen
   suite execution and graders, followed by T-007 comparison and gate evaluation logic.
+
+### T-006 Assignment
+
+- **Outcome:** A selected agent version can execute a frozen suite of trusted audit cases through
+  the production agent pipeline, with reproducible inputs and durable outputs, traces, usage,
+  failures, and deterministic grader results.
+- **Definition of done:** Only trusted cases can be frozen; a frozen suite and agent configuration
+  remain immutable for the run; run creation and case execution are idempotent; each case reaches
+  a terminal state without discarding other completed cases; one-to-one deterministic grading
+  calculates the PRD metrics and failure types; agent and evaluator usage remain separate; the
+  standalone pipeline worker can execute a persisted run; run APIs expose progress/results; a
+  scripted end-to-end run passes focused and repository validation. The top-level 10-case criterion
+  remains pending until a tenth case receives explicit human approval.
+- **Owner:** codex
+- **Branch/worktree:** `feat/evaluation-engine` at
+  `/Users/darshan/work/agent-eval-evaluation-engine`
+- **Owned paths:** evaluation contracts in `packages/domain/**`; `packages/evals/**`;
+  `packages/db/src/eval-store.ts` and focused eval-store tests; evaluation-specific additions in
+  `apps/pipeline/**` and `apps/web/src/trpc/routers/**`; scoped test-fixture assertions, package
+  manifests, lockfile changes, and append-only `.codex/codemap.md` entries.
+- **Dependencies:** T-003, T-005, and T-011 are complete. A separate agent is implementing Neon DB
+  support, but no branch, PR, or board claim was remotely visible at claim time. T-006 must not edit
+  `packages/db/src/schema.ts`, `packages/db/drizzle/**`, or database bootstrap/adapter files until
+  that agent's ownership and handoff are known; any narrow export integration will be serialized.
+- **Non-goals:** Version comparison, quality-gate decisions, detailed trace UI, concurrent case
+  execution, automatic distributed queues, LLM-as-judge grading, real PDF ingestion, and merging
+  the T-006 pull request without explicit user instruction.
+- **Verified assumptions:** SQLite remains the currently integrated runtime while Neon support is
+  in progress; the grader must be storage/provider independent; cases execute sequentially for the
+  MVP; case-level model/pipeline failures are terminal results while run-level infrastructure
+  failures fail the run; automated tests use scripted providers and make no billable Gemini calls;
+  `eval-010` remains `PENDING_REVIEW` and excluded until explicitly approved by a human.
+- **Validation:** focused grader/runner tests; eval-store transaction/idempotency tests against an
+  isolated database; scripted worker integration for all approved cases; touched-scope Biome;
+  strict TypeScript; full tests and production build; repeat affected checks after final edits.
+- **Started/checkpoint:** 2026-07-13T06:56:44Z / 2026-07-13T06:56:44Z
+- **Status/next action:** IN PROGRESS — publish this board claim, create the fresh worktree, append
+  acceptance to the codemap, then implement domain contracts and the pure deterministic grader
+  before touching persistence integration.
 
 ### Validation Commands
 
