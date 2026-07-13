@@ -314,7 +314,8 @@ pnpm build                       # PASS (pipeline + Next.js)
 - `pnpm typecheck` and `pnpm build` — BLOCKED by merged T-006 synchronous SQLite calls against
   Neon in the eval store and evaluation/indexing adapters.
 - `pnpm test` — BLOCKED outside T-013 because DB suites require `DATABASE_URL`; agent tests pass.
-- Draft PR #12 — OPEN/DRAFT at `0e7c9b9`; no merge performed. The ticket worktree was deleted.
+- Draft PR #12 — OPEN/DRAFT at `0e7c9b9`; Vercel Preview Comments PASS and Vercel FAIL on the
+  known repository build blocker; no merge performed. The ticket worktree was deleted.
 
 ### Progress Log
 
