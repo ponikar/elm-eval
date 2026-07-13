@@ -70,7 +70,7 @@ export function AppSidebar() {
   });
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className="peer/sidebar">
+    <Sidebar variant="inset" collapsible="offcanvas" className="peer/sidebar">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
