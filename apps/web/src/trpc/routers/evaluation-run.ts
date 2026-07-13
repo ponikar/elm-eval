@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { listEvalCases } from '@repo/db';
 import {
   createEvaluationRun,
+  findOrCreateFrozenSuite,
   freezeEvalSuite,
   getEvaluationRunDetails,
   listEvaluationRuns,
@@ -53,14 +54,7 @@ export const evaluationRunRouter = createTRPCRouter({
         throw new Error('No trusted eval cases available. Approve cases before running.');
       }
 
-      const suite = await freezeEvalSuite({
-        id: randomUUID(),
-        name: `auto-frozen-${Date.now()}`,
-        version: 1,
-        description: 'Automatically frozen trusted suite for dashboard-triggered run',
-        caseIds: trustedCaseIds,
-        frozenAt: new Date().toISOString(),
-      });
+      const suite = await findOrCreateFrozenSuite(trustedCaseIds);
       const suiteId = suite.id;
 
       const idempotencyKey = `run-${input.agentVersionId}-${suiteId}-${Date.now()}`;

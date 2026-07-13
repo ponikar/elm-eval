@@ -254,6 +254,82 @@ export async function freezeEvalSuite(
   });
 }
 
+export async function findOrCreateFrozenSuite(
+  caseIds: string[],
+  database: EvalDatabase = db,
+): Promise<EvalSuiteSnapshot> {
+  if (caseIds.length === 0) throw new Error('An evaluation suite requires at least one case');
+
+  return await database.transaction(async (tx) => {
+    const rows = await tx.select().from(evalCase).where(inArray(evalCase.id, caseIds));
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    const cases = caseIds.map((id) => {
+      const row = byId.get(id);
+      if (!row) throw new Error(`Evaluation case ${id} does not exist`);
+      return FrozenEvalCaseSchema.parse(parseEvalCase(row));
+    });
+    const hash = contentHash(cases);
+
+    const existingSuites = await tx
+      .select()
+      .from(evalSuite)
+      .where(and(eq(evalSuite.status, 'FROZEN'), eq(evalSuite.contentHash, hash)));
+
+    for (const existing of existingSuites) {
+      const memberships = await tx
+        .select()
+        .from(evalSuiteCase)
+        .where(eq(evalSuiteCase.suiteId, existing.id));
+      if (memberships.length > 0) {
+        return await loadSuiteSnapshot(existing.id, tx);
+      }
+
+      await tx.insert(evalSuiteCase).values(
+        cases.map((item, ordinal) => ({
+          suiteId: existing.id,
+          evalCaseId: item.id,
+          ordinal,
+          caseContentHash: createHash('sha256').update(canonicalize(item)).digest('hex'),
+          caseSnapshotJson: canonicalize(item),
+          addedAt: existing.frozenAt ?? new Date().toISOString(),
+        })),
+      );
+      return await loadSuiteSnapshot(existing.id, tx);
+    }
+
+    const id = randomUUID();
+    const now = new Date().toISOString();
+    await tx.insert(evalSuite).values({
+      id,
+      name: `auto-frozen-${hash.slice(0, 8)}`,
+      version: 1,
+      description: 'Automatically frozen trusted suite for dashboard-triggered run',
+      status: 'FROZEN',
+      contentHash: hash,
+      createdAt: now,
+      frozenAt: now,
+    });
+    await tx.insert(evalSuiteCase).values(
+      cases.map((item, ordinal) => ({
+        suiteId: id,
+        evalCaseId: item.id,
+        ordinal,
+        caseContentHash: createHash('sha256').update(canonicalize(item)).digest('hex'),
+        caseSnapshotJson: canonicalize(item),
+        addedAt: now,
+      })),
+    );
+    return EvalSuiteSnapshotSchema.parse({
+      id,
+      name: `auto-frozen-${hash.slice(0, 8)}`,
+      version: 1,
+      contentHash: hash,
+      cases,
+      frozenAt: now,
+    });
+  });
+}
+
 export async function loadSuiteSnapshot(
   suiteId: string,
   database: EvalReader = db,
