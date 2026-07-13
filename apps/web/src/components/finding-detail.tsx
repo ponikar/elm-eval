@@ -42,7 +42,6 @@ export function FindingDetail({ finding }: FindingDetailProps) {
             <CategoryBadge category={finding.category as never} />
             <SeverityBadge severity={finding.severity as never} />
           </div>
-
           <p className="text-sm leading-relaxed text-muted-foreground">{finding.description}</p>
 
           <Separator />

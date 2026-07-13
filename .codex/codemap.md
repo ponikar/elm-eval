@@ -544,3 +544,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** None for PR #8.
 - **Next Step:** Review and merge https://github.com/ponikar/elm-eval/pull/8, reconcile PR #7, update T-005 status on main, then remove this worktree.
 - **Changed Files and Evidence:** Commits `812da65` and `8d98f6b`; pushed branch verified; PR #8 CLEAN/MERGEABLE; Vercel and Vercel Preview Comments PASS.
+
+---
+
+## Entry 19 — 2026-07-13T05:34:43Z
+
+- **Agent:** codex
+- **Ticket:** T-005
+- **Branch:** feat/human-correction-loop
+- **Worktree:** /Users/darshan/work/agent-eval-human-correction
+- **Status:** COMPLETE / CONFLICT RECONCILED
+- **Scope:** Reconcile PR #7 audit UI integration before the eval persistence schema ticket.
+- **Completed:** Merged current `origin/main`; preserved the SQLite-backed review source of truth and T-005 correction form; retained the merged audit-page visual improvements; removed PR #7's superseded in-memory mutation wiring.
+- **Pending:** Push merge resolution, verify PR #8, merge it, update the main goal board, then claim the eval persistence schema ticket.
+- **Blockers:** None.
+- **Next Step:** Commit and push the conflict resolution, verify PR #8 checks and mergeability, then integrate it before claiming the new schema scope.
+- **Changed Files and Evidence:** `apps/web/src/app/(dashboard)/audits/[id]/page.tsx`, `apps/web/src/components/finding-detail.tsx`, merge reconciliation in `apps/web/src/trpc/routers/audit.ts`, and this journal entry. Touched Biome PASS; web strict typecheck PASS; web test 1/1 PASS; DB tests 5/5 PASS; `git diff --check` PASS.

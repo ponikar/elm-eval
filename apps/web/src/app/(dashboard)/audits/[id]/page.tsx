@@ -11,8 +11,8 @@ import { FindingsTable } from '@/components/findings-table';
 import { trpc } from '@/trpc/react';
 
 export default function AuditDetailPage() {
-  const params = useParams();
-  const auditId = params['id'] as string;
+  const params = useParams<{ id: string }>();
+  const auditId = params.id;
   const [selectedFindingId, setSelectedFindingId] = useState<string | null>(null);
 
   const audit = trpc.audit.get.useQuery({ id: auditId });
