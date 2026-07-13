@@ -755,6 +755,22 @@ https://github.com/ponikar/elm-eval/pull/5
 
 ---
 
+## Entry 32 — 2026-07-13T09:01:31Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-015
+- **Branch:** main
+- **Worktree:** /Users/darshan/work/agent-eval
+- **Status:** PLANNED / DEPENDENCY-QUEUED
+- **Scope:** Make persisted evaluation cost visible with the exact frozen model used for each run.
+- **Completed:** Verified model identity already exists in `agentVersionSnapshot.model`, while cost exists per execution and requires server-side aggregation. Defined a run-summary API and Runs table acceptance contract without changing active T-014 files.
+- **Pending:** T-006 async Neon repair, T-014 dashboard handoff, then ticket claim and implementation in a fresh worktree.
+- **Blockers:** T-014 currently owns the Runs page; T-006 owns the broken eval-store/router compatibility. Concurrent edits would violate file ownership.
+- **Next Step:** After both owners hand off, claim T-015 and implement server-aggregated summaries before wiring the Runs table.
+- **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`; inspected run domain snapshots, execution cost fields, list/get API, placeholder Runs page, and active worktree ownership. No source changes or validation runs.
+
+---
+
 ## Entry 32 — 2026-07-13T08:03:30Z
 
 - **Agent:** codex worker (`pipeline_gap_audit`)

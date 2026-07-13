@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T08:19:46Z
+**Updated:** 2026-07-13T09:09:38Z
 
 ### Outcome
 
@@ -51,6 +51,14 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   partial-failure recovery, dependency direction, and observable worker boundaries.
 - `senior-software-architecture` — selected for T-013 to keep Gemini pricing at the provider
   boundary and avoid unnecessary evaluation-schema or billing-system expansion.
+- `senior-software-architecture` — selected for T-015 to aggregate run cost at the persistence
+  boundary instead of issuing per-run UI queries or recalculating price in the browser.
+- `frontend-skill` — selected for T-015 to present model, cost, progress, and status as a restrained
+  operational table consistent with the active shadcn dashboard repair.
+- `senior-software-architecture` — selected for T-016 to make the pricing boundary provider-neutral
+  without expanding the existing Gemini-only price catalog or changing runtime behavior.
+- `github:github` and `github:yeet` — selected for T-016 to inspect, update, and verify draft PR #12
+  after resolving its conflict; merging remains explicitly out of scope.
 
 ### Subgoals
 
@@ -70,7 +78,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
 | T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
-| T-013  | Real Gemini cost accounting          | codex       | BLOCKED     | fix/gemini-cost-accounting | /Users/darshan/work/agent-eval-gemini-cost | Provider complete; root gates await T-006 Neon repair |
+| T-013  | Real Gemini cost accounting          | codex       | SUPERSEDED  | fix/gemini-cost-accounting | —                                             | Deferred by user in favor of UI repair        |
+| T-014  | Dashboard UI repair + shadcn alignment | codex     | IN PROGRESS | feat/dashboard-ui-repair   | /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair | Claim worktree, then replace the custom shell with shadcn dashboard patterns |
+| T-015  | Eval run cost + model visibility     | codex       | planned     | —                           | —                                             | After T-014/T-006, expose run summaries and render Runs table |
+| T-016  | Generic model pricing + PR repair    | codex       | IN PROGRESS | fix/gemini-cost-accounting  | /Users/darshan/work/agent-eval-model-pricing  | Merge current main, preserve board history, and update generic pricing names |
 
 ### Decisions
 
@@ -241,11 +252,98 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Validation:** pricing/provider unit tests; `pnpm format`; touched agent Biome; agent strict
   typecheck and tests; repository typecheck, tests, and build; repeat affected checks after final
   edits. No credentialed Gemini call is required.
-- **Started/checkpoint:** 2026-07-13T08:14:28Z / 2026-07-13T08:19:46Z
-- **Status/next action:** BLOCKED / DRAFT PR #12 — provider-local pricing commit `05c5aca` is
-  published at https://github.com/ponikar/elm-eval/pull/12 without merging. After T-006 is ported
-  to async Neon and a test `DATABASE_URL` is available, rebase and rerun repository typecheck,
-  tests, and build before marking T-013 complete.
+- **Started/checkpoint:** 2026-07-13T08:14:28Z / 2026-07-13T08:23:49Z
+- **Status/next action:** SUPERSEDED — provider-local pricing work remains preserved in draft
+  PR #12, but the user explicitly redirected active work to the Next.js dashboard UI repair. Resume
+  this task later after the UI work and T-006 Neon repair settle.
+
+### T-014 Assignment
+
+- **Outcome:** The Next.js dashboard uses official shadcn/ui dashboard primitives and layout
+  patterns instead of the current custom shell, with Tailwind v4 correctly resolving shared
+  `@repo/ui` classes so styling remains stable and is not lost to source-scanning gaps.
+- **Definition of done:** The web app's Tailwind/shadcn monorepo wiring matches current official
+  guidance; shared UI source paths are explicitly included from the app stylesheet; the dashboard
+  layout uses shadcn sidebar/breadcrumb/sidebar-inset composition; the main dashboard screens use
+  consistent shadcn components and remove ad hoc placeholder UI where possible without changing
+  backend behavior; focused validation and repository gates pass with no new warnings.
+- **Owner:** codex
+- **Branch/worktree:** `feat/dashboard-ui-repair` at
+  `/Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair`
+- **Owned paths:** `apps/web/src/app/**`, `apps/web/src/components/**`, `apps/web/components.json`,
+  `apps/web/src/app/globals.css`, relevant `packages/ui/src/components/ui/**`, and append-only
+  `.codex/codemap.md` entries. No database schema, pipeline, eval, or domain-logic changes.
+- **Dependencies:** Existing data APIs and Neon migration work on `main` must remain untouched.
+  T-006 async Neon repair stays separate and must not be mixed into this ticket.
+- **Non-goals:** New backend features, schema changes, seeded data changes, pipeline logic,
+  evaluation grading, or trace persistence behavior.
+- **Verified assumptions:** The user explicitly wants shadcn ready-to-use dashboard UI preferred
+  over custom components; Tailwind v4 is the intended runtime; browser-plugin automation is
+  unavailable in-session, so validation will rely on the local dev server, compiled CSS/HTML, and
+  standard app checks.
+- **Validation:** `pnpm format`; focused `pnpm --filter web typecheck`, `pnpm --filter web test`,
+  and `pnpm --filter web build`; local dev-server HTML/CSS checks for shared classes and dashboard
+  rendering; then full `pnpm typecheck`, `pnpm test`, and `pnpm build`.
+- **Started/checkpoint:** 2026-07-13T08:24:15Z / 2026-07-13T08:24:15Z
+- **Status/next action:** IN PROGRESS — publish this board claim on `main`, create the dedicated
+  worktree, append the assignment acceptance to `.codex/codemap.md`, then implement the shadcn
+  sidebar/dashboard shell and Tailwind source hardening.
+
+### T-015 Assignment
+
+- **Outcome:** After every evaluation run, the Runs screen shows the frozen Gemini model used and
+  the persisted USD cost produced by that model, alongside run status and progress.
+- **Definition of done:** The run-list API returns one server-aggregated summary per run containing
+  frozen agent version name/model, progress counts, summed agent cost, summed evaluator cost, and
+  latency; the Runs page renders loading/error/empty states and a shadcn table with model and cost
+  visible without opening a run; small non-zero costs do not round to `$0.00`; focused and root
+  validation gates pass.
+- **Owner:** codex
+- **Branch/worktree:** To be claimed after T-014 releases the Runs page and T-006 releases eval
+  persistence/router paths.
+- **Owned paths:** evaluation summary query in `packages/db/src/eval-store.ts`, the evaluation-run
+  tRPC router, `apps/web/src/app/(dashboard)/runs/page.tsx`, focused tests, and coordination files.
+- **Dependencies:** T-013 pricing branch supplies `agentCostUsd`; T-006 must first port eval storage
+  and routers to async Neon; T-014 currently owns the Runs page and must complete or hand it off.
+- **Non-goals:** Recalculating model prices in the browser, invoice reconciliation, cost-based
+  quality gates, comparison charts, schema changes, or per-trace cost visualization.
+- **Verified assumptions:** Display the model from the immutable `agentVersionSnapshot.model`, not
+  the mutable live agent record; sum persisted execution costs server-side; show agent and evaluator
+  costs separately; format USD to six fractional digits so MVP-scale token costs remain visible.
+- **Validation:** DB summary aggregation tests; evaluation-run router test; Runs page loading/error/
+  empty/data rendering coverage where supported; touched Biome; DB/web typecheck and tests; root
+  typecheck, tests, and build after T-006 repair.
+- **Status/next action:** PLANNED — do not start or create a worktree while T-014 and T-006 own the
+  required paths. Implement immediately after both dependencies publish their handoffs.
+
+### T-016 Assignment
+
+- **Outcome:** Draft PR #12 exposes provider-neutral model-pricing module and API names and is
+  reconciled with current `main` without losing newer goal-board or append-only codemap history.
+- **Definition of done:** The pricing file and exported pricing types/functions use generic model
+  terminology; Gemini provider behavior, supported rates, and focused tests remain unchanged;
+  current `main` is merged into the PR branch; all conflict sides and newer T-014/T-015 state are
+  preserved; focused agent gates pass; the pushed draft PR is no longer conflicting.
+- **Owner:** codex
+- **Branch/worktree:** `fix/gemini-cost-accounting` at
+  `/Users/darshan/work/agent-eval-model-pricing`.
+- **Owned paths:** `packages/agent/src/gemini-pricing.ts`, replacement
+  `packages/agent/src/model-pricing.ts`, `packages/agent/src/gemini-provider.ts`, focused agent
+  tests, and conflict-resolution updates to `.codex/goal.md` and `.codex/codemap.md`. No web,
+  database, eval-engine, fixture, manifest, or lockfile changes.
+- **Dependencies:** Draft PR #12 and current `main`; T-014 continues independently in a separate
+  worktree with non-overlapping UI ownership.
+- **Non-goals:** Adding providers or rates, changing pricing semantics, T-015 cost display work,
+  repairing the separate T-006 Neon adapter, or merging PR #12.
+- **Verified assumptions:** Generic naming is an API/module organization request; the price catalog
+  may still contain only the two currently supported Gemini models; a normal merge commit avoids
+  rewriting the already-published PR branch.
+- **Validation:** Pricing/provider focused tests; touched-scope Biome; agent strict typecheck and
+  tests; inspect final diff; push and verify PR #12 mergeability and draft state.
+- **Started/checkpoint:** 2026-07-13T09:09:38Z / 2026-07-13T09:09:38Z
+- **Status/next action:** IN PROGRESS — publish this isolated board claim, create the fresh
+  worktree, merge current `main`, resolve coordination-file conflicts, and perform the generic
+  pricing rename without touching T-014 paths.
 
 ### Validation Commands
 
@@ -307,23 +405,15 @@ pnpm build                       # PASS (pipeline + Next.js)
 ### T-013 Validation
 
 - `pnpm install --frozen-lockfile` — PASS.
-- `pnpm format` — PASS exit 0; T-013 files formatted. Root reports 27 pre-existing warnings outside
-  T-013 scope.
+- `pnpm format` — PASS exit 0 with 27 pre-existing warnings outside T-013; touched files clean.
 - Touched agent `biome check` — PASS with zero diagnostics.
 - `pnpm --filter @repo/agent typecheck` — PASS.
-- `pnpm --filter @repo/agent test` — PASS, 11/11 tests including four cost/provider cases and
-  pipeline cost aggregation.
-- `pnpm typecheck` — BLOCKED by pre-existing T-006 synchronous SQLite `.get()`, `.all()`, `.run()`,
-  and transaction contracts in `packages/db/src/eval-store.ts` against Neon Postgres.
+- `pnpm --filter @repo/agent test` — PASS, 11/11 tests.
+- `pnpm typecheck` and `pnpm build` — BLOCKED by merged T-006 synchronous SQLite calls against
+  Neon in the eval store and evaluation/indexing adapters.
 - `pnpm test` — BLOCKED outside T-013 because DB suites require `DATABASE_URL`; agent tests pass.
-- `pnpm build` — BLOCKED by the same T-006 Neon incompatibility in the eval store and pipeline
-  evaluation/indexing adapters.
-- No credentialed Gemini smoke call was made; deterministic injected-response tests cover usage and
-  cost behavior without a billable request.
-- Draft PR #12 — OPEN/DRAFT at commit `05c5aca`; Vercel Preview Comments PASS and Vercel pending at
-  initial verification; no merge performed.
-- Files changed: Gemini provider, provider-local pricing helper/tests, pipeline aggregation test,
-  goal ledger, and append-only codemap.
+- Draft PR #12 — OPEN/DRAFT at `0e7c9b9`; Vercel Preview Comments PASS and Vercel FAIL on the
+  known repository build blocker; no merge performed. The ticket worktree was deleted.
 
 ### Progress Log
 
@@ -373,25 +463,25 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-13T07:23:32Z — Pushed T-006 implementation `a535993` and opened draft PR #11 with an
   explicit no-merge notice and PR #10 Neon compatibility dependency; local gates pass and remote
   Vercel checks subsequently passed and the draft PR is CLEAN.
-- 2026-07-13T08:14:28Z — Reconciled merged PRs #10/#11, published the T-013 provider-local cost
-  accounting claim as `e2a7364`, preserved the T-006 audit journal, and removed its stale worktree.
-- 2026-07-13T08:19:46Z — Implemented standard Gemini cost estimates with thinking-token billing,
-  unknown-model preflight rejection, and pipeline aggregation evidence. Agent gates pass; root
-  gates remain blocked by the merged T-006 Neon incompatibility and missing test `DATABASE_URL`.
+- 2026-07-13T08:23:49Z — T-013 provider-local cost accounting published in draft PR #12. Focused
+  agent gates pass; root gates remain blocked by T-006 Neon incompatibility and DB test setup. Both
+  ticket worktrees were removed after their journals and commits were preserved.
+- 2026-07-13T08:24:15Z — User explicitly redirected active work to a standalone UI ticket. T-013
+  is superseded for now; T-014 is claimed to align the Next.js dashboard with official shadcn
+  dashboard patterns and harden Tailwind v4 shared-class resolution in a dedicated worktree.
 
 ### Blockers
 
 - T-006 and repository-wide validation are blocked because merged eval persistence and pipeline
   adapters still use synchronous SQLite calls against Neon Postgres. Root DB tests also require a
-  test `DATABASE_URL`. T-013 focused behavior is implemented and passing but cannot be marked
-  complete until those external gates are repaired and rerun.
+  test `DATABASE_URL`. T-013 focused behavior passes but cannot be marked complete until those
+  external gates are repaired and rerun.
 
 ### Handoff
 
-**Current state:** T-013 computes standard paid-list costs for both seeded Gemini models, includes
-thinking tokens, rejects unpriced models before network use, and passes all focused agent gates.
-The stale T-006 worktree is removed. Repository-wide gates remain blocked outside T-013 by the
-merged synchronous eval adapter and missing DB test connection.
-**Next exact action:** Publish T-013 as a draft PR without merging. After the T-006 Neon repair,
-rebase this branch, supply an isolated test `DATABASE_URL`, rerun every root gate, then reconcile
-the canonical board before integration.
+**Current state:** The active local work item is now T-014. The dashboard still uses a custom
+sidebar/header shell and several dashboard routes are placeholders instead of official shadcn
+dashboard patterns, though Tailwind v4 itself is loading and shared shadcn classes are compiling.
+**Next exact action:** Commit this board claim on `main`, create
+`feat/dashboard-ui-repair` in a fresh worktree, append the assignment acceptance to
+`.codex/codemap.md`, and keep the implementation strictly on the UI side.
