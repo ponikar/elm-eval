@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T08:23:49Z
+**Updated:** 2026-07-13T08:24:15Z
 
 ### Outcome
 
@@ -70,7 +70,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
 | T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
-| T-013  | Real Gemini cost accounting          | codex       | BLOCKED     | fix/gemini-cost-accounting | —                                             | Draft PR #12; root gates await T-006 Neon repair |
+| T-013  | Real Gemini cost accounting          | codex       | SUPERSEDED  | fix/gemini-cost-accounting | —                                             | Deferred by user in favor of UI repair        |
+| T-014  | Dashboard UI repair + shadcn alignment | codex     | IN PROGRESS | feat/dashboard-ui-repair   | /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair | Claim worktree, then replace the custom shell with shadcn dashboard patterns |
 
 ### Decisions
 
@@ -242,10 +243,41 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   typecheck and tests; repository typecheck, tests, and build; repeat affected checks after final
   edits. No credentialed Gemini call is required.
 - **Started/checkpoint:** 2026-07-13T08:14:28Z / 2026-07-13T08:23:49Z
-- **Status/next action:** BLOCKED / DRAFT PR #12 — provider-local pricing commit `05c5aca` and
-  handoff `0e7c9b9` are published at https://github.com/ponikar/elm-eval/pull/12 without merging.
-  After T-006 is ported to async Neon and a test `DATABASE_URL` is available, recreate a clean
-  worktree, rebase, and rerun repository typecheck, tests, and build before completion.
+- **Status/next action:** SUPERSEDED — provider-local pricing work remains preserved in draft
+  PR #12, but the user explicitly redirected active work to the Next.js dashboard UI repair. Resume
+  this task later after the UI work and T-006 Neon repair settle.
+
+### T-014 Assignment
+
+- **Outcome:** The Next.js dashboard uses official shadcn/ui dashboard primitives and layout
+  patterns instead of the current custom shell, with Tailwind v4 correctly resolving shared
+  `@repo/ui` classes so styling remains stable and is not lost to source-scanning gaps.
+- **Definition of done:** The web app's Tailwind/shadcn monorepo wiring matches current official
+  guidance; shared UI source paths are explicitly included from the app stylesheet; the dashboard
+  layout uses shadcn sidebar/breadcrumb/sidebar-inset composition; the main dashboard screens use
+  consistent shadcn components and remove ad hoc placeholder UI where possible without changing
+  backend behavior; focused validation and repository gates pass with no new warnings.
+- **Owner:** codex
+- **Branch/worktree:** `feat/dashboard-ui-repair` at
+  `/Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair`
+- **Owned paths:** `apps/web/src/app/**`, `apps/web/src/components/**`, `apps/web/components.json`,
+  `apps/web/src/app/globals.css`, relevant `packages/ui/src/components/ui/**`, and append-only
+  `.codex/codemap.md` entries. No database schema, pipeline, eval, or domain-logic changes.
+- **Dependencies:** Existing data APIs and Neon migration work on `main` must remain untouched.
+  T-006 async Neon repair stays separate and must not be mixed into this ticket.
+- **Non-goals:** New backend features, schema changes, seeded data changes, pipeline logic,
+  evaluation grading, or trace persistence behavior.
+- **Verified assumptions:** The user explicitly wants shadcn ready-to-use dashboard UI preferred
+  over custom components; Tailwind v4 is the intended runtime; browser-plugin automation is
+  unavailable in-session, so validation will rely on the local dev server, compiled CSS/HTML, and
+  standard app checks.
+- **Validation:** `pnpm format`; focused `pnpm --filter web typecheck`, `pnpm --filter web test`,
+  and `pnpm --filter web build`; local dev-server HTML/CSS checks for shared classes and dashboard
+  rendering; then full `pnpm typecheck`, `pnpm test`, and `pnpm build`.
+- **Started/checkpoint:** 2026-07-13T08:24:15Z / 2026-07-13T08:24:15Z
+- **Status/next action:** IN PROGRESS — publish this board claim on `main`, create the dedicated
+  worktree, append the assignment acceptance to `.codex/codemap.md`, then implement the shadcn
+  sidebar/dashboard shell and Tailwind source hardening.
 
 ### Validation Commands
 
@@ -368,6 +400,9 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-13T08:23:49Z — T-013 provider-local cost accounting published in draft PR #12. Focused
   agent gates pass; root gates remain blocked by T-006 Neon incompatibility and DB test setup. Both
   ticket worktrees were removed after their journals and commits were preserved.
+- 2026-07-13T08:24:15Z — User explicitly redirected active work to a standalone UI ticket. T-013
+  is superseded for now; T-014 is claimed to align the Next.js dashboard with official shadcn
+  dashboard patterns and harden Tailwind v4 shared-class resolution in a dedicated worktree.
 
 ### Blockers
 
@@ -378,10 +413,9 @@ pnpm build                       # PASS (pipeline + Next.js)
 
 ### Handoff
 
-**Current state:** T-013 computes standard paid-list costs for both seeded Gemini models, includes
-thinking tokens, rejects unpriced models before network use, and passes all focused agent gates in
-draft PR #12. Only the canonical main worktree remains. Repository-wide gates are blocked outside
-T-013 by the merged synchronous eval adapter and missing DB test connection.
-**Next exact action:** Repair T-006 against async Neon in a new claimed worktree. Then recreate the
-T-013 worktree from its branch, rebase, provide an isolated test `DATABASE_URL`, rerun every root
-gate, and only then mark PR #12 ready for merge.
+**Current state:** The active local work item is now T-014. The dashboard still uses a custom
+sidebar/header shell and several dashboard routes are placeholders instead of official shadcn
+dashboard patterns, though Tailwind v4 itself is loading and shared shadcn classes are compiling.
+**Next exact action:** Commit this board claim on `main`, create
+`feat/dashboard-ui-repair` in a fresh worktree, append the assignment acceptance to
+`.codex/codemap.md`, and keep the implementation strictly on the UI side.
