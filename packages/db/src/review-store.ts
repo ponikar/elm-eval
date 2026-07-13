@@ -446,6 +446,7 @@ export function createCorrection(
         findingId: original.id,
         auditId: original.auditId,
         agentVersionId: original.agentVersionId,
+        rulebookVersionId: version.rulebookVersionId,
         failureType: input.failureType,
         reason: input.reason,
         originalFindingJson: JSON.stringify(original),
