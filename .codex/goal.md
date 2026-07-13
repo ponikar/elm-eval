@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T09:16:30Z
+**Updated:** 2026-07-13T10:53:32Z
 
 ### Outcome
 
@@ -55,6 +55,11 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   boundary instead of issuing per-run UI queries or recalculating price in the browser.
 - `frontend-skill` — selected for T-015 to present model, cost, progress, and status as a restrained
   operational table consistent with the active shadcn dashboard repair.
+- `senior-software-architecture` — selected for T-008 to keep trace reads isolated from the active
+  T-006 repair by adding non-overlapping query modules instead of editing the repaired eval-store
+  hot path during parallel UI work.
+- `frontend-skill` — selected for T-008 to turn the placeholder traces screen into a dense,
+  operational debugging workspace using existing ready-made shadcn primitives.
 - `senior-software-architecture` — selected for T-016 to make the pricing boundary provider-neutral
   without expanding the existing Gemini-only price catalog or changing runtime behavior.
 - `github:github` and `github:yeet` — selected for T-016 to inspect, update, and verify draft PR #12
@@ -74,7 +79,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
 | T-006  | Evaluation engine                    | codex       | IN PROGRESS | main                   | —                                             | PR #11 merged; repair async Neon adapter compatibility |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
-| T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
+| T-008  | Trace viewer + demo validation       | codex       | IN PROGRESS | feat/trace-viewer      | /Users/darshan/work/agent-eval/worktrees/trace-viewer | Publish claim, create worktree, then replace the placeholder traces page with a real trace workspace |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
 | T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
