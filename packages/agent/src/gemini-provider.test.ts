@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { calculateGeminiCostUsd, getGeminiStandardPricing } from './gemini-pricing.js';
 import { GeminiModelProvider } from './gemini-provider.js';
+import { calculateModelCostUsd, getModelPricing } from './model-pricing.js';
 
 const schema = z.object({ ok: z.boolean() });
 
@@ -19,15 +19,15 @@ function request(model: string) {
 
 describe('Gemini cost accounting', () => {
   it('calculates standard paid-list estimates for the seeded models', () => {
-    const flash = getGeminiStandardPricing('gemini-2.5-flash');
-    const flashLite = getGeminiStandardPricing('gemini-2.5-flash-lite');
+    const flash = getModelPricing('gemini-2.5-flash');
+    const flashLite = getModelPricing('gemini-2.5-flash-lite');
 
     expect(flash).toBeDefined();
     expect(flashLite).toBeDefined();
     if (!flash || !flashLite) throw new Error('Seeded Gemini pricing is missing');
 
-    expect(calculateGeminiCostUsd(flash, { input: 1_000_000, output: 1_000_000 })).toBe(2.8);
-    expect(calculateGeminiCostUsd(flashLite, { input: 1_000_000, output: 1_000_000 })).toBe(0.5);
+    expect(calculateModelCostUsd(flash, { input: 1_000_000, output: 1_000_000 })).toBe(2.8);
+    expect(calculateModelCostUsd(flashLite, { input: 1_000_000, output: 1_000_000 })).toBe(0.5);
   });
 
   it('includes thinking tokens in output usage and cost', async () => {

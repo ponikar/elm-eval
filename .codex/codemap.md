@@ -848,3 +848,35 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** None. T-014 continues in its separate non-overlapping UI worktree.
 - **Next Step:** Merge `origin/main` normally and inspect the exact conflicts before resolving them.
 - **Changed Files and Evidence:** `.codex/codemap.md`; clean branch matched `origin/fix/gemini-cost-accounting` at `0e7c9b9`; board claim `10a0a65` is published on `origin/main`.
+
+---
+
+## Entry 37 — 2026-07-13T09:14:08Z
+
+- **Agent:** codex reviewer (`t005_review`)
+- **Ticket:** T-016
+- **Branch:** fix/gemini-cost-accounting
+- **Worktree:** /Users/darshan/work/agent-eval-model-pricing
+- **Status:** READ-ONLY REVIEW COMPLETE / PASS
+- **Scope:** Provider-neutral pricing rename, behavior preservation, merge-history integrity, and source-scope review.
+- **Completed:** Verified generic `model-pricing` module/API names, unchanged two-model rates and cost behavior, exact preservation of current `origin/main` goal state, and preservation of main T-015 plus branch T-013/T-016 codemap entries; found no unrelated source changes.
+- **Pending:** Coordinator final diff review, commit, push, and draft PR #12 mergeability verification.
+- **Blockers:** None.
+- **Next Step:** Commit the scoped rename and this review entry, push the PR branch, then verify PR #12 remains draft and is conflict-free.
+- **Changed Files and Evidence:** `.codex/codemap.md` only by reviewer; `git diff --check` PASS; touched Biome PASS; agent typecheck PASS; agent tests 11/11 PASS.
+
+---
+
+## Entry 38 — 2026-07-13T09:14:57Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-016
+- **Branch:** fix/gemini-cost-accounting
+- **Worktree:** /Users/darshan/work/agent-eval-model-pricing
+- **Status:** IN PROGRESS / IMPLEMENTED AND REVIEWED
+- **Scope:** Provider-neutral pricing rename and conflict-free reconciliation with current `main`.
+- **Completed:** Merged `origin/main` without rewriting history; preserved T-015 plus all T-013/T-016 journal entries; replaced Gemini-specific pricing module/type/function names with generic model-pricing names; retained rates and behavior; passed focused gates and independent review.
+- **Pending:** Final diff review, commit, push, update the draft PR description, and verify PR #12 is no longer conflicting.
+- **Blockers:** No T-016 blocker. Root typecheck/build remain blocked by the pre-existing T-006 SQLite-to-Neon adapter mismatch; broader tests require `DATABASE_URL`.
+- **Next Step:** Commit and push the reviewed scope, then verify the remote PR remains draft, conflict-free, and unmerged.
+- **Changed Files and Evidence:** `packages/agent/src/model-pricing.ts` replaces `gemini-pricing.ts`; provider/test imports use generic APIs; `.codex/goal.md` and append-only `.codex/codemap.md`; format and touched Biome PASS; agent typecheck PASS; agent tests 11/11 PASS; diff check PASS; root blockers reproduced unchanged.

@@ -1,6 +1,6 @@
 import { type GenerateContentParameters, GoogleGenAI } from '@google/genai';
 import { env } from '@repo/domain';
-import { calculateGeminiCostUsd, getGeminiStandardPricing } from './gemini-pricing.js';
+import { calculateModelCostUsd, getModelPricing } from './model-pricing.js';
 import type {
   ModelProvider,
   StructuredGenerationRequest,
@@ -40,12 +40,9 @@ export class GeminiModelProvider implements ModelProvider {
   async generateStructured<TInput, TOutput>(
     request: StructuredGenerationRequest<TInput, TOutput>,
   ): Promise<StructuredGenerationResult<TOutput>> {
-    const pricing = getGeminiStandardPricing(request.model);
+    const pricing = getModelPricing(request.model);
     if (!pricing)
-      throw new ModelProviderError(
-        `No standard Gemini pricing configured for model ${request.model}`,
-        'PERMANENT',
-      );
+      throw new ModelProviderError(`No pricing configured for model ${request.model}`, 'PERMANENT');
     const started = this.now();
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), request.timeoutMs);
@@ -74,7 +71,7 @@ export class GeminiModelProvider implements ModelProvider {
         output: request.schema.parse(JSON.parse(response.text)),
         model: request.model,
         latencyMs: this.now() - started,
-        costUsd: calculateGeminiCostUsd(pricing, tokenUsage),
+        costUsd: calculateModelCostUsd(pricing, tokenUsage),
         tokenUsage,
       };
     } catch (error: unknown) {

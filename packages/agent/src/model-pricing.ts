@@ -1,11 +1,11 @@
-export interface GeminiStandardPricing {
+export interface ModelPricing {
   inputUsdPerMillionTokens: number;
   outputUsdPerMillionTokens: number;
 }
 
 // Standard paid-tier text rates verified at https://ai.google.dev/gemini-api/docs/pricing
-// on 2026-07-13. The Gemini API response exposes usage, not the account's final invoice.
-const GEMINI_STANDARD_PRICING: Readonly<Record<string, GeminiStandardPricing>> = {
+// on 2026-07-13. Provider responses expose usage, not the account's final invoice.
+const MODEL_PRICING: Readonly<Record<string, ModelPricing>> = {
   'gemini-2.5-flash': {
     inputUsdPerMillionTokens: 0.3,
     outputUsdPerMillionTokens: 2.5,
@@ -16,12 +16,12 @@ const GEMINI_STANDARD_PRICING: Readonly<Record<string, GeminiStandardPricing>> =
   },
 };
 
-export function getGeminiStandardPricing(model: string): GeminiStandardPricing | undefined {
-  return GEMINI_STANDARD_PRICING[model];
+export function getModelPricing(model: string): ModelPricing | undefined {
+  return MODEL_PRICING[model];
 }
 
-export function calculateGeminiCostUsd(
-  pricing: GeminiStandardPricing,
+export function calculateModelCostUsd(
+  pricing: ModelPricing,
   usage: { input: number; output: number },
 ): number {
   return (
