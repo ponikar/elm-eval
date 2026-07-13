@@ -55,21 +55,16 @@ export const evaluationRunRouter = createTRPCRouter({
       }
 
       const existingSuites = await listFrozenSuites();
-      const firstSuite = existingSuites[0];
-      let suiteId: string;
-      if (firstSuite) {
-        suiteId = firstSuite.id;
-      } else {
-        const suite = await freezeEvalSuite({
-          id: randomUUID(),
-          name: 'auto-frozen',
-          version: 1,
-          description: 'Automatically frozen trusted suite for dashboard-triggered run',
-          caseIds: trustedCaseIds,
-          frozenAt: new Date().toISOString(),
-        });
-        suiteId = suite.id;
-      }
+      const latestVersion = (existingSuites[0]?.version ?? 0) + 1;
+      const suite = await freezeEvalSuite({
+        id: randomUUID(),
+        name: 'auto-frozen',
+        version: latestVersion,
+        description: 'Automatically frozen trusted suite for dashboard-triggered run',
+        caseIds: trustedCaseIds,
+        frozenAt: new Date().toISOString(),
+      });
+      const suiteId = suite.id;
 
       const idempotencyKey = `run-${input.agentVersionId}-${suiteId}-${Date.now()}`;
       const run = await createEvaluationRun({

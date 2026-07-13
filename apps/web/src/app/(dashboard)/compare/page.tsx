@@ -24,6 +24,7 @@ import {
 import { GitCompare, Loader2, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { DashboardHeader } from '@/components/dashboard-header';
 import { trpc } from '@/trpc/react';
 
@@ -186,6 +187,9 @@ export default function ComparePage() {
       setPollingRunId(data.runId);
       await runSummaries.refetch();
       router.push('/runs');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to start evaluation run');
     },
   });
 
