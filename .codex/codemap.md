@@ -528,3 +528,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Next Step:** Merge PR #7, update goal board, pick next ticket.
 - **Validation:** pnpm format PASS, pnpm typecheck PASS (10/10), pnpm test PASS (7/7), pnpm build PASS (2/2).
 - **Changed Files and Evidence:** apps/web/src/trpc/routers/audit.ts (mutations + mutable findings array), apps/web/src/components/finding-detail.tsx (action buttons + inline correct form), apps/web/src/app/(dashboard)/audits/[id]/page.tsx (wired mutations), .codex/goal.md (board update). PR: https://github.com/ponikar/elm-eval/pull/7
+
+---
+
+## Entry 18 — 2026-07-13T05:08:00Z
+
+- **Agent:** codex
+- **Ticket:** T-005
+- **Branch:** feat/human-correction-loop
+- **Worktree:** /Users/darshan/work/agent-eval-human-correction
+- **Status:** COMPLETE / REMOTE HANDOFF
+- **Scope:** Commit, publication, and PR verification.
+- **Completed:** Committed T-005 as `812da65`; pushed the branch; opened PR #8; merged current `origin/main` board update with all codemap entries preserved in `8d98f6b`; pushed again; verified PR #8 is clean, mergeable, and Vercel checks pass.
+- **Pending:** Coordinator review/merge, main-board completion update, and worktree removal. Open PR #7 overlaps the same review UI with in-memory state and must be reconciled or closed rather than merged after T-005.
+- **Blockers:** None for PR #8.
+- **Next Step:** Review and merge https://github.com/ponikar/elm-eval/pull/8, reconcile PR #7, update T-005 status on main, then remove this worktree.
+- **Changed Files and Evidence:** Commits `812da65` and `8d98f6b`; pushed branch verified; PR #8 CLEAN/MERGEABLE; Vercel and Vercel Preview Comments PASS.
