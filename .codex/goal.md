@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-12T17:57:55Z
+**Updated:** 2026-07-13T05:36:14Z
 
 ### Outcome
 
@@ -16,10 +16,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - [x] Web app (Next.js) boots and renders home page
 - [x] Pipeline worker boots without errors
 - [ ] Drizzle schema covers all core tables, including corrections and durable grader/gate results
-- [ ] Seed audit loads in the audit review workspace
+- [x] Seed audit loads in the audit review workspace
 - [x] Agent v1 extracts structured findings
 - [x] Evidence validation catches invalid citations
-- [ ] Human correction converts to regression test
+- [x] Human correction converts to regression test
 - [ ] Evaluation suite runs 10 trusted cases
 - [ ] Version comparison shows stable/improvements/regressions
 - [ ] Quality gate approves or blocks candidate
@@ -45,6 +45,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 
 - `senior-software-architecture` — selected for T-003 pipeline boundaries, failure modes,
   idempotency, persistence, and observability design. No repository-local skill is available.
+- `senior-software-architecture` — selected for T-011 schema ownership, immutable suite/run
+  snapshots, referential integrity, deletion policies, durable grading, and gate persistence.
 
 ### Subgoals
 
@@ -57,11 +59,12 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-009  | Pre-seeded documentation pipeline    | opencode    | COMPLETE    | feat/pre-seed-pipeline | —                                             | Gemini extraction + fixtures + DB schema      |
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
 | T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
-| T-005  | Human correction loop                | codex       | IN PROGRESS | feat/human-correction-loop | /Users/darshan/work/agent-eval-human-correction | Persist correction → trusted regression test |
+| T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
 | T-006  | Evaluation engine                    | opencode    | planned     | —                      | —                                             | Run suite + graders                           |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
+| T-011  | Eval persistence schema foundation   | codex       | IN PROGRESS | feat/eval-schema-foundation | /Users/darshan/work/agent-eval-schema-foundation | Add centralized durable eval schema + migration |
 
 ### Decisions
 
@@ -120,8 +123,40 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Validation:** idempotent seed tests; correction validation/transaction/idempotency tests;
   router/UI behavior tests where supported; Biome check, strict TypeScript, full tests, and build.
 - **Started/checkpoint:** 2026-07-12T17:57:55Z / 2026-07-12T17:57:55Z
-- **Status/next action:** IN PROGRESS — publish this claim, create and verify the worktree, append
-  assignment acceptance, then implement domain and persistence contracts.
+- **Status/next action:** COMPLETE — merged by PR #8 at `19bce35`; persisted review decisions,
+  corrections, and idempotent trusted regression conversion pass focused and repository checks.
+
+### T-011 Assignment
+
+- **Outcome:** Drizzle has one canonical schema source containing the complete durable persistence
+  model required for frozen evaluation suites, executions, grader results, comparisons, and
+  configurable quality-gate decisions.
+- **Definition of done:** Add immutable/versioned suite membership; strengthen run/execution
+  invariants; persist queryable grader results, comparison outcomes, and gate configuration/results;
+  add required foreign keys, unique constraints, indexes, and safe history-retention policies;
+  generate one forward-only migration and verify it from an empty database and the current T-005
+  database state; focused and repository validation gates pass without new warnings or errors.
+- **Owner:** codex
+- **Branch/worktree:** `feat/eval-schema-foundation` at
+  `/Users/darshan/work/agent-eval-schema-foundation`
+- **Owned paths:** `packages/db/src/schema.ts`, `packages/db/drizzle/**`, focused DB schema/migration
+  tests, and append-only `.codex/codemap.md` entries. Domain/runtime behavior changes are excluded
+  unless required to preserve compilation after a schema contract correction.
+- **Dependencies:** T-005 merged in PR #8; T-006 and T-007 depend on this ticket and must not edit
+  the owned DB schema/migration paths concurrently.
+- **Non-goals:** Evaluation execution algorithms, grader implementation, comparison UI, quality-gate
+  evaluation logic, real PDF ingestion, and normalizing corrective actions into a workflow entity.
+- **Verified assumptions:** `packages/db/src/schema.ts` remains the single canonical source for all
+  Drizzle table definitions; generated SQL and snapshots remain in `packages/db/drizzle/**` as
+  migration artifacts, not competing schema sources; SQLite is the MVP database; JSON remains
+  appropriate for immutable input/output snapshots and detailed grader metadata, while searchable
+  outcomes receive typed columns.
+- **Validation:** migration generation and drift check; migrate empty and current-shape SQLite
+  databases; DB invariant tests; touched-scope Biome; strict TypeScript; full tests and build.
+- **Started/checkpoint:** 2026-07-13T05:36:14Z / 2026-07-13T05:36:14Z
+- **Status/next action:** IN PROGRESS — publish the board-only claim, remove the completed T-005
+  worktree, create the fresh T-011 worktree, inspect current Drizzle tooling/call sites, then
+  implement the schema and forward migration.
 
 ### Validation Commands
 
@@ -173,6 +208,9 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-12T23:30:00Z — T-004 COMPLETE. Added approve/reject/correct review actions to audit
   finding detail view (tRPC mutations, inline edit form, action buttons). PR #7 created on
   feat/audit-review-ui. Validation: format PASS, typecheck PASS (10/10), test PASS (7/7), build PASS.
+- 2026-07-13T05:36:14Z — T-005 merged via PR #8 after reconciling PR #7's temporary in-memory
+  review mutations with the durable SQLite source of truth; claimed T-011 to complete the eval
+  persistence schema before T-006/T-007 implementation.
 
 ### Blockers
 
