@@ -223,12 +223,8 @@ export default function ComparePage() {
   const activeComparison = comparisonDetail.data ?? latestComparison.data ?? null;
   const trusted = evalCases.data?.filter((item) => item.status === 'TRUSTED') ?? [];
   const critical = trusted.filter((item) => item.criticality === 'CRITICAL');
-  const baselineAgent =
-    activeComparison?.baselineRun.agentVersionSnapshot ??
-    agents.data?.find((item) => item.type === 'baseline');
-  const candidateAgent =
-    activeComparison?.candidateRun.agentVersionSnapshot ??
-    agents.data?.find((item) => item.type === 'candidate');
+  const baselineAgent = agents.data?.find((item) => item.type === 'baseline');
+  const candidateAgent = agents.data?.find((item) => item.type === 'candidate');
 
   const highlightedCases = useMemo(() => {
     if (!activeComparison) return [];
