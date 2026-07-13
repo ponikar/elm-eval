@@ -242,9 +242,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   typecheck and tests; repository typecheck, tests, and build; repeat affected checks after final
   edits. No credentialed Gemini call is required.
 - **Started/checkpoint:** 2026-07-13T08:14:28Z / 2026-07-13T08:19:46Z
-- **Status/next action:** BLOCKED / IMPLEMENTED — provider-local pricing and tests pass. Publish a
-  draft PR without merging; after T-006 is ported to async Neon and a test `DATABASE_URL` is
-  available, rebase and rerun repository typecheck, tests, and build before marking T-013 complete.
+- **Status/next action:** BLOCKED / DRAFT PR #12 — provider-local pricing commit `05c5aca` is
+  published at https://github.com/ponikar/elm-eval/pull/12 without merging. After T-006 is ported
+  to async Neon and a test `DATABASE_URL` is available, rebase and rerun repository typecheck,
+  tests, and build before marking T-013 complete.
 
 ### Validation Commands
 
@@ -319,6 +320,8 @@ pnpm build                       # PASS (pipeline + Next.js)
   evaluation/indexing adapters.
 - No credentialed Gemini smoke call was made; deterministic injected-response tests cover usage and
   cost behavior without a billable request.
+- Draft PR #12 — OPEN/DRAFT at commit `05c5aca`; Vercel Preview Comments PASS and Vercel pending at
+  initial verification; no merge performed.
 - Files changed: Gemini provider, provider-local pricing helper/tests, pipeline aggregation test,
   goal ledger, and append-only codemap.
 

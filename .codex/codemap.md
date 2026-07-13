@@ -800,3 +800,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** Root typecheck/build fail in merged T-006 SQLite eval-store/pipeline calls against Neon; root DB tests additionally require `DATABASE_URL`. Root formatter reports 27 pre-existing warnings outside T-013.
 - **Next Step:** Review the final scoped diff, commit and publish the blocked-but-focused-valid T-013 branch, open a draft PR, and do not merge.
 - **Changed Files and Evidence:** `packages/agent/src/gemini-provider.ts`, `gemini-pricing.ts`, `gemini-provider.test.ts`, `pipeline.test.ts`, goal/codemap. Frozen install PASS; format completed; touched Biome PASS; agent typecheck PASS; agent tests 11/11 PASS; root gates blocked only outside owned scope as recorded in `.codex/goal.md`.
+
+---
+
+## Entry 35 — 2026-07-13T08:22:05Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-013
+- **Branch:** fix/gemini-cost-accounting
+- **Worktree:** /Users/darshan/work/agent-eval-gemini-cost
+- **Status:** BLOCKED / REMOTE HANDOFF
+- **Scope:** Commit, publish, and verify the focused cost-accounting change without merging.
+- **Completed:** Committed as `05c5aca`, pushed the branch with matching remote hash, and opened draft PR #12 with the Neon/root-validation blockers documented. Vercel Preview Comments passed; Vercel was pending at initial verification.
+- **Pending:** Push this final journal update, remove the ticket worktree, then repair T-006 Neon compatibility before revalidating and integrating T-013.
+- **Blockers:** Same external root-gate blockers recorded in Entry 34; no focused T-013 blocker.
+- **Next Step:** After T-006 repair, recreate a clean worktree from this branch, rebase on main, run all root gates with an isolated `DATABASE_URL`, and only then mark ready for merge.
+- **Changed Files and Evidence:** Commit `05c5acaa3896afbb265e34ecfaf47206bf5b7930`; draft PR https://github.com/ponikar/elm-eval/pull/12; branch/remote hashes match; no merge performed.
