@@ -42,10 +42,10 @@ function seededDatabase() {
   return database;
 }
 
-function freezeFirstCase(database: ReturnType<typeof seededDatabase>) {
+async function freezeFirstCase(database: ReturnType<typeof seededDatabase>) {
   const first = SEED_EVAL_CASES.find((item) => item.status === 'TRUSTED');
   if (!first) throw new Error('Expected one trusted seed case');
-  return freezeEvalSuite(
+  return await freezeEvalSuite(
     {
       id: 'suite-1',
       name: 'Release suite',
@@ -57,9 +57,9 @@ function freezeFirstCase(database: ReturnType<typeof seededDatabase>) {
   );
 }
 
-function createRun(database: ReturnType<typeof seededDatabase>) {
-  freezeFirstCase(database);
-  return createEvaluationRun(
+async function createRun(database: ReturnType<typeof seededDatabase>) {
+  await freezeFirstCase(database);
+  return await createEvaluationRun(
     {
       id: 'run-1',
       suiteId: 'suite-1',
@@ -73,13 +73,13 @@ function createRun(database: ReturnType<typeof seededDatabase>) {
 }
 
 describe('evaluation store', () => {
-  it('freezes only trusted cases and preserves their snapshots', () => {
+  it('freezes only trusted cases and preserves their snapshots', async () => {
     const database = seededDatabase();
     const trustedIds = SEED_EVAL_CASES.filter((item) => item.status === 'TRUSTED').map(
       (item) => item.id,
     );
     expect(trustedIds).toHaveLength(9);
-    expect(() =>
+    await expect(
       freezeEvalSuite(
         {
           id: 'invalid-suite',
@@ -90,9 +90,9 @@ describe('evaluation store', () => {
         },
         database,
       ),
-    ).toThrow();
+    ).rejects.toThrow();
 
-    const snapshot = freezeEvalSuite(
+    const snapshot = await freezeEvalSuite(
       {
         id: 'trusted-suite',
         name: 'Trusted suite',
@@ -104,18 +104,18 @@ describe('evaluation store', () => {
     );
     expect(snapshot.cases).toHaveLength(9);
     const originalName = snapshot.cases[0]?.name;
-    database
+    await database
       .update(evalCase)
       .set({ name: 'Changed after freezing' })
-      .where(eq(evalCase.id, trustedIds[0] ?? ''))
-      .run();
-    expect(loadSuiteSnapshot(snapshot.id, database).cases[0]?.name).toBe(originalName);
+      .where(eq(evalCase.id, trustedIds[0] ?? ''));
+    const reloaded = await loadSuiteSnapshot(snapshot.id, database);
+    expect(reloaded.cases[0]?.name).toBe(originalName);
   });
 
-  it('creates one idempotent run with one execution per frozen case', () => {
+  it('creates one idempotent run with one execution per frozen case', async () => {
     const database = seededDatabase();
-    const first = createRun(database);
-    const second = createEvaluationRun(
+    const first = await createRun(database);
+    const second = await createEvaluationRun(
       {
         id: 'ignored-new-id',
         suiteId: 'suite-1',
@@ -127,8 +127,8 @@ describe('evaluation store', () => {
     );
     expect(second.run.id).toBe(first.run.id);
     expect(second.cases).toEqual(first.cases);
-    expect(getTestExecutions(first.run.id, database)).toHaveLength(1);
-    expect(() =>
+    expect(await getTestExecutions(first.run.id, database)).toHaveLength(1);
+    await expect(
       createEvaluationRun(
         {
           id: 'different-input',
@@ -139,17 +139,17 @@ describe('evaluation store', () => {
         },
         database,
       ),
-    ).toThrow('idempotency key was reused with different inputs');
+    ).rejects.toThrow('idempotency key was reused with different inputs');
   });
 
-  it('atomically stores output, grader result, usage, and execution traces', () => {
+  it('atomically stores output, grader result, usage, and execution traces', async () => {
     const database = seededDatabase();
-    const plan = createRun(database);
+    const plan = await createRun(database);
     const executionId = plan.cases[0]?.executionId ?? '';
-    expect(claimEvaluationRun(plan.run.id, '2026-07-13T00:03:00.000Z', database)).toBe(true);
-    expect(claimEvaluationRun(plan.run.id, '2026-07-13T00:03:00.000Z', database)).toBe(false);
-    expect(claimTestExecution(executionId, '2026-07-13T00:03:01.000Z', database)).toBe(true);
-    appendEvaluationTrace(
+    expect(await claimEvaluationRun(plan.run.id, '2026-07-13T00:03:00.000Z', database)).toBe(true);
+    expect(await claimEvaluationRun(plan.run.id, '2026-07-13T00:03:00.000Z', database)).toBe(false);
+    expect(await claimTestExecution(executionId, '2026-07-13T00:03:01.000Z', database)).toBe(true);
+    await appendEvaluationTrace(
       {
         id: 'trace-1',
         executionId,
@@ -162,7 +162,7 @@ describe('evaluation store', () => {
       },
       database,
     );
-    completeTestExecution(
+    await completeTestExecution(
       {
         executionId,
         output: {
@@ -218,9 +218,10 @@ describe('evaluation store', () => {
       },
       database,
     );
-    completeEvaluationRun(plan.run.id, '2026-07-13T00:03:03.000Z', database);
+    await completeEvaluationRun(plan.run.id, '2026-07-13T00:03:03.000Z', database);
 
-    expect(getTestExecutions(plan.run.id, database)[0]).toMatchObject({
+    const executions = await getTestExecutions(plan.run.id, database);
+    expect(executions[0]).toMatchObject({
       status: 'COMPLETED',
       passed: true,
       agentCostUsd: 0.04,
@@ -228,23 +229,25 @@ describe('evaluation store', () => {
       tokenInput: 100,
       tokenOutput: 20,
     });
-    expect(database.select().from(graderResult).all()).toHaveLength(1);
-    expect(database.select().from(traceEvent).all()).toHaveLength(1);
-    expect(getEvaluationRunPlan(plan.run.id, database).run.status).toBe('COMPLETED');
-    expect(listEvaluationRuns(database)).toHaveLength(1);
-    expect(getEvaluationRunDetails(plan.run.id, database)).toMatchObject({
+    expect(await database.select().from(graderResult)).toHaveLength(1);
+    expect(await database.select().from(traceEvent)).toHaveLength(1);
+    const planAfterComplete = await getEvaluationRunPlan(plan.run.id, database);
+    expect(planAfterComplete.run.status).toBe('COMPLETED');
+    expect(await listEvaluationRuns(database)).toHaveLength(1);
+    const details = await getEvaluationRunDetails(plan.run.id, database);
+    expect(details).toMatchObject({
       progress: { total: 1, completed: 1, failed: 0, passed: 1 },
       cases: [{ execution: { id: executionId }, grader: { id: 'grader-1' } }],
     });
   });
 
-  it('allows a run to complete when an individual case fails', () => {
+  it('allows a run to complete when an individual case fails', async () => {
     const database = seededDatabase();
-    const plan = createRun(database);
+    const plan = await createRun(database);
     const executionId = plan.cases[0]?.executionId ?? '';
-    claimEvaluationRun(plan.run.id, '2026-07-13T00:03:00.000Z', database);
-    claimTestExecution(executionId, '2026-07-13T00:03:01.000Z', database);
-    failTestExecution(
+    await claimEvaluationRun(plan.run.id, '2026-07-13T00:03:00.000Z', database);
+    await claimTestExecution(executionId, '2026-07-13T00:03:01.000Z', database);
+    await failTestExecution(
       {
         executionId,
         errorCode: 'MODEL_TIMEOUT',
@@ -254,15 +257,18 @@ describe('evaluation store', () => {
       },
       database,
     );
-    completeEvaluationRun(plan.run.id, '2026-07-13T00:03:32.000Z', database);
-    expect(getTestExecutions(plan.run.id, database)[0]).toMatchObject({
+    await completeEvaluationRun(plan.run.id, '2026-07-13T00:03:32.000Z', database);
+    const executions = await getTestExecutions(plan.run.id, database);
+    expect(executions[0]).toMatchObject({
       status: 'FAILED',
       passed: false,
       errorCode: 'MODEL_TIMEOUT',
     });
-    expect(
-      database.select().from(evaluationRun).where(eq(evaluationRun.id, plan.run.id)).get(),
-    ).toMatchObject({
+    const runRows = await database
+      .select()
+      .from(evaluationRun)
+      .where(eq(evaluationRun.id, plan.run.id));
+    expect(runRows[0]).toMatchObject({
       status: 'COMPLETED',
     });
   });

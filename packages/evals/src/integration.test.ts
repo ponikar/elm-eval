@@ -99,11 +99,11 @@ describe('evaluation engine integration', () => {
       },
       database,
     );
-    const trustedIds = listEvalCases(database)
+    const trustedIds = (await listEvalCases(database))
       .filter((item) => item.status === 'TRUSTED')
       .map((item) => item.id);
     expect(trustedIds).toHaveLength(10);
-    const suite = freezeEvalSuite(
+    const suite = await freezeEvalSuite(
       {
         id: 'suite-10',
         name: 'Ten trusted cases',
@@ -113,7 +113,7 @@ describe('evaluation engine integration', () => {
       },
       database,
     );
-    const plan = createEvaluationRun(
+    const plan = await createEvaluationRun(
       {
         id: 'run-10',
         suiteId: suite.id,
@@ -176,7 +176,7 @@ describe('evaluation engine integration', () => {
       completedCases: 10,
       failedCases: 0,
     });
-    const details = getEvaluationRunDetails(plan.run.id, database);
+    const details = await getEvaluationRunDetails(plan.run.id, database);
     expect(details.run.status).toBe('COMPLETED');
     expect(
       details.cases
