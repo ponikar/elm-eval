@@ -253,6 +253,37 @@ export const EvalCaseSchema = z.object({
   parentCaseId: z.string().optional(),
 });
 
+// ─── Human review types ─────────────────────────────────────────────────────
+
+export const FindingCorrectionInputSchema = AuditFindingSchema.omit({
+  id: true,
+  auditId: true,
+  agentVersionId: true,
+  reviewStatus: true,
+});
+
+export const HumanCorrectionSchema = z.object({
+  id: z.string().min(1),
+  findingId: z.string().min(1),
+  auditId: z.string().min(1),
+  agentVersionId: z.string().min(1),
+  failureType: FailureTypeSchema,
+  reason: z.string().min(3),
+  originalFinding: AuditFindingSchema,
+  correctedFinding: AuditFindingSchema,
+  regressionEvalCaseId: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const CreateCorrectionInputSchema = z.object({
+  findingId: z.string().min(1),
+  failureType: FailureTypeSchema,
+  reason: z.string().min(3),
+  corrected: FindingCorrectionInputSchema,
+  saveAsRegressionTest: z.boolean().default(false),
+});
+
 // ─── Pipeline types ──────────────────────────────────────────────────────────
 
 export const EvaluationRunSchema = z.object({
@@ -367,6 +398,9 @@ export type PipelineStage = z.infer<typeof PipelineStageSchema>;
 export type PipelineFailureCode = z.infer<typeof PipelineFailureCodeSchema>;
 export type PipelineJob = z.infer<typeof PipelineJobSchema>;
 export type EvalCase = z.infer<typeof EvalCaseSchema>;
+export type FindingCorrectionInput = z.infer<typeof FindingCorrectionInputSchema>;
+export type HumanCorrection = z.infer<typeof HumanCorrectionSchema>;
+export type CreateCorrectionInput = z.infer<typeof CreateCorrectionInputSchema>;
 export type EvaluationRun = z.infer<typeof EvaluationRunSchema>;
 export type TestExecution = z.infer<typeof TestExecutionSchema>;
 export type GraderResult = z.infer<typeof GraderResultSchema>;

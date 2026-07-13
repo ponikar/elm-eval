@@ -1,38 +1,52 @@
-import { MOCK_FINDINGS, SEED_AUDIT, SEED_RULEBOOK, SEED_RULES } from '@repo/test-fixtures';
+import {
+  getAudit,
+  getAuditFindings,
+  getRulebook,
+  getRules,
+  listAudits,
+  setFindingReviewStatus,
+} from '@repo/db';
 import { z } from 'zod';
+import { ensureReviewWorkspace } from '../../server/review-workspace';
 import { createTRPCRouter, publicProcedure } from '../init';
 
 export const auditRouter = createTRPCRouter({
   list: publicProcedure.query(() => {
-    return [
-      {
-        id: SEED_AUDIT.id,
-        supplierName: SEED_AUDIT.supplierName,
-        factoryName: SEED_AUDIT.factoryName,
-        auditStandard: SEED_AUDIT.auditStandard,
-        auditDate: SEED_AUDIT.auditDate,
-        documentName: SEED_AUDIT.documentName,
-        pageCount: SEED_AUDIT.pages.length,
-        findingCount: MOCK_FINDINGS.length,
-      },
-    ];
+    ensureReviewWorkspace();
+    return listAudits();
   }),
 
   get: publicProcedure.input(z.object({ id: z.string() })).query(({ input }) => {
-    if (input.id !== SEED_AUDIT.id) return null;
-    return SEED_AUDIT;
+    ensureReviewWorkspace();
+    return getAudit(input.id);
   }),
 
   getFindings: publicProcedure.input(z.object({ auditId: z.string() })).query(({ input }) => {
-    if (input.auditId !== SEED_AUDIT.id) return [];
-    return MOCK_FINDINGS;
+    ensureReviewWorkspace();
+    return getAuditFindings(input.auditId);
   }),
 
   getRules: publicProcedure.query(() => {
-    return SEED_RULES;
+    ensureReviewWorkspace();
+    return getRules('rulebook-001');
   }),
 
   getRulebook: publicProcedure.query(() => {
-    return SEED_RULEBOOK;
+    ensureReviewWorkspace();
+    return getRulebook('rulebook-001');
   }),
+
+  approveFinding: publicProcedure
+    .input(z.object({ findingId: z.string().min(1) }))
+    .mutation(({ input }) => {
+      ensureReviewWorkspace();
+      return setFindingReviewStatus(input.findingId, 'APPROVED');
+    }),
+
+  rejectFinding: publicProcedure
+    .input(z.object({ findingId: z.string().min(1) }))
+    .mutation(({ input }) => {
+      ensureReviewWorkspace();
+      return setFindingReviewStatus(input.findingId, 'REJECTED');
+    }),
 });

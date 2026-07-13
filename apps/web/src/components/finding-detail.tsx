@@ -1,6 +1,8 @@
+import type { AuditFinding } from '@repo/domain';
 import { Card, CardContent, CardHeader, CardTitle, Separator } from '@repo/ui';
 import { AlertTriangle, CheckCircle, Clock, FileText, Scale, User } from 'lucide-react';
 import { CategoryBadge } from './category-badge';
+import { FindingReviewActions } from './finding-review-actions';
 import { ReviewStatusBadge } from './review-status-badge';
 import { SeverityBadge } from './severity-badge';
 
@@ -118,6 +120,7 @@ export function FindingDetail({ finding }: FindingDetailProps) {
           </div>
         </CardContent>
       </Card>
+      <FindingReviewActions finding={finding as AuditFinding} />
     </div>
   );
 }

@@ -447,3 +447,67 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Next Step:** Claim T-005 in a dedicated worktree.
 - **Validation:** pnpm install --frozen-lockfile PASS, pnpm format:check PASS (29 warnings, 0 errors), pnpm typecheck PASS (10/10), pnpm test PASS (7/7), pnpm build PASS (2/2).
 - **Changed Files and Evidence:** biome.json (new), package.json (root + 9 workspace packages), 9 eslint.config.js (deleted), packages/eslint-config/ (deleted), .prettierrc (deleted), AGENTS.md (updated format instruction), pnpm-lock.yaml (regenerated), biome auto-fixed formatting across 56+ source files. All validation gates pass with exit 0.
+
+---
+
+## Entry 14 — 2026-07-12T17:57:55Z
+
+- **Agent:** codex
+- **Ticket:** T-005
+- **Branch:** feat/human-correction-loop
+- **Worktree:** /Users/darshan/work/agent-eval-human-correction
+- **Status:** IN PROGRESS
+- **Scope:** Persisted audit review, human corrections, and atomic conversion to trusted regression cases.
+- **Completed:** Accepted the published T-005 assignment and verified the dedicated branch/worktree at claim commit `a33731c`.
+- **Pending:** Domain schemas, SQLite seed/store/migration, tRPC mutations, review UI, focused tests, full validation, commit/push/PR.
+- **Blockers:** None.
+- **Next Step:** Implement correction domain and persistence contracts with deterministic citation/rule validation and idempotent conversion.
+- **Changed Files and Evidence:** `.codex/codemap.md`; verified `pwd`, branch, clean status, and main claim push.
+
+---
+
+## Entry 15 — 2026-07-12T18:26:00Z
+
+- **Agent:** codex
+- **Ticket:** T-005
+- **Branch:** feat/human-correction-loop
+- **Worktree:** /Users/darshan/work/agent-eval-human-correction
+- **Status:** IN PROGRESS — implementation and primary validation complete
+- **Scope:** Durable review decisions and correction-to-regression flow.
+- **Completed:** Added correction schemas/table/migration; automatic local migrations; idempotent fixture seeding into SQLite; database-backed audit/eval reads; approve/reject/correct tRPC mutations; atomic trusted-case creation; separate idempotent conversion API; review form; native SQLite Next.js packaging; four focused transaction tests.
+- **Pending:** Read-only reviewer response, final diff review, final validation rerun, commit/push/PR, coordinator integration, and worktree removal.
+- **Blockers:** In-app browser unavailable; live tRPC audit-list and eval-list endpoints returned persisted data. Repository-wide Biome still reports 29 pre-existing warnings recorded by T-010, while all T-005 touched files pass with no warnings or errors.
+- **Next Step:** Resolve reviewer findings, rerun focused/touched and full gates, then commit and publish the ticket branch.
+- **Changed Files and Evidence:** Domain/db/migration/web review/API/config/package/lock files; focused Biome PASS; DB tests 4/4 PASS; all tests 11/11 PASS; strict typecheck PASS; production build PASS; frozen install PASS.
+
+---
+
+## Entry 16 — 2026-07-12T18:29:00Z
+
+- **Agent:** codex t005-review (read-only)
+- **Ticket:** T-005
+- **Branch:** feat/human-correction-loop
+- **Worktree:** /Users/darshan/work/agent-eval-human-correction
+- **Status:** REVIEW COMPLETE
+- **Scope:** Transaction, migration/runtime, API/UI, and test coverage review.
+- **Completed:** Identified incomplete audit freezing, insufficient rulebook snapshot isolation, incomplete UI failure-type options, missing integration coverage, and overlapping/silent review-action risks.
+- **Pending:** Coordinator fixes and final validation.
+- **Blockers:** None.
+- **Next Step:** Freeze all ordered audit pages, scope rules to the agent-version rulebook, tighten UI actions, extend tests, and rerun gates.
+- **Changed Files and Evidence:** None; read-only diff review and 4/4 DB test plus DB/web typecheck verification.
+
+---
+
+## Entry 17 — 2026-07-13T05:05:47Z
+
+- **Agent:** codex
+- **Ticket:** T-005
+- **Branch:** feat/human-correction-loop
+- **Worktree:** /Users/darshan/work/agent-eval-human-correction
+- **Status:** COMPLETE — ready for coordinator review
+- **Scope:** Persisted audit review and human correction to trusted regression test.
+- **Completed:** Resolved review findings by freezing every ordered audit page, constraining corrected rules to the finding agent-version rulebook, exposing all failure types, preventing overlapping decisions, rendering mutation errors, and adding router integration coverage. Added durable seed/review/correction stores, migration, tRPC APIs, correction UI, SQLite runtime packaging, and DB artifact ignores.
+- **Pending:** Commit, push, create PR, coordinator review/integration, main-board completion update, and worktree removal.
+- **Blockers:** Visual browser click-through unavailable because the in-app browser surface was unavailable. Live tRPC audit/eval reads and the router mutation flow were verified. Repository-wide Biome retains the 29 warnings accepted and recorded by T-010; all T-005 touched files are clean.
+- **Next Step:** Commit scoped T-005 changes, push `feat/human-correction-loop`, create PR, verify remote state, and hand off to the coordinator.
+- **Changed Files and Evidence:** Domain correction contracts; Drizzle correction schema/migration; DB seed/review/correction store and five tests; audit/eval/correction routers and one integration test; correction UI; Next SQLite runtime config; package/lock/ignore files. Focused Biome PASS; frozen install PASS; tests 13/13 PASS; strict typecheck PASS; production build PASS; `git diff --check` PASS.

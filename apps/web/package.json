@@ -6,6 +6,7 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "clean": "rm -rf dist .next node_modules .turbo"
@@ -21,6 +22,7 @@
     "@trpc/next": "^11.13.0",
     "@trpc/react-query": "^11.13.0",
     "@trpc/server": "^11.13.0",
+    "better-sqlite3": "^12.11.1",
     "lucide-react": "^1.24.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
@@ -36,6 +38,7 @@
     "@types/react-dom": "^19.0.0",
     "postcss": "^8.5.16",
     "tailwindcss": "^4.3.2",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
   }
 }
