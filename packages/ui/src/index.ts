@@ -41,6 +41,8 @@ export {
   SheetTrigger,
 } from './components/ui/sheet';
 export { Skeleton } from './components/ui/skeleton';
+export { Toaster } from './components/ui/sonner';
+export { Spinner } from './components/ui/spinner';
 export {
   Table,
   TableBody,

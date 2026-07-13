@@ -1,8 +1,9 @@
 'use client';
 
 import type { AuditFinding, FailureType, FindingCategory, Severity } from '@repo/domain';
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@repo/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle, Spinner } from '@repo/ui';
 import { useId, useState } from 'react';
+import { toast } from 'sonner';
 import { trpc } from '@/trpc/react';
 
 const categories: FindingCategory[] = [
@@ -46,12 +47,32 @@ export function FindingReviewActions({ finding }: { finding: AuditFinding }) {
   const refresh = async () => {
     await Promise.all([utils.audit.getFindings.invalidate(), utils.evalCase.list.invalidate()]);
   };
-  const approve = trpc.audit.approveFinding.useMutation({ onSuccess: refresh });
-  const reject = trpc.audit.rejectFinding.useMutation({ onSuccess: refresh });
+  const approve = trpc.audit.approveFinding.useMutation({
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Finding approved');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const reject = trpc.audit.rejectFinding.useMutation({
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Finding rejected');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const correct = trpc.correction.create.useMutation({
     onSuccess: async () => {
       await refresh();
       setEditing(false);
+      toast.success('Finding corrected');
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
   const pending = approve.isPending || reject.isPending || correct.isPending;
@@ -68,7 +89,14 @@ export function FindingReviewActions({ finding }: { finding: AuditFinding }) {
             disabled={pending}
             onClick={() => approve.mutate({ findingId: finding.id })}
           >
-            Approve
+            {approve.isPending ? (
+              <>
+                <Spinner />
+                Approving...
+              </>
+            ) : (
+              'Approve'
+            )}
           </Button>
           <Button
             type="button"
@@ -89,7 +117,14 @@ export function FindingReviewActions({ finding }: { finding: AuditFinding }) {
             disabled={pending}
             onClick={() => reject.mutate({ findingId: finding.id })}
           >
-            Reject
+            {reject.isPending ? (
+              <>
+                <Spinner />
+                Rejecting...
+              </>
+            ) : (
+              'Reject'
+            )}
           </Button>
         </CardContent>
       </Card>
@@ -264,7 +299,14 @@ export function FindingReviewActions({ finding }: { finding: AuditFinding }) {
           {correct.error && <p className="text-sm text-destructive">{correct.error.message}</p>}
           <div className="flex gap-2">
             <Button type="submit" disabled={pending || reason.trim().length < 3}>
-              Save correction
+              {correct.isPending ? (
+                <>
+                  <Spinner />
+                  Saving...
+                </>
+              ) : (
+                'Save correction'
+              )}
             </Button>
             <Button type="button" variant="outline" onClick={() => setEditing(false)}>
               Cancel
