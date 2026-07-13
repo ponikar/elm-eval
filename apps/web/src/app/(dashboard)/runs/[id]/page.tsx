@@ -376,7 +376,7 @@ export default function RunDetailPage() {
                             </TableHeader>
                             <TableBody>
                               {run.data.cases.map((item) => (
-                          <TableRow key={item.execution.id}>
+                                <TableRow key={item.execution.id}>
                                   <TableCell className="font-medium">
                                     {item.evalCase.name}
                                   </TableCell>
