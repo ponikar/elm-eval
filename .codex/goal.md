@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T08:14:28Z
+**Updated:** 2026-07-13T08:19:46Z
 
 ### Outcome
 
@@ -70,7 +70,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
 | T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
-| T-013  | Real Gemini cost accounting          | codex       | IN PROGRESS | fix/gemini-cost-accounting | /Users/darshan/work/agent-eval-gemini-cost | Calculate standard paid-list cost from token usage |
+| T-013  | Real Gemini cost accounting          | codex       | BLOCKED     | fix/gemini-cost-accounting | /Users/darshan/work/agent-eval-gemini-cost | Provider complete; root gates await T-006 Neon repair |
 
 ### Decisions
 
@@ -241,10 +241,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Validation:** pricing/provider unit tests; `pnpm format`; touched agent Biome; agent strict
   typecheck and tests; repository typecheck, tests, and build; repeat affected checks after final
   edits. No credentialed Gemini call is required.
-- **Started/checkpoint:** 2026-07-13T08:14:28Z / 2026-07-13T08:14:28Z
-- **Status/next action:** IN PROGRESS — publish this board claim, preserve the stale T-006 audit
-  journal, remove its worktree, then create the fresh T-013 worktree and implement provider-local
-  standard-rate cost calculation.
+- **Started/checkpoint:** 2026-07-13T08:14:28Z / 2026-07-13T08:19:46Z
+- **Status/next action:** BLOCKED / IMPLEMENTED — provider-local pricing and tests pass. Publish a
+  draft PR without merging; after T-006 is ported to async Neon and a test `DATABASE_URL` is
+  available, rebase and rerun repository typecheck, tests, and build before marking T-013 complete.
 
 ### Validation Commands
 
@@ -303,6 +303,25 @@ pnpm build                       # PASS (pipeline + Next.js)
   focused port after PR #10's contract is finalized.
 - Remote Vercel and Vercel Preview Comments checks — PASS on draft PR #11; PR is CLEAN.
 
+### T-013 Validation
+
+- `pnpm install --frozen-lockfile` — PASS.
+- `pnpm format` — PASS exit 0; T-013 files formatted. Root reports 27 pre-existing warnings outside
+  T-013 scope.
+- Touched agent `biome check` — PASS with zero diagnostics.
+- `pnpm --filter @repo/agent typecheck` — PASS.
+- `pnpm --filter @repo/agent test` — PASS, 11/11 tests including four cost/provider cases and
+  pipeline cost aggregation.
+- `pnpm typecheck` — BLOCKED by pre-existing T-006 synchronous SQLite `.get()`, `.all()`, `.run()`,
+  and transaction contracts in `packages/db/src/eval-store.ts` against Neon Postgres.
+- `pnpm test` — BLOCKED outside T-013 because DB suites require `DATABASE_URL`; agent tests pass.
+- `pnpm build` — BLOCKED by the same T-006 Neon incompatibility in the eval store and pipeline
+  evaluation/indexing adapters.
+- No credentialed Gemini smoke call was made; deterministic injected-response tests cover usage and
+  cost behavior without a billable request.
+- Files changed: Gemini provider, provider-local pricing helper/tests, pipeline aggregation test,
+  goal ledger, and append-only codemap.
+
 ### Progress Log
 
 - 2026-07-12T16:00:00Z — GOAL-001 created. T-001 claimed.
@@ -351,19 +370,25 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-13T07:23:32Z — Pushed T-006 implementation `a535993` and opened draft PR #11 with an
   explicit no-merge notice and PR #10 Neon compatibility dependency; local gates pass and remote
   Vercel checks subsequently passed and the draft PR is CLEAN.
+- 2026-07-13T08:14:28Z — Reconciled merged PRs #10/#11, published the T-013 provider-local cost
+  accounting claim as `e2a7364`, preserved the T-006 audit journal, and removed its stale worktree.
+- 2026-07-13T08:19:46Z — Implemented standard Gemini cost estimates with thinking-token billing,
+  unknown-model preflight rejection, and pipeline aggregation evidence. Agent gates pass; root
+  gates remain blocked by the merged T-006 Neon incompatibility and missing test `DATABASE_URL`.
 
 ### Blockers
 
-- T-006 can be published and reviewed against current `main`. Integration sequencing depends on
-  PR #10: if Neon lands first, port T-006's DB adapter/API calls to its async Postgres contract and
-  rerun the full gate before merging either dependent change.
+- T-006 and repository-wide validation are blocked because merged eval persistence and pipeline
+  adapters still use synchronous SQLite calls against Neon Postgres. Root DB tests also require a
+  test `DATABASE_URL`. T-013 focused behavior is implemented and passing but cannot be marked
+  complete until those external gates are repaired and rerun.
 
 ### Handoff
 
-**Current state:** T-006 is implemented and fully validated in the dedicated
-`feat/evaluation-engine` worktree. It freezes only trusted snapshots, executes cases sequentially
-through an injected production-pipeline adapter, persists deterministic grades and observability,
-and exposes run creation/read APIs. T-007 comparison/gates and T-008 detailed trace UI remain
-planned. PR #10 independently migrates the database runtime to Neon and is not integrated here.
-**Next exact action:** Do not merge draft PR #11. Monitor its remote checks, then reconcile the
-async Neon adapter after PR #10 stabilizes and only merge when the user explicitly instructs it.
+**Current state:** T-013 computes standard paid-list costs for both seeded Gemini models, includes
+thinking tokens, rejects unpriced models before network use, and passes all focused agent gates.
+The stale T-006 worktree is removed. Repository-wide gates remain blocked outside T-013 by the
+merged synchronous eval adapter and missing DB test connection.
+**Next exact action:** Publish T-013 as a draft PR without merging. After the T-006 Neon repair,
+rebase this branch, supply an isolated test `DATABASE_URL`, rerun every root gate, then reconcile
+the canonical board before integration.

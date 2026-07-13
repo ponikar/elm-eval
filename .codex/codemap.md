@@ -752,3 +752,51 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** No review blocker. Integration sequencing with PR #10 remains unresolved and no merge is authorized.
 - **Next Step:** Push this final verification entry and leave draft PR #11 open and unmerged.
 - **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`; PR https://github.com/ponikar/elm-eval/pull/11 CLEAN/DRAFT; Vercel PASS; Vercel Preview Comments PASS.
+
+---
+
+## Entry 32 — 2026-07-13T08:03:30Z
+
+- **Agent:** codex worker (`pipeline_gap_audit`)
+- **Ticket:** T-006
+- **Branch:** feat/evaluation-engine
+- **Worktree:** /Users/darshan/work/agent-eval-evaluation-engine
+- **Status:** READ-ONLY AUDIT COMPLETE / PRESERVED AT CLEANUP
+- **Scope:** Production agent/retrieval/worker pipeline against PRD acceptance criteria.
+- **Completed:** Verified core pipeline behavior and identified the merged T-006 Neon incompatibility, page/status and recovery gaps, zero cost accounting, and pending T-007/T-008 layers. Preserved the original journal-only change in local commit `fc443de` before removing the stale worktree.
+- **Pending:** Repair the T-006 Neon adapter separately; T-013 now owns only provider-local Gemini cost accounting.
+- **Blockers:** Remote `main` at the T-006 merge still contains synchronous SQLite eval-store calls against Neon.
+- **Next Step:** Implement T-013 without expanding into DB or evaluation adapter repair.
+- **Changed Files and Evidence:** `.codex/codemap.md` only; original T-006 audit entry preserved verbatim in `fc443de`; stale worktree removed cleanly.
+
+---
+
+## Entry 33 — 2026-07-13T08:15:31Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-013
+- **Branch:** fix/gemini-cost-accounting
+- **Worktree:** /Users/darshan/work/agent-eval-gemini-cost
+- **Status:** IN PROGRESS / ACCEPTED
+- **Scope:** Standard paid-list Gemini cost calculation for the two seeded stable models.
+- **Completed:** Published board claim `e2a7364`, removed the stale T-006 worktree after preserving its journal, and verified this fresh branch/worktree.
+- **Pending:** Add the minimal pricing calculator, wire Gemini usage including thinking tokens, add focused tests, and run validation.
+- **Blockers:** None for provider-local implementation. Repository-wide validation is expected to expose the pre-existing merged T-006 Neon incompatibility.
+- **Next Step:** Characterize the Gemini client boundary and add focused provider tests before replacing the zero cost.
+- **Changed Files and Evidence:** `.codex/codemap.md`; clean worktree verified at the published claim commit.
+
+---
+
+## Entry 34 — 2026-07-13T08:19:46Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-013
+- **Branch:** fix/gemini-cost-accounting
+- **Worktree:** /Users/darshan/work/agent-eval-gemini-cost
+- **Status:** BLOCKED / IMPLEMENTED AND FOCUSED-VALIDATED
+- **Scope:** Provider-local Gemini paid-list cost estimates and propagation evidence.
+- **Completed:** Added standard pricing for the two seeded Gemini models, included thinking tokens as billable output, rejected unknown pricing before network use, retained full precision, and proved pipeline aggregation. Architecture guidance kept the change out of DB and eval schemas.
+- **Pending:** Commit, push, and open a draft PR; then rebase and rerun root gates after the separate T-006 Neon adapter repair.
+- **Blockers:** Root typecheck/build fail in merged T-006 SQLite eval-store/pipeline calls against Neon; root DB tests additionally require `DATABASE_URL`. Root formatter reports 27 pre-existing warnings outside T-013.
+- **Next Step:** Review the final scoped diff, commit and publish the blocked-but-focused-valid T-013 branch, open a draft PR, and do not merge.
+- **Changed Files and Evidence:** `packages/agent/src/gemini-provider.ts`, `gemini-pricing.ts`, `gemini-provider.test.ts`, `pipeline.test.ts`, goal/codemap. Frozen install PASS; format completed; touched Biome PASS; agent typecheck PASS; agent tests 11/11 PASS; root gates blocked only outside owned scope as recorded in `.codex/goal.md`.

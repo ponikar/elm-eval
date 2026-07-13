@@ -70,7 +70,7 @@ class Provider implements ModelProvider {
       output: r.schema.parse(this.outputs[i]),
       model: r.model,
       latencyMs: 1,
-      costUsd: 0,
+      costUsd: 0.001,
       tokenUsage: { input: 1, output: 1 },
     };
   }
@@ -121,6 +121,7 @@ describe('AuditAgentPipeline', () => {
       createId: () => 'f',
     }).run(input);
     expect(p.calls).toBe(3);
+    expect(result.usage.costUsd).toBe(0.003);
     expect(result.findings).toHaveLength(1);
     expect(
       result.traces.filter((t) => t.stage === 'CANDIDATE_EXTRACTION' && t.outputSummary),
