@@ -381,8 +381,10 @@ export interface RunSummary {
   completedAt: string | undefined;
   errorCode: string | undefined;
   errorMessage: string | undefined;
+  agentVersionId: string;
   agentVersionName: string;
   agentVersionModel: string;
+  agentVersionType: string;
   suiteName: string;
   suiteVersion: number;
   progress: {
@@ -430,8 +432,10 @@ export async function listRunSummaries(database: EvalDatabase = db): Promise<Run
       completedAt: run.completedAt,
       errorCode: run.errorCode,
       errorMessage: run.errorMessage,
+      agentVersionId: run.agentVersionSnapshot.id,
       agentVersionName: run.agentVersionSnapshot.name,
       agentVersionModel: run.agentVersionSnapshot.model,
+      agentVersionType: run.agentVersionSnapshot.type ?? 'unknown',
       suiteName: run.suiteSnapshot.name,
       suiteVersion: run.suiteSnapshot.version,
       progress: {

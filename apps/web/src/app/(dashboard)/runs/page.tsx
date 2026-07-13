@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   Clock3,
   Coins,
+  Loader2,
   Play,
   XCircle,
 } from 'lucide-react';
@@ -31,12 +32,11 @@ import { DashboardHeader } from '@/components/dashboard-header';
 import { trpc } from '@/trpc/react';
 
 function formatUsd(value: number) {
-  if (value === 0) return '$0.00';
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
-    maximumFractionDigits: 6,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
@@ -58,14 +58,20 @@ function formatDate(value?: string) {
 }
 
 function RunStatusBadge({ status }: { status: string }) {
+  if (status === 'PENDING' || status === 'RUNNING') {
+    return (
+      <Badge variant="default" className="gap-1 text-xs">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        {status}
+      </Badge>
+    );
+  }
   const config: Record<
     string,
     { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ElementType }
   > = {
     COMPLETED: { variant: 'secondary', icon: CheckCircle2 },
-    RUNNING: { variant: 'default', icon: Activity },
     FAILED: { variant: 'destructive', icon: XCircle },
-    PENDING: { variant: 'outline', icon: Clock3 },
   };
   const { variant, icon: Icon } = config[status] ?? { variant: 'outline' as const, icon: Play };
   return (
@@ -181,7 +187,17 @@ export default function RunsPage() {
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Bot className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-medium">{run.agentVersionName}</span>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{run.agentVersionName}</span>
+                                  <Badge
+                                    variant={
+                                      run.agentVersionType === 'baseline' ? 'secondary' : 'default'
+                                    }
+                                    className="w-fit text-[10px]"
+                                  >
+                                    {run.agentVersionType}
+                                  </Badge>
+                                </div>
                               </div>
                             </TableCell>
                             <TableCell>
