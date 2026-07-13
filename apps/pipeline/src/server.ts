@@ -33,18 +33,14 @@ const server = createServer((req, res) => {
 
     console.log(`[server] Received run request for ${runId}`);
 
+    sendJson(res, 202, { status: 'accepted', runId });
+
     runEvaluationJob(runId)
-      .then((result) => {
+      .then(() => {
         console.log(`[server] Run ${runId} completed`);
-        return sendJson(res, 200, { status: 'completed', runId, result });
       })
       .catch((error: unknown) => {
         console.error(`[server] Run ${runId} failed:`, error);
-        return sendJson(res, 500, {
-          status: 'failed',
-          runId,
-          error: error instanceof Error ? error.message : 'Unknown error',
-        });
       });
 
     return;
