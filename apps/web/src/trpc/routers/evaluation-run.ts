@@ -5,7 +5,6 @@ import {
   freezeEvalSuite,
   getEvaluationRunDetails,
   listEvaluationRuns,
-  listFrozenSuites,
   listRunSummaries,
 } from '@repo/db/eval-store';
 import { z } from 'zod';
@@ -54,12 +53,10 @@ export const evaluationRunRouter = createTRPCRouter({
         throw new Error('No trusted eval cases available. Approve cases before running.');
       }
 
-      const existingSuites = await listFrozenSuites();
-      const latestVersion = (existingSuites[0]?.version ?? 0) + 1;
       const suite = await freezeEvalSuite({
         id: randomUUID(),
-        name: 'auto-frozen',
-        version: latestVersion,
+        name: `auto-frozen-${Date.now()}`,
+        version: 1,
         description: 'Automatically frozen trusted suite for dashboard-triggered run',
         caseIds: trustedCaseIds,
         frozenAt: new Date().toISOString(),
