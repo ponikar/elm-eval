@@ -899,7 +899,39 @@ https://github.com/ponikar/elm-eval/pull/5
 
 ---
 
-## Entry 40 — 2026-07-13T08:59:18Z
+## Entry 40 — 2026-07-13T10:54:37Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-008
+- **Branch:** feat/trace-viewer
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/trace-viewer
+- **Status:** IN PROGRESS / ACCEPTED
+- **Scope:** Replace the placeholder dashboard traces page with a real trace workspace using existing shadcn primitives and non-overlapping read-only trace query modules.
+- **Completed:** Published the T-008 board claim on `origin/main` as `504cf55` from a clean coordination worktree based on `origin/main`; created and verified the dedicated `feat/trace-viewer` worktree at that published claim without disturbing the active T-006 repair in the local `main` worktree.
+- **Pending:** Add trace read/store and tRPC query surfaces, then implement the traces dashboard page with execution selection, run/case summary, grader context, and ordered stage events.
+- **Blockers:** None at claim time. The implementation must avoid editing the active T-006 repair paths `packages/db/src/eval-store.ts` and `apps/web/src/trpc/routers/evaluation-run.ts`.
+- **Next Step:** Inspect the current dashboard component inventory and run-detail shape, then implement isolated trace-query modules and the traces workspace UI in this worktree.
+- **Changed Files and Evidence:** `.codex/goal.md` claim published on `origin/main`; this `.codex/codemap.md` entry; `git push origin HEAD:main` PASS; `git worktree add -b feat/trace-viewer /Users/darshan/work/agent-eval/worktrees/trace-viewer 504cf55` PASS; branch, pwd, and clean status verified in the new worktree.
+
+---
+
+## Entry 41 — 2026-07-13T11:03:54Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-008
+- **Branch:** feat/trace-viewer
+- **Worktree:** /Users/darshan/work/agent-eval/worktrees/trace-viewer
+- **Status:** COMPLETE IMPLEMENTATION / READY TO PUBLISH
+- **Scope:** End-to-end trace viewer delivery using new non-overlapping read-only store/router modules and existing shadcn dashboard primitives.
+- **Completed:** Added `@repo/db/trace-store` with run summaries, run overview, and execution-trace detail queries; exposed those through a new `trace` tRPC router; registered the router in the app router; and replaced the placeholder traces page with a real workspace that supports run selection, case selection, grader summaries, ordered stage timelines, actual-vs-expected inspection, loading states, empty states, and runtime error states. Verified the route compiles and serves on a local dev server at `http://127.0.0.1:3003/traces`.
+- **Pending:** Commit, push, create a PR, and then continue with T-007 comparison/gate work separately.
+- **Blockers:** Focused `pnpm --filter web test` remains blocked by missing `DATABASE_URL` in this environment before the existing DB-backed router tests can execute. No T-008-specific test failure remains.
+- **Next Step:** Review the scoped diff, commit the T-008 worktree, push `feat/trace-viewer`, and open a PR.
+- **Changed Files and Evidence:** `.codex/codemap.md`, `packages/db/package.json`, new `packages/db/src/trace-store.ts`, `apps/web/src/trpc/routers/_app.ts`, new `apps/web/src/trpc/routers/trace.ts`, and `apps/web/src/app/(dashboard)/traces/page.tsx`. Validation: `pnpm format` PASS (same 28 pre-existing repo warnings remain); `pnpm --filter @repo/db typecheck` PASS; `pnpm --filter web typecheck` PASS after generating `.next/types`; `DATABASE_URL=postgres://user:pass@127.0.0.1:5432/traceviewer pnpm --filter web build` PASS; `git diff --check` PASS; `pnpm --filter web test` FAILS only because `DATABASE_URL` is unset for the pre-existing router test harness.
+
+---
+
+## Entry 42 — 2026-07-13T08:59:18Z
 
 - **Agent:** codex (coordinator)
 - **Ticket:** T-014
@@ -915,7 +947,7 @@ https://github.com/ponikar/elm-eval/pull/5
 
 ---
 
-## Entry 41 — 2026-07-13T09:18:42Z
+## Entry 43 — 2026-07-13T09:18:42Z
 
 - **Agent:** codex (coordinator)
 - **Ticket:** T-014
@@ -931,7 +963,7 @@ https://github.com/ponikar/elm-eval/pull/5
 
 ---
 
-## Entry 42 — 2026-07-13T09:24:51Z
+## Entry 44 — 2026-07-13T09:24:51Z
 
 - **Agent:** codex (coordinator)
 - **Ticket:** T-014

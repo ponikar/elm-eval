@@ -184,23 +184,23 @@ function parseGrader(row: typeof graderResult.$inferSelect): GraderResult {
     hallucinatedFindingRate: row.hallucinatedFindingRate ?? undefined,
     correctiveActionCompleteness: row.correctiveActionCompleteness ?? undefined,
     schemaValidity: row.schemaValidity ?? undefined,
-    failureTypes: JSON.parse(row.failureTypesJson),
-    details: JSON.parse(row.detailsJson),
+    failureTypes: JSON.parse(row.failureTypesJson as string),
+    details: JSON.parse(row.detailsJson as string),
     judgeModel: row.judgeModel ?? undefined,
     createdAt: row.createdAt,
   });
 }
 
-export function freezeEvalSuite(
+export async function freezeEvalSuite(
   input: FreezeEvalSuiteInput,
   database: EvalDatabase = db,
-): EvalSuiteSnapshot {
+): Promise<EvalSuiteSnapshot> {
   if (input.caseIds.length === 0) throw new Error('An evaluation suite requires at least one case');
   if (new Set(input.caseIds).size !== input.caseIds.length)
     throw new Error('An evaluation suite cannot contain duplicate cases');
 
-  return database.transaction((tx) => {
-    const rows = tx.select().from(evalCase).where(inArray(evalCase.id, input.caseIds)).all();
+  return await database.transaction(async (tx) => {
+    const rows = await tx.select().from(evalCase).where(inArray(evalCase.id, input.caseIds));
     const byId = new Map(rows.map((row) => [row.id, row]));
     const cases = input.caseIds.map((id) => {
       const row = byId.get(id);
@@ -212,41 +212,37 @@ export function freezeEvalSuite(
       throw new Error('All cases in a frozen suite must use the same rulebook version');
 
     const hash = contentHash(cases);
-    const existing = tx
+    const existingRows = await tx
       .select()
       .from(evalSuite)
-      .where(and(eq(evalSuite.name, input.name), eq(evalSuite.version, input.version)))
-      .get();
+      .where(and(eq(evalSuite.name, input.name), eq(evalSuite.version, input.version)));
+    const existing = existingRows[0];
     if (existing) {
       if (existing.contentHash !== hash)
         throw new Error(`Evaluation suite ${input.name} v${input.version} is already frozen`);
-      return loadSuiteSnapshot(existing.id, tx);
+      return await loadSuiteSnapshot(existing.id, tx);
     }
 
-    tx.insert(evalSuite)
-      .values({
-        id: input.id,
-        name: input.name,
-        version: input.version,
-        description: input.description,
-        status: 'FROZEN',
-        contentHash: hash,
-        createdAt: input.frozenAt,
-        frozenAt: input.frozenAt,
-      })
-      .run();
-    tx.insert(evalSuiteCase)
-      .values(
-        cases.map((item, ordinal) => ({
-          suiteId: input.id,
-          evalCaseId: item.id,
-          ordinal,
-          caseContentHash: createHash('sha256').update(canonicalize(item)).digest('hex'),
-          caseSnapshotJson: canonicalize(item),
-          addedAt: input.frozenAt,
-        })),
-      )
-      .run();
+    await tx.insert(evalSuite).values({
+      id: input.id,
+      name: input.name,
+      version: input.version,
+      description: input.description,
+      status: 'FROZEN',
+      contentHash: hash,
+      createdAt: input.frozenAt,
+      frozenAt: input.frozenAt,
+    });
+    await tx.insert(evalSuiteCase).values(
+      cases.map((item, ordinal) => ({
+        suiteId: input.id,
+        evalCaseId: item.id,
+        ordinal,
+        caseContentHash: createHash('sha256').update(canonicalize(item)).digest('hex'),
+        caseSnapshotJson: canonicalize(item),
+        addedAt: input.frozenAt,
+      })),
+    );
     return EvalSuiteSnapshotSchema.parse({
       id: input.id,
       name: input.name,
@@ -258,16 +254,19 @@ export function freezeEvalSuite(
   });
 }
 
-export function loadSuiteSnapshot(suiteId: string, database: EvalReader = db): EvalSuiteSnapshot {
-  const suite = database.select().from(evalSuite).where(eq(evalSuite.id, suiteId)).get();
+export async function loadSuiteSnapshot(
+  suiteId: string,
+  database: EvalReader = db,
+): Promise<EvalSuiteSnapshot> {
+  const suiteRows = await database.select().from(evalSuite).where(eq(evalSuite.id, suiteId));
+  const suite = suiteRows[0];
   if (suite?.status !== 'FROZEN' || !suite.frozenAt)
     throw new Error(`Frozen evaluation suite ${suiteId} does not exist`);
-  const memberships = database
+  const memberships = await database
     .select()
     .from(evalSuiteCase)
     .where(eq(evalSuiteCase.suiteId, suiteId))
-    .orderBy(asc(evalSuiteCase.ordinal))
-    .all();
+    .orderBy(asc(evalSuiteCase.ordinal));
   const cases = memberships.map((membership) =>
     FrozenEvalCaseSchema.parse(JSON.parse(membership.caseSnapshotJson)),
   );
@@ -284,73 +283,72 @@ export function loadSuiteSnapshot(suiteId: string, database: EvalReader = db): E
   });
 }
 
-export function createEvaluationRun(
+export async function createEvaluationRun(
   input: CreateEvaluationRunInput,
   database: EvalDatabase = db,
-): EvaluationRunPlan {
-  return database.transaction((tx) => {
-    const existing = tx
+): Promise<EvaluationRunPlan> {
+  return await database.transaction(async (tx) => {
+    const existingRows = await tx
       .select()
       .from(evaluationRun)
-      .where(eq(evaluationRun.idempotencyKey, input.idempotencyKey))
-      .get();
+      .where(eq(evaluationRun.idempotencyKey, input.idempotencyKey));
+    const existing = existingRows[0];
     if (existing) {
       if (existing.suiteId !== input.suiteId || existing.agentVersionId !== input.agentVersionId)
         throw new Error('Evaluation run idempotency key was reused with different inputs');
-      return getEvaluationRunPlan(existing.id, tx);
+      return await getEvaluationRunPlan(existing.id, tx);
     }
 
-    const suite = loadSuiteSnapshot(input.suiteId, tx);
-    const agentRow = tx
+    const suite = await loadSuiteSnapshot(input.suiteId, tx);
+    const agentRows = await tx
       .select()
       .from(agentVersion)
-      .where(eq(agentVersion.id, input.agentVersionId))
-      .get();
+      .where(eq(agentVersion.id, input.agentVersionId));
+    const agentRow = agentRows[0];
     if (!agentRow) throw new Error(`Agent version ${input.agentVersionId} does not exist`);
     const agent = parseAgentVersion(agentRow);
     const rulebookIds = new Set(suite.cases.map((item) => item.input.rulebookVersionId));
     if (rulebookIds.size !== 1 || !rulebookIds.has(agent.rulebookVersionId))
       throw new Error('Agent version and frozen suite must use the same rulebook version');
 
-    tx.insert(evaluationRun)
-      .values({
-        id: input.id,
-        agentVersionId: agent.id,
-        suiteId: suite.id,
-        rulebookVersionId: agent.rulebookVersionId,
-        idempotencyKey: input.idempotencyKey,
-        suiteContentHash: suite.contentHash,
-        suiteSnapshotJson: canonicalize(suite),
-        agentVersionSnapshotJson: canonicalize(agent),
+    await tx.insert(evaluationRun).values({
+      id: input.id,
+      agentVersionId: agent.id,
+      suiteId: suite.id,
+      rulebookVersionId: agent.rulebookVersionId,
+      idempotencyKey: input.idempotencyKey,
+      suiteContentHash: suite.contentHash,
+      suiteSnapshotJson: canonicalize(suite),
+      agentVersionSnapshotJson: canonicalize(agent),
+      status: 'PENDING',
+      createdAt: input.createdAt,
+    });
+    const createExecutionId = input.createExecutionId ?? (() => randomUUID());
+    await tx.insert(testExecution).values(
+      suite.cases.map((item) => ({
+        id: createExecutionId(item.id),
+        runId: input.id,
+        evalCaseId: item.id,
         status: 'PENDING',
         createdAt: input.createdAt,
-      })
-      .run();
-    const createExecutionId = input.createExecutionId ?? (() => randomUUID());
-    tx.insert(testExecution)
-      .values(
-        suite.cases.map((item) => ({
-          id: createExecutionId(item.id),
-          runId: input.id,
-          evalCaseId: item.id,
-          status: 'PENDING',
-          createdAt: input.createdAt,
-        })),
-      )
-      .run();
-    return getEvaluationRunPlan(input.id, tx);
+      })),
+    );
+    return await getEvaluationRunPlan(input.id, tx);
   });
 }
 
-export function getEvaluationRunPlan(runId: string, database: EvalReader = db): EvaluationRunPlan {
-  const row = database.select().from(evaluationRun).where(eq(evaluationRun.id, runId)).get();
+export async function getEvaluationRunPlan(
+  runId: string,
+  database: EvalReader = db,
+): Promise<EvaluationRunPlan> {
+  const runRows = await database.select().from(evaluationRun).where(eq(evaluationRun.id, runId));
+  const row = runRows[0];
   if (!row) throw new Error(`Evaluation run ${runId} does not exist`);
   const run = parseRun(row);
-  const executions = database
+  const executions = await database
     .select()
     .from(testExecution)
-    .where(eq(testExecution.runId, runId))
-    .all();
+    .where(eq(testExecution.runId, runId));
   const executionByCase = new Map(executions.map((execution) => [execution.evalCaseId, execution]));
   return {
     run,
@@ -362,40 +360,34 @@ export function getEvaluationRunPlan(runId: string, database: EvalReader = db): 
   };
 }
 
-export function getTestExecutions(runId: string, database: EvalDatabase = db): TestExecution[] {
-  return database
-    .select()
-    .from(testExecution)
-    .where(eq(testExecution.runId, runId))
-    .all()
-    .map(parseExecution);
-}
-
-export function listEvaluationRuns(database: EvalDatabase = db): EvaluationRun[] {
-  return database
-    .select()
-    .from(evaluationRun)
-    .orderBy(asc(evaluationRun.createdAt))
-    .all()
-    .map(parseRun);
-}
-
-export function getEvaluationRunDetails(
+export async function getTestExecutions(
   runId: string,
   database: EvalDatabase = db,
-): EvaluationRunDetails {
-  const plan = getEvaluationRunPlan(runId, database);
-  const executions = getTestExecutions(runId, database);
+): Promise<TestExecution[]> {
+  const rows = await database.select().from(testExecution).where(eq(testExecution.runId, runId));
+  return rows.map(parseExecution);
+}
+
+export async function listEvaluationRuns(database: EvalDatabase = db): Promise<EvaluationRun[]> {
+  const rows = await database.select().from(evaluationRun).orderBy(asc(evaluationRun.createdAt));
+  return rows.map(parseRun);
+}
+
+export async function getEvaluationRunDetails(
+  runId: string,
+  database: EvalDatabase = db,
+): Promise<EvaluationRunDetails> {
+  const plan = await getEvaluationRunPlan(runId, database);
+  const executions = await getTestExecutions(runId, database);
   const executionIds = executions.map((item) => item.id);
-  const graders =
+  const graderRows =
     executionIds.length === 0
       ? []
-      : database
+      : await database
           .select()
           .from(graderResult)
-          .where(inArray(graderResult.executionId, executionIds))
-          .all()
-          .map(parseGrader);
+          .where(inArray(graderResult.executionId, executionIds));
+  const graders = graderRows.map(parseGrader);
   const executionByCase = new Map(executions.map((item) => [item.evalCaseId, item]));
   const graderByExecution = new Map(graders.map((item) => [item.executionId, item]));
   const cases = plan.run.suiteSnapshot.cases.map((item) => {
@@ -417,74 +409,67 @@ export function getEvaluationRunDetails(
   };
 }
 
-export function claimEvaluationRun(
+export async function claimEvaluationRun(
   runId: string,
   startedAt: string,
   database: EvalDatabase = db,
-): boolean {
-  return (
-    database
-      .update(evaluationRun)
-      .set({ status: 'RUNNING', startedAt, errorCode: null, errorMessage: null })
-      .where(and(eq(evaluationRun.id, runId), eq(evaluationRun.status, 'PENDING')))
-      .returning({ id: evaluationRun.id })
-      .get() !== undefined
-  );
+): Promise<boolean> {
+  const rows = await database
+    .update(evaluationRun)
+    .set({ status: 'RUNNING', startedAt, errorCode: null, errorMessage: null })
+    .where(and(eq(evaluationRun.id, runId), eq(evaluationRun.status, 'PENDING')))
+    .returning({ id: evaluationRun.id });
+  return rows.length > 0;
 }
 
-export function claimTestExecution(
+export async function claimTestExecution(
   executionId: string,
   startedAt: string,
   database: EvalDatabase = db,
-): boolean {
-  return (
-    database
-      .update(testExecution)
-      .set({ status: 'RUNNING', startedAt, errorCode: null, errorMessage: null })
-      .where(and(eq(testExecution.id, executionId), eq(testExecution.status, 'PENDING')))
-      .returning({ id: testExecution.id })
-      .get() !== undefined
-  );
+): Promise<boolean> {
+  const rows = await database
+    .update(testExecution)
+    .set({ status: 'RUNNING', startedAt, errorCode: null, errorMessage: null })
+    .where(and(eq(testExecution.id, executionId), eq(testExecution.status, 'PENDING')))
+    .returning({ id: testExecution.id });
+  return rows.length > 0;
 }
 
-export function appendEvaluationTrace(
+export async function appendEvaluationTrace(
   input: TraceEvent & { executionId: string },
   database: EvalDatabase = db,
-): void {
+): Promise<void> {
   const trace = TraceEventSchema.parse(input);
-  database
-    .insert(traceEvent)
-    .values({
-      id: trace.id,
-      executionId: input.executionId,
-      pipelineJobId: null,
-      stage: trace.stage,
-      eventType: trace.eventType,
-      sequence: trace.sequence,
-      attempt: trace.attempt,
-      startedAt: trace.startedAt,
-      completedAt: trace.completedAt,
-      durationMs: trace.durationMs,
-      inputSummary: trace.inputSummary === undefined ? null : JSON.stringify(trace.inputSummary),
-      outputSummary: trace.outputSummary === undefined ? null : JSON.stringify(trace.outputSummary),
-      errorCode: trace.errorCode,
-      tokenInput: trace.tokenUsage?.input,
-      tokenOutput: trace.tokenUsage?.output,
-      costUsd: trace.costUsd,
-    })
-    .run();
+  await database.insert(traceEvent).values({
+    id: trace.id,
+    executionId: input.executionId,
+    pipelineJobId: null,
+    stage: trace.stage,
+    eventType: trace.eventType,
+    sequence: trace.sequence,
+    attempt: trace.attempt,
+    startedAt: trace.startedAt,
+    completedAt: trace.completedAt,
+    durationMs: trace.durationMs,
+    inputSummary: trace.inputSummary === undefined ? null : JSON.stringify(trace.inputSummary),
+    outputSummary: trace.outputSummary === undefined ? null : JSON.stringify(trace.outputSummary),
+    errorCode: trace.errorCode,
+    tokenInput: trace.tokenUsage?.input,
+    tokenOutput: trace.tokenUsage?.output,
+    costUsd: trace.costUsd,
+  });
 }
 
-export function completeTestExecution(
+export async function completeTestExecution(
   input: CompleteExecutionInput,
   database: EvalDatabase = db,
-): void {
+): Promise<void> {
   const output = EvaluationAgentOutputSchema.parse(input.output);
   const grader = GraderResultSchema.parse(input.grader);
   if (grader.executionId !== input.executionId)
     throw new Error('Grader result belongs to a different test execution');
-  database.transaction((tx) => {
-    const updated = tx
+  await database.transaction(async (tx) => {
+    const updated = await tx
       .update(testExecution)
       .set({
         status: 'COMPLETED',
@@ -500,37 +485,34 @@ export function completeTestExecution(
         completedAt: input.completedAt,
       })
       .where(and(eq(testExecution.id, input.executionId), eq(testExecution.status, 'RUNNING')))
-      .returning({ id: testExecution.id })
-      .get();
-    if (!updated) throw new Error(`Test execution ${input.executionId} is not RUNNING`);
-    tx.insert(graderResult)
-      .values({
-        id: grader.id,
-        executionId: grader.executionId,
-        graderVersion: grader.graderVersion,
-        passed: grader.passed,
-        deterministicPassed: grader.deterministicPassed,
-        findingRecall: grader.findingRecall,
-        criticalFindingRecall: grader.criticalFindingRecall,
-        findingPrecision: grader.findingPrecision,
-        categoryAccuracy: grader.categoryAccuracy,
-        severityAccuracy: grader.severityAccuracy,
-        criticalUnderclassificationCount: grader.criticalUnderclassificationCount,
-        auditCitationPrecision: grader.auditCitationPrecision,
-        ruleReferenceAccuracy: grader.ruleReferenceAccuracy,
-        hallucinatedFindingRate: grader.hallucinatedFindingRate,
-        correctiveActionCompleteness: grader.correctiveActionCompleteness,
-        schemaValidity: grader.schemaValidity,
-        failureTypesJson: canonicalize(grader.failureTypes),
-        detailsJson: canonicalize(grader.details),
-        judgeModel: grader.judgeModel,
-        createdAt: grader.createdAt,
-      })
-      .run();
+      .returning({ id: testExecution.id });
+    if (updated.length === 0) throw new Error(`Test execution ${input.executionId} is not RUNNING`);
+    await tx.insert(graderResult).values({
+      id: grader.id,
+      executionId: grader.executionId,
+      graderVersion: grader.graderVersion,
+      passed: grader.passed,
+      deterministicPassed: grader.deterministicPassed,
+      findingRecall: grader.findingRecall,
+      criticalFindingRecall: grader.criticalFindingRecall,
+      findingPrecision: grader.findingPrecision,
+      categoryAccuracy: grader.categoryAccuracy,
+      severityAccuracy: grader.severityAccuracy,
+      criticalUnderclassificationCount: grader.criticalUnderclassificationCount,
+      auditCitationPrecision: grader.auditCitationPrecision,
+      ruleReferenceAccuracy: grader.ruleReferenceAccuracy,
+      hallucinatedFindingRate: grader.hallucinatedFindingRate,
+      correctiveActionCompleteness: grader.correctiveActionCompleteness,
+      schemaValidity: grader.schemaValidity,
+      failureTypesJson: canonicalize(grader.failureTypes),
+      detailsJson: canonicalize(grader.details),
+      judgeModel: grader.judgeModel,
+      createdAt: grader.createdAt,
+    });
   });
 }
 
-export function failTestExecution(
+export async function failTestExecution(
   input: {
     executionId: string;
     errorCode: string;
@@ -539,8 +521,8 @@ export function failTestExecution(
     completedAt: string;
   },
   database: EvalDatabase = db,
-): void {
-  const updated = database
+): Promise<void> {
+  const updated = await database
     .update(testExecution)
     .set({
       status: 'FAILED',
@@ -551,40 +533,38 @@ export function failTestExecution(
       completedAt: input.completedAt,
     })
     .where(and(eq(testExecution.id, input.executionId), eq(testExecution.status, 'RUNNING')))
-    .returning({ id: testExecution.id })
-    .get();
-  if (!updated) throw new Error(`Test execution ${input.executionId} is not RUNNING`);
+    .returning({ id: testExecution.id });
+  if (updated.length === 0) throw new Error(`Test execution ${input.executionId} is not RUNNING`);
 }
 
-export function completeEvaluationRun(
+export async function completeEvaluationRun(
   runId: string,
   completedAt: string,
   database: EvalDatabase = db,
-): void {
-  database.transaction((tx) => {
-    const pending = tx
+): Promise<void> {
+  await database.transaction(async (tx) => {
+    const pendingRows = await tx
       .select({ id: testExecution.id })
       .from(testExecution)
       .where(
         and(eq(testExecution.runId, runId), inArray(testExecution.status, ['PENDING', 'RUNNING'])),
-      )
-      .get();
-    if (pending) throw new Error(`Evaluation run ${runId} still has non-terminal executions`);
-    const updated = tx
+      );
+    if (pendingRows.length > 0)
+      throw new Error(`Evaluation run ${runId} still has non-terminal executions`);
+    const updated = await tx
       .update(evaluationRun)
       .set({ status: 'COMPLETED', completedAt, errorCode: null, errorMessage: null })
       .where(and(eq(evaluationRun.id, runId), eq(evaluationRun.status, 'RUNNING')))
-      .returning({ id: evaluationRun.id })
-      .get();
-    if (!updated) throw new Error(`Evaluation run ${runId} is not RUNNING`);
+      .returning({ id: evaluationRun.id });
+    if (updated.length === 0) throw new Error(`Evaluation run ${runId} is not RUNNING`);
   });
 }
 
-export function failEvaluationRun(
+export async function failEvaluationRun(
   input: { runId: string; errorCode: string; errorMessage: string; completedAt: string },
   database: EvalDatabase = db,
-): void {
-  const updated = database
+): Promise<void> {
+  const updated = await database
     .update(evaluationRun)
     .set({
       status: 'FAILED',
@@ -593,7 +573,6 @@ export function failEvaluationRun(
       completedAt: input.completedAt,
     })
     .where(and(eq(evaluationRun.id, input.runId), eq(evaluationRun.status, 'RUNNING')))
-    .returning({ id: evaluationRun.id })
-    .get();
-  if (!updated) throw new Error(`Evaluation run ${input.runId} is not RUNNING`);
+    .returning({ id: evaluationRun.id });
+  if (updated.length === 0) throw new Error(`Evaluation run ${input.runId} is not RUNNING`);
 }

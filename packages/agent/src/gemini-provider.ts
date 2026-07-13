@@ -1,5 +1,7 @@
 import { type GenerateContentParameters, GoogleGenAI } from '@google/genai';
 import { env } from '@repo/domain';
+import type { ZodType } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { calculateModelCostUsd, getModelPricing } from './model-pricing.js';
 import type {
   ModelProvider,
@@ -53,7 +55,7 @@ export class GeminiModelProvider implements ModelProvider {
         config: {
           systemInstruction: request.systemPrompt,
           responseMimeType: 'application/json',
-          responseSchema: request.schema,
+          responseSchema: zodToJsonSchema(request.schema as ZodType),
           temperature: request.temperature,
           maxOutputTokens: request.maxTokens,
           abortSignal: controller.signal,

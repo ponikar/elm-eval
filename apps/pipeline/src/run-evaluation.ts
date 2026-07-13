@@ -21,8 +21,10 @@ import {
 import { RuleSearcher } from '@repo/retrieval';
 import { eq } from 'drizzle-orm';
 
-function json(value: string | null): unknown {
-  return value === null ? undefined : JSON.parse(value);
+function json(value: unknown): unknown {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === 'string') return JSON.parse(value);
+  return value;
 }
 
 function failureCode(error: unknown): string {
@@ -44,39 +46,35 @@ function createRepository(): EvaluationRepository {
   };
 }
 
-function loadRulebookResources(rulebookId: string) {
-  const rulebookRow = db.select().from(rulebook).where(eq(rulebook.id, rulebookId)).get();
+async function loadRulebookResources(rulebookId: string) {
+  const rulebookRows = await db.select().from(rulebook).where(eq(rulebook.id, rulebookId));
+  const rulebookRow = rulebookRows[0];
   if (!rulebookRow) throw new Error(`Rulebook ${rulebookId} does not exist`);
   if (rulebookRow.indexStatus !== 'INDEXED')
     throw new Error(`Rulebook ${rulebookId} is not indexed`);
-  const rules = db
+  const ruleRows = await db
     .select()
     .from(complianceRule)
-    .where(eq(complianceRule.rulebookId, rulebookId))
-    .all()
-    .map((row) =>
-      ComplianceRuleSchema.parse({
-        ...row,
-        severityGuidance: json(row.severityGuidance),
-        correctiveActionGuidance: json(row.correctiveActionGuidance),
-      }),
-    );
-  const chunks = db
-    .select()
-    .from(ruleChunk)
-    .where(eq(ruleChunk.rulebookId, rulebookId))
-    .all()
-    .map((row) =>
-      RuleChunkSchema.parse({
-        ...row,
-        metadata: {
-          sectionId: row.sectionId,
-          sectionTitle: row.sectionTitle,
-          category: row.category,
-        },
-        embedding: json(row.embedding),
-      }),
-    );
+    .where(eq(complianceRule.rulebookId, rulebookId));
+  const rules = ruleRows.map((row) =>
+    ComplianceRuleSchema.parse({
+      ...row,
+      severityGuidance: json(row.severityGuidance),
+      correctiveActionGuidance: json(row.correctiveActionGuidance),
+    }),
+  );
+  const chunkRows = await db.select().from(ruleChunk).where(eq(ruleChunk.rulebookId, rulebookId));
+  const chunks = chunkRows.map((row) =>
+    RuleChunkSchema.parse({
+      ...row,
+      metadata: {
+        sectionId: row.sectionId,
+        sectionTitle: row.sectionTitle,
+        category: row.category,
+      },
+      embedding: json(row.embedding),
+    }),
+  );
   if (rules.length === 0 || chunks.length === 0 || chunks.some((chunk) => !chunk.embedding?.length))
     throw new Error(
       `Rulebook ${rulebookId} has no complete retrieval index; run the index-rulebook command first`,
@@ -85,8 +83,8 @@ function loadRulebookResources(rulebookId: string) {
 }
 
 export async function runEvaluationJob(runId: string) {
-  const plan = getEvaluationRunPlan(runId);
-  const resources = loadRulebookResources(plan.run.rulebookVersionId);
+  const plan = await getEvaluationRunPlan(runId);
+  const resources = await loadRulebookResources(plan.run.rulebookVersionId);
   const searcher = new RuleSearcher();
   const result = await runEvaluation(runId, {
     repository: createRepository(),
