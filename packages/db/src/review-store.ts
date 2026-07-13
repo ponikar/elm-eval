@@ -55,7 +55,7 @@ function parseFinding(row: typeof auditFinding.$inferSelect): AuditFinding {
     auditEvidence: { pageNumber: row.evidencePage, quote: row.evidenceQuote },
     applicableRule: { ruleId: row.ruleId, rulebookVersion: row.rulebookVersion },
     confidence: row.confidence,
-    correctiveAction: JSON.parse(row.correctiveAction),
+    correctiveAction: JSON.parse(row.correctiveAction as string),
     reviewStatus: row.reviewStatus,
   });
 }
@@ -68,8 +68,8 @@ function parseCorrection(row: typeof humanCorrection.$inferSelect): HumanCorrect
     agentVersionId: row.agentVersionId,
     failureType: row.failureType,
     reason: row.reason,
-    originalFinding: JSON.parse(row.originalFindingJson),
-    correctedFinding: JSON.parse(row.correctedFindingJson),
+    originalFinding: JSON.parse(row.originalFindingJson as string),
+    correctedFinding: JSON.parse(row.correctedFindingJson as string),
     regressionEvalCaseId: row.regressionEvalCaseId ?? undefined,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -98,10 +98,11 @@ function findingValues(finding: AuditFinding, timestamp: string) {
   };
 }
 
-export function seedReviewWorkspace(seed: ReviewSeedData, database: ReviewDatabase = db): void {
+export async function seedReviewWorkspace(seed: ReviewSeedData, database: ReviewDatabase = db) {
   const timestamp = new Date().toISOString();
-  database.transaction((tx) => {
-    tx.insert(rulebook)
+  await database.transaction(async (tx) => {
+    await tx
+      .insert(rulebook)
       .values({
         id: seed.rulebook.id,
         sourceDocumentId: null,
@@ -115,9 +116,9 @@ export function seedReviewWorkspace(seed: ReviewSeedData, database: ReviewDataba
         createdAt: timestamp,
         updatedAt: timestamp,
       })
-      .onConflictDoNothing()
-      .run();
-    tx.insert(complianceRule)
+      .onConflictDoNothing();
+    await tx
+      .insert(complianceRule)
       .values(
         seed.rules.map((rule) => ({
           id: rule.id,
@@ -134,10 +135,10 @@ export function seedReviewWorkspace(seed: ReviewSeedData, database: ReviewDataba
             : null,
         })),
       )
-      .onConflictDoNothing()
-      .run();
-    tx.insert(agentVersion).values(seed.agentVersions).onConflictDoNothing().run();
-    tx.insert(supplierAudit)
+      .onConflictDoNothing();
+    await tx.insert(agentVersion).values(seed.agentVersions).onConflictDoNothing();
+    await tx
+      .insert(supplierAudit)
       .values({
         id: seed.audit.id,
         supplierName: seed.audit.supplierName,
@@ -149,9 +150,9 @@ export function seedReviewWorkspace(seed: ReviewSeedData, database: ReviewDataba
         createdAt: timestamp,
         updatedAt: timestamp,
       })
-      .onConflictDoNothing()
-      .run();
-    tx.insert(auditPage)
+      .onConflictDoNothing();
+    await tx
+      .insert(auditPage)
       .values(
         seed.audit.pages.map((page) => ({
           id: `${seed.audit.id}:page:${page.pageNumber}`,
@@ -163,13 +164,13 @@ export function seedReviewWorkspace(seed: ReviewSeedData, database: ReviewDataba
           parserVersion: 'fixture-v1',
         })),
       )
-      .onConflictDoNothing()
-      .run();
-    tx.insert(auditFinding)
+      .onConflictDoNothing();
+    await tx
+      .insert(auditFinding)
       .values(seed.findings.map((finding) => findingValues(finding, timestamp)))
-      .onConflictDoNothing()
-      .run();
-    tx.insert(evalCase)
+      .onConflictDoNothing();
+    await tx
+      .insert(evalCase)
       .values(
         seed.evalCases.map((item) => ({
           id: item.id,
@@ -186,40 +187,43 @@ export function seedReviewWorkspace(seed: ReviewSeedData, database: ReviewDataba
           updatedAt: timestamp,
         })),
       )
-      .onConflictDoNothing()
-      .run();
+      .onConflictDoNothing();
   });
 }
 
-export function listAudits(database: ReviewDatabase = db) {
-  return database
-    .select()
-    .from(supplierAudit)
-    .all()
-    .map((audit) => ({
+export async function listAudits(database: ReviewDatabase = db) {
+  const audits = await database.select().from(supplierAudit);
+  return Promise.all(
+    audits.map(async (audit) => ({
       ...audit,
-      pageCount: database
-        .select({ id: auditPage.id })
-        .from(auditPage)
-        .where(eq(auditPage.auditId, audit.id))
-        .all().length,
-      findingCount: database
-        .select({ id: auditFinding.id })
-        .from(auditFinding)
-        .where(eq(auditFinding.auditId, audit.id))
-        .all().length,
-    }));
+      pageCount: (
+        await database
+          .select({ id: auditPage.id })
+          .from(auditPage)
+          .where(eq(auditPage.auditId, audit.id))
+      ).length,
+      findingCount: (
+        await database
+          .select({ id: auditFinding.id })
+          .from(auditFinding)
+          .where(eq(auditFinding.auditId, audit.id))
+      ).length,
+    })),
+  );
 }
 
-export function getAudit(id: string, database: ReviewDatabase = db): SupplierAudit | null {
-  const audit = database.select().from(supplierAudit).where(eq(supplierAudit.id, id)).get();
+export async function getAudit(
+  id: string,
+  database: ReviewDatabase = db,
+): Promise<SupplierAudit | null> {
+  const results = await database.select().from(supplierAudit).where(eq(supplierAudit.id, id));
+  const audit = results[0];
   if (!audit) return null;
-  const pages = database
+  const pages = await database
     .select()
     .from(auditPage)
     .where(eq(auditPage.auditId, id))
-    .orderBy(asc(auditPage.pageNumber))
-    .all();
+    .orderBy(asc(auditPage.pageNumber));
   return {
     id: audit.id,
     supplierName: audit.supplierName,
@@ -231,38 +235,38 @@ export function getAudit(id: string, database: ReviewDatabase = db): SupplierAud
   };
 }
 
-export function getAuditFindings(auditId: string, database: ReviewDatabase = db): AuditFinding[] {
-  return database
-    .select()
-    .from(auditFinding)
-    .where(eq(auditFinding.auditId, auditId))
-    .all()
-    .map(parseFinding);
+export async function getAuditFindings(
+  auditId: string,
+  database: ReviewDatabase = db,
+): Promise<AuditFinding[]> {
+  const rows = await database.select().from(auditFinding).where(eq(auditFinding.auditId, auditId));
+  return rows.map(parseFinding);
 }
 
-export function listEvalCases(database: ReviewDatabase = db): EvalCase[] {
-  return database
-    .select()
-    .from(evalCase)
-    .all()
-    .map((row) => ({
-      id: row.id,
-      name: row.name,
-      category: row.category as EvalCase['category'],
-      criticality: row.criticality as EvalCase['criticality'],
-      input: {
-        auditPages: JSON.parse(row.inputAuditPages),
-        rulebookVersionId: row.inputRulebookVersionId,
-      },
-      expected: JSON.parse(row.expectedJson),
-      source: row.source as EvalCase['source'],
-      status: row.status as EvalCase['status'],
-      parentCaseId: row.parentCaseId ?? undefined,
-    }));
+export async function listEvalCases(database: ReviewDatabase = db): Promise<EvalCase[]> {
+  const rows = await database.select().from(evalCase);
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    category: row.category as EvalCase['category'],
+    criticality: row.criticality as EvalCase['criticality'],
+    input: {
+      auditPages: JSON.parse(row.inputAuditPages as string),
+      rulebookVersionId: row.inputRulebookVersionId,
+    },
+    expected: JSON.parse(row.expectedJson as string),
+    source: row.source as EvalCase['source'],
+    status: row.status as EvalCase['status'],
+    parentCaseId: row.parentCaseId ?? undefined,
+  }));
 }
 
-export function getRulebook(id: string, database: ReviewDatabase = db): Rulebook | null {
-  const row = database.select().from(rulebook).where(eq(rulebook.id, id)).get();
+export async function getRulebook(
+  id: string,
+  database: ReviewDatabase = db,
+): Promise<Rulebook | null> {
+  const results = await database.select().from(rulebook).where(eq(rulebook.id, id));
+  const row = results[0];
   if (!row) return null;
   return {
     id: row.id,
@@ -276,41 +280,47 @@ export function getRulebook(id: string, database: ReviewDatabase = db): Rulebook
   };
 }
 
-export function getRules(rulebookId: string, database: ReviewDatabase = db): ComplianceRule[] {
-  return database
+export async function getRules(
+  rulebookId: string,
+  database: ReviewDatabase = db,
+): Promise<ComplianceRule[]> {
+  const rows = await database
     .select()
     .from(complianceRule)
-    .where(eq(complianceRule.rulebookId, rulebookId))
-    .all()
-    .map((row) => ({
-      id: row.id,
-      rulebookId: row.rulebookId,
-      rulebookVersion: row.rulebookVersion,
-      sectionId: row.sectionId,
-      sectionTitle: row.sectionTitle,
-      category: row.category as ComplianceRule['category'],
-      requirementText: row.requirementText,
-      sourcePage: row.sourcePage,
-      severityGuidance: row.severityGuidance ? JSON.parse(row.severityGuidance) : undefined,
-      correctiveActionGuidance: row.correctiveActionGuidance
-        ? JSON.parse(row.correctiveActionGuidance)
-        : undefined,
-    }));
+    .where(eq(complianceRule.rulebookId, rulebookId));
+  return rows.map((row) => ({
+    id: row.id,
+    rulebookId: row.rulebookId,
+    rulebookVersion: row.rulebookVersion,
+    sectionId: row.sectionId,
+    sectionTitle: row.sectionTitle,
+    category: row.category as ComplianceRule['category'],
+    requirementText: row.requirementText,
+    sourcePage: row.sourcePage,
+    severityGuidance: row.severityGuidance
+      ? (JSON.parse(row.severityGuidance as string) as ComplianceRule['severityGuidance'])
+      : undefined,
+    correctiveActionGuidance: row.correctiveActionGuidance
+      ? (JSON.parse(
+          row.correctiveActionGuidance as string,
+        ) as ComplianceRule['correctiveActionGuidance'])
+      : undefined,
+  }));
 }
 
-export function setFindingReviewStatus(
+export async function setFindingReviewStatus(
   findingId: string,
   status: 'APPROVED' | 'REJECTED',
   database: ReviewDatabase = db,
-): AuditFinding {
-  const updated = database
+): Promise<AuditFinding> {
+  const updated = await database
     .update(auditFinding)
     .set({ reviewStatus: status, updatedAt: new Date().toISOString() })
     .where(eq(auditFinding.id, findingId))
-    .returning()
-    .get();
-  if (!updated) throw new Error(`Finding ${findingId} not found`);
-  return parseFinding(updated);
+    .returning();
+  const row = updated[0];
+  if (!row) throw new Error(`Finding ${findingId} not found`);
+  return parseFinding(row);
 }
 
 export class CorrectionValidationError extends Error {
@@ -322,12 +332,13 @@ export class CorrectionValidationError extends Error {
   }
 }
 
-export function createCorrection(
+export async function createCorrection(
   input: CreateCorrectionInput,
   database: ReviewDatabase = db,
-): HumanCorrection {
-  return database.transaction((tx) => {
-    const row = tx.select().from(auditFinding).where(eq(auditFinding.id, input.findingId)).get();
+): Promise<HumanCorrection> {
+  return database.transaction(async (tx) => {
+    const rows = await tx.select().from(auditFinding).where(eq(auditFinding.id, input.findingId));
+    const row = rows[0];
     if (!row) throw new Error(`Finding ${input.findingId} not found`);
     const original = parseFinding(row);
     const corrected = AuditFindingSchema.parse({
@@ -337,7 +348,7 @@ export function createCorrection(
       agentVersionId: original.agentVersionId,
       reviewStatus: 'CORRECTED',
     });
-    const page = tx
+    const pageResults = await tx
       .select()
       .from(auditPage)
       .where(
@@ -345,14 +356,13 @@ export function createCorrection(
           eq(auditPage.auditId, original.auditId),
           eq(auditPage.pageNumber, corrected.auditEvidence.pageNumber),
         ),
-      )
-      .get();
-    const pages = tx
+      );
+    const page = pageResults[0];
+    const pages = await tx
       .select()
       .from(auditPage)
       .where(eq(auditPage.auditId, original.auditId))
-      .orderBy(asc(auditPage.pageNumber))
-      .all();
+      .orderBy(asc(auditPage.pageNumber));
     if (
       !page ||
       !normalizeEvidence(page.text).includes(normalizeEvidence(corrected.auditEvidence.quote))
@@ -361,13 +371,13 @@ export function createCorrection(
         'INVALID_AUDIT_CITATION',
         'Evidence quote is not present on the cited audit page',
       );
-    const version = tx
+    const versionResults = await tx
       .select()
       .from(agentVersion)
-      .where(eq(agentVersion.id, original.agentVersionId))
-      .get();
+      .where(eq(agentVersion.id, original.agentVersionId));
+    const version = versionResults[0];
     if (!version) throw new Error(`Agent version ${original.agentVersionId} not found`);
-    const rule = tx
+    const ruleResults = await tx
       .select()
       .from(complianceRule)
       .where(
@@ -376,8 +386,8 @@ export function createCorrection(
           eq(complianceRule.rulebookVersion, corrected.applicableRule.rulebookVersion),
           eq(complianceRule.rulebookId, version.rulebookVersionId),
         ),
-      )
-      .get();
+      );
+    const rule = ruleResults[0];
     if (!rule)
       throw new CorrectionValidationError(
         'INVALID_RULE_REFERENCE',
@@ -388,137 +398,8 @@ export function createCorrection(
     const correctionId = randomUUID();
     const regressionEvalCaseId = input.saveAsRegressionTest ? `regression-${correctionId}` : null;
     if (regressionEvalCaseId) {
-      tx.insert(evalCase)
-        .values({
-          id: regressionEvalCaseId,
-          name: `Correction: ${corrected.title}`,
-          category: corrected.category,
-          criticality: corrected.severity === 'CRITICAL' ? 'CRITICAL' : 'NORMAL',
-          inputAuditPages: JSON.stringify(
-            pages.map((auditPageRow) => ({
-              pageNumber: auditPageRow.pageNumber,
-              text: auditPageRow.text,
-            })),
-          ),
-          inputRulebookVersionId: rule.rulebookId,
-          expectedJson: JSON.stringify([
-            {
-              findingShouldExist: true,
-              category: corrected.category,
-              severity: corrected.severity,
-              auditEvidence: {
-                pageNumber: corrected.auditEvidence.pageNumber,
-                textContains: corrected.auditEvidence.quote,
-              },
-              applicableRule: corrected.applicableRule,
-              requiredCorrectiveActionFacts: [corrected.correctiveAction.action],
-            },
-          ]),
-          source: 'HUMAN_CORRECTION',
-          status: 'TRUSTED',
-          parentCaseId: null,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        })
-        .run();
-    }
-    tx.update(auditFinding)
-      .set({
-        title: corrected.title,
-        description: corrected.description,
-        category: corrected.category,
-        severity: corrected.severity,
-        evidencePage: corrected.auditEvidence.pageNumber,
-        evidenceQuote: corrected.auditEvidence.quote,
-        ruleId: corrected.applicableRule.ruleId,
-        rulebookVersion: corrected.applicableRule.rulebookVersion,
-        confidence: corrected.confidence,
-        correctiveAction: JSON.stringify(corrected.correctiveAction),
-        reviewStatus: 'CORRECTED',
-        updatedAt: timestamp,
-      })
-      .where(eq(auditFinding.id, original.id))
-      .run();
-    const inserted = tx
-      .insert(humanCorrection)
-      .values({
-        id: correctionId,
-        findingId: original.id,
-        auditId: original.auditId,
-        agentVersionId: original.agentVersionId,
-        rulebookVersionId: version.rulebookVersionId,
-        failureType: input.failureType,
-        reason: input.reason,
-        originalFindingJson: JSON.stringify(original),
-        correctedFindingJson: JSON.stringify(corrected),
-        regressionEvalCaseId,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      })
-      .returning()
-      .get();
-    return parseCorrection(inserted);
-  });
-}
-
-export function convertCorrectionToRegressionTest(
-  correctionId: string,
-  database: ReviewDatabase = db,
-): EvalCase {
-  return database.transaction((tx) => {
-    const correction = tx
-      .select()
-      .from(humanCorrection)
-      .where(eq(humanCorrection.id, correctionId))
-      .get();
-    if (!correction) throw new Error(`Correction ${correctionId} not found`);
-    if (correction.regressionEvalCaseId) {
-      const existing = listEvalCases(database).find(
-        (item) => item.id === correction.regressionEvalCaseId,
-      );
-      if (!existing) throw new Error('Correction references a missing regression case');
-      return existing;
-    }
-    const corrected = AuditFindingSchema.parse(JSON.parse(correction.correctedFindingJson));
-    const page = tx
-      .select()
-      .from(auditPage)
-      .where(
-        and(
-          eq(auditPage.auditId, correction.auditId),
-          eq(auditPage.pageNumber, corrected.auditEvidence.pageNumber),
-        ),
-      )
-      .get();
-    const pages = tx
-      .select()
-      .from(auditPage)
-      .where(eq(auditPage.auditId, correction.auditId))
-      .orderBy(asc(auditPage.pageNumber))
-      .all();
-    const version = tx
-      .select()
-      .from(agentVersion)
-      .where(eq(agentVersion.id, correction.agentVersionId))
-      .get();
-    if (!version) throw new Error(`Agent version ${correction.agentVersionId} not found`);
-    const rule = tx
-      .select()
-      .from(complianceRule)
-      .where(
-        and(
-          eq(complianceRule.id, corrected.applicableRule.ruleId),
-          eq(complianceRule.rulebookVersion, corrected.applicableRule.rulebookVersion),
-          eq(complianceRule.rulebookId, version.rulebookVersionId),
-        ),
-      )
-      .get();
-    if (!page || !rule) throw new Error('Corrected evidence or rule snapshot is no longer valid');
-    const timestamp = new Date().toISOString();
-    const id = `regression-${correction.id}`;
-    tx.insert(evalCase)
-      .values({
-        id,
+      await tx.insert(evalCase).values({
+        id: regressionEvalCaseId,
         name: `Correction: ${corrected.title}`,
         category: corrected.category,
         criticality: corrected.severity === 'CRITICAL' ? 'CRITICAL' : 'NORMAL',
@@ -547,13 +428,140 @@ export function convertCorrectionToRegressionTest(
         parentCaseId: null,
         createdAt: timestamp,
         updatedAt: timestamp,
+      });
+    }
+    await tx
+      .update(auditFinding)
+      .set({
+        title: corrected.title,
+        description: corrected.description,
+        category: corrected.category,
+        severity: corrected.severity,
+        evidencePage: corrected.auditEvidence.pageNumber,
+        evidenceQuote: corrected.auditEvidence.quote,
+        ruleId: corrected.applicableRule.ruleId,
+        rulebookVersion: corrected.applicableRule.rulebookVersion,
+        confidence: corrected.confidence,
+        correctiveAction: JSON.stringify(corrected.correctiveAction),
+        reviewStatus: 'CORRECTED',
+        updatedAt: timestamp,
       })
-      .run();
-    tx.update(humanCorrection)
+      .where(eq(auditFinding.id, original.id));
+    const inserted = await tx
+      .insert(humanCorrection)
+      .values({
+        id: correctionId,
+        findingId: original.id,
+        auditId: original.auditId,
+        agentVersionId: original.agentVersionId,
+        rulebookVersionId: version.rulebookVersionId,
+        failureType: input.failureType,
+        reason: input.reason,
+        originalFindingJson: JSON.stringify(original),
+        correctedFindingJson: JSON.stringify(corrected),
+        regressionEvalCaseId,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      })
+      .returning();
+    const insertedRow = inserted[0];
+    if (!insertedRow) throw new Error('Correction was not persisted');
+    return parseCorrection(insertedRow);
+  });
+}
+
+export async function convertCorrectionToRegressionTest(
+  correctionId: string,
+  database: ReviewDatabase = db,
+): Promise<EvalCase> {
+  return database.transaction(async (tx) => {
+    const correctionResults = await tx
+      .select()
+      .from(humanCorrection)
+      .where(eq(humanCorrection.id, correctionId));
+    const correction = correctionResults[0];
+    if (!correction) throw new Error(`Correction ${correctionId} not found`);
+    if (correction.regressionEvalCaseId) {
+      const existingCases = await listEvalCases(database);
+      const existing = existingCases.find((item) => item.id === correction.regressionEvalCaseId);
+      if (!existing) throw new Error('Correction references a missing regression case');
+      return existing;
+    }
+    const corrected = AuditFindingSchema.parse(
+      JSON.parse(correction.correctedFindingJson as string),
+    );
+    const pageResults = await tx
+      .select()
+      .from(auditPage)
+      .where(
+        and(
+          eq(auditPage.auditId, correction.auditId),
+          eq(auditPage.pageNumber, corrected.auditEvidence.pageNumber),
+        ),
+      );
+    const page = pageResults[0];
+    const pages = await tx
+      .select()
+      .from(auditPage)
+      .where(eq(auditPage.auditId, correction.auditId))
+      .orderBy(asc(auditPage.pageNumber));
+    const versionResults = await tx
+      .select()
+      .from(agentVersion)
+      .where(eq(agentVersion.id, correction.agentVersionId));
+    const version = versionResults[0];
+    if (!version) throw new Error(`Agent version ${correction.agentVersionId} not found`);
+    const ruleResults = await tx
+      .select()
+      .from(complianceRule)
+      .where(
+        and(
+          eq(complianceRule.id, corrected.applicableRule.ruleId),
+          eq(complianceRule.rulebookVersion, corrected.applicableRule.rulebookVersion),
+          eq(complianceRule.rulebookId, version.rulebookVersionId),
+        ),
+      );
+    const rule = ruleResults[0];
+    if (!page || !rule) throw new Error('Corrected evidence or rule snapshot is no longer valid');
+    const timestamp = new Date().toISOString();
+    const id = `regression-${correction.id}`;
+    await tx.insert(evalCase).values({
+      id,
+      name: `Correction: ${corrected.title}`,
+      category: corrected.category,
+      criticality: corrected.severity === 'CRITICAL' ? 'CRITICAL' : 'NORMAL',
+      inputAuditPages: JSON.stringify(
+        pages.map((auditPageRow) => ({
+          pageNumber: auditPageRow.pageNumber,
+          text: auditPageRow.text,
+        })),
+      ),
+      inputRulebookVersionId: rule.rulebookId,
+      expectedJson: JSON.stringify([
+        {
+          findingShouldExist: true,
+          category: corrected.category,
+          severity: corrected.severity,
+          auditEvidence: {
+            pageNumber: corrected.auditEvidence.pageNumber,
+            textContains: corrected.auditEvidence.quote,
+          },
+          applicableRule: corrected.applicableRule,
+          requiredCorrectiveActionFacts: [corrected.correctiveAction.action],
+        },
+      ]),
+      source: 'HUMAN_CORRECTION',
+      status: 'TRUSTED',
+      parentCaseId: null,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    });
+    await tx
+      .update(humanCorrection)
       .set({ regressionEvalCaseId: id, updatedAt: timestamp })
-      .where(eq(humanCorrection.id, correction.id))
-      .run();
-    const created = listEvalCases(database).find((item) => item.id === id);
+      .where(eq(humanCorrection.id, correction.id));
+    const createdCases = await listEvalCases(database);
+    const created = createdCases.find((item) => item.id === id);
     if (!created) throw new Error('Regression case was not persisted');
     return created;
   });

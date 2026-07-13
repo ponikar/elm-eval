@@ -1,19 +1,21 @@
 import { relations, sql } from 'drizzle-orm';
 import {
-  type AnySQLiteColumn,
+  type AnyPgColumn,
+  boolean,
   check,
   index,
   integer,
+  jsonb,
+  numeric,
+  pgTable,
   primaryKey,
-  real,
-  sqliteTable,
   text,
   uniqueIndex,
-} from 'drizzle-orm/sqlite-core';
+} from 'drizzle-orm/pg-core';
 
 // ─── Core audit tables ───────────────────────────────────────────────────────
 
-export const supplierAudit = sqliteTable('supplier_audit', {
+export const supplierAudit = pgTable('supplier_audit', {
   id: text('id').primaryKey(),
   supplierName: text('supplier_name').notNull(),
   factoryName: text('factory_name').notNull(),
@@ -25,7 +27,7 @@ export const supplierAudit = sqliteTable('supplier_audit', {
   updatedAt: text('updated_at').notNull(),
 });
 
-export const auditPage = sqliteTable(
+export const auditPage = pgTable(
   'audit_page',
   {
     id: text('id').primaryKey(),
@@ -41,7 +43,7 @@ export const auditPage = sqliteTable(
   (table) => [uniqueIndex('audit_page_audit_number_unique').on(table.auditId, table.pageNumber)],
 );
 
-export const pipelineJob = sqliteTable(
+export const pipelineJob = pgTable(
   'pipeline_job',
   {
     id: text('id').primaryKey(),
@@ -66,7 +68,7 @@ export const pipelineJob = sqliteTable(
 
 // ─── Rulebook tables ─────────────────────────────────────────────────────────
 
-export const sourceDocument = sqliteTable('source_document', {
+export const sourceDocument = pgTable('source_document', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   type: text('type').notNull(),
@@ -76,7 +78,7 @@ export const sourceDocument = sqliteTable('source_document', {
   createdAt: text('created_at').notNull(),
 });
 
-export const rulebook = sqliteTable(
+export const rulebook = pgTable(
   'rulebook',
   {
     id: text('id').primaryKey(),
@@ -94,7 +96,7 @@ export const rulebook = sqliteTable(
   (table) => [uniqueIndex('rulebook_standard_version_unique').on(table.standard, table.version)],
 );
 
-export const complianceRule = sqliteTable('compliance_rule', {
+export const complianceRule = pgTable('compliance_rule', {
   id: text('id').primaryKey(),
   rulebookId: text('rulebook_id')
     .notNull()
@@ -105,11 +107,11 @@ export const complianceRule = sqliteTable('compliance_rule', {
   category: text('category').notNull(),
   requirementText: text('requirement_text').notNull(),
   sourcePage: integer('source_page').notNull(),
-  severityGuidance: text('severity_guidance'),
-  correctiveActionGuidance: text('corrective_action_guidance'),
+  severityGuidance: jsonb('severity_guidance'),
+  correctiveActionGuidance: jsonb('corrective_action_guidance'),
 });
 
-export const ruleChunk = sqliteTable('rule_chunk', {
+export const ruleChunk = pgTable('rule_chunk', {
   id: text('id').primaryKey(),
   ruleId: text('rule_id')
     .notNull()
@@ -130,7 +132,7 @@ export const ruleChunk = sqliteTable('rule_chunk', {
 
 // ─── Finding tables ──────────────────────────────────────────────────────────
 
-export const auditFinding = sqliteTable(
+export const auditFinding = pgTable(
   'audit_finding',
   {
     id: text('id').primaryKey(),
@@ -151,7 +153,7 @@ export const auditFinding = sqliteTable(
     evidenceQuote: text('evidence_quote').notNull(),
     ruleId: text('rule_id').notNull(),
     rulebookVersion: text('rulebook_version').notNull(),
-    confidence: real('confidence').notNull(),
+    confidence: numeric('confidence', { mode: 'number' }).notNull(),
     correctiveAction: text('corrective_action').notNull(),
     reviewStatus: text('review_status').notNull().default('PENDING'),
     createdAt: text('created_at').notNull(),
@@ -162,13 +164,13 @@ export const auditFinding = sqliteTable(
 
 // ─── Agent version ───────────────────────────────────────────────────────────
 
-export const agentVersion = sqliteTable('agent_version', {
+export const agentVersion = pgTable('agent_version', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   model: text('model').notNull(),
   promptVersion: text('prompt_version').notNull(),
   systemPrompt: text('system_prompt').notNull(),
-  temperature: real('temperature').notNull(),
+  temperature: numeric('temperature', { mode: 'number' }).notNull(),
   rulebookVersionId: text('rulebook_version_id')
     .notNull()
     .references(() => rulebook.id),
@@ -183,7 +185,7 @@ export const agentVersion = sqliteTable('agent_version', {
 
 // ─── Eval tables ─────────────────────────────────────────────────────────────
 
-export const evalCase = sqliteTable(
+export const evalCase = pgTable(
   'eval_case',
   {
     id: text('id').primaryKey(),
@@ -197,14 +199,14 @@ export const evalCase = sqliteTable(
     expectedJson: text('expected_json').notNull(),
     source: text('source').notNull().default('HUMAN_CREATED'),
     status: text('status').notNull().default('DRAFT'),
-    parentCaseId: text('parent_case_id').references((): AnySQLiteColumn => evalCase.id),
+    parentCaseId: text('parent_case_id').references((): AnyPgColumn => evalCase.id),
     createdAt: text('created_at').notNull(),
     updatedAt: text('updated_at').notNull(),
   },
   (table) => [index('eval_case_parent_idx').on(table.parentCaseId)],
 );
 
-export const evalSuite = sqliteTable(
+export const evalSuite = pgTable(
   'eval_suite',
   {
     id: text('id').primaryKey(),
@@ -223,7 +225,7 @@ export const evalSuite = sqliteTable(
   ],
 );
 
-export const evalSuiteCase = sqliteTable(
+export const evalSuiteCase = pgTable(
   'eval_suite_case',
   {
     suiteId: text('suite_id')
@@ -244,7 +246,7 @@ export const evalSuiteCase = sqliteTable(
   ],
 );
 
-export const humanCorrection = sqliteTable(
+export const humanCorrection = pgTable(
   'human_correction',
   {
     id: text('id').primaryKey(),
@@ -274,7 +276,7 @@ export const humanCorrection = sqliteTable(
   ],
 );
 
-export const evaluationRun = sqliteTable(
+export const evaluationRun = pgTable(
   'evaluation_run',
   {
     id: text('id').primaryKey(),
@@ -304,7 +306,7 @@ export const evaluationRun = sqliteTable(
   ],
 );
 
-export const testExecution = sqliteTable(
+export const testExecution = pgTable(
   'test_execution',
   {
     id: text('id').primaryKey(),
@@ -316,9 +318,9 @@ export const testExecution = sqliteTable(
       .references(() => evalCase.id),
     status: text('status').notNull().default('PENDING'),
     agentOutput: text('agent_output'),
-    passed: integer('passed', { mode: 'boolean' }),
-    agentCostUsd: real('agent_cost_usd').notNull().default(0),
-    evaluatorCostUsd: real('evaluator_cost_usd').notNull().default(0),
+    passed: boolean('passed'),
+    agentCostUsd: numeric('agent_cost_usd', { mode: 'number' }).notNull().default(0),
+    evaluatorCostUsd: numeric('evaluator_cost_usd', { mode: 'number' }).notNull().default(0),
     tokenInput: integer('token_input').notNull().default(0),
     tokenOutput: integer('token_output').notNull().default(0),
     latencyMs: integer('latency_ms').notNull().default(0),
@@ -338,7 +340,7 @@ export const testExecution = sqliteTable(
   ],
 );
 
-export const graderResult = sqliteTable(
+export const graderResult = pgTable(
   'grader_result',
   {
     id: text('id').primaryKey(),
@@ -346,23 +348,23 @@ export const graderResult = sqliteTable(
       .notNull()
       .references(() => testExecution.id, { onDelete: 'cascade' }),
     graderVersion: text('grader_version').notNull(),
-    passed: integer('passed', { mode: 'boolean' }).notNull(),
-    deterministicPassed: integer('deterministic_passed', { mode: 'boolean' }).notNull(),
-    findingRecall: real('finding_recall'),
-    criticalFindingRecall: real('critical_finding_recall'),
-    findingPrecision: real('finding_precision'),
-    categoryAccuracy: real('category_accuracy'),
-    severityAccuracy: real('severity_accuracy'),
+    passed: boolean('passed').notNull(),
+    deterministicPassed: boolean('deterministic_passed').notNull(),
+    findingRecall: numeric('finding_recall', { mode: 'number' }),
+    criticalFindingRecall: numeric('critical_finding_recall', { mode: 'number' }),
+    findingPrecision: numeric('finding_precision', { mode: 'number' }),
+    categoryAccuracy: numeric('category_accuracy', { mode: 'number' }),
+    severityAccuracy: numeric('severity_accuracy', { mode: 'number' }),
     criticalUnderclassificationCount: integer('critical_underclassification_count')
       .notNull()
       .default(0),
-    auditCitationPrecision: real('audit_citation_precision'),
-    ruleReferenceAccuracy: real('rule_reference_accuracy'),
-    hallucinatedFindingRate: real('hallucinated_finding_rate'),
-    correctiveActionCompleteness: real('corrective_action_completeness'),
-    schemaValidity: real('schema_validity'),
-    failureTypesJson: text('failure_types_json').notNull(),
-    detailsJson: text('details_json').notNull(),
+    auditCitationPrecision: numeric('audit_citation_precision', { mode: 'number' }),
+    ruleReferenceAccuracy: numeric('rule_reference_accuracy', { mode: 'number' }),
+    hallucinatedFindingRate: numeric('hallucinated_finding_rate', { mode: 'number' }),
+    correctiveActionCompleteness: numeric('corrective_action_completeness', { mode: 'number' }),
+    schemaValidity: numeric('schema_validity', { mode: 'number' }),
+    failureTypesJson: jsonb('failure_types_json').notNull(),
+    detailsJson: jsonb('details_json').notNull(),
     judgeModel: text('judge_model'),
     createdAt: text('created_at').notNull(),
   },
@@ -375,7 +377,7 @@ export const graderResult = sqliteTable(
   ],
 );
 
-export const runComparison = sqliteTable(
+export const runComparison = pgTable(
   'run_comparison',
   {
     id: text('id').primaryKey(),
@@ -391,8 +393,8 @@ export const runComparison = sqliteTable(
     regressionCount: integer('regression_count').notNull().default(0),
     stableFailureCount: integer('stable_failure_count').notNull().default(0),
     criticalRegressionCount: integer('critical_regression_count').notNull().default(0),
-    metricDeltaJson: text('metric_delta_json'),
-    costDeltaUsd: real('cost_delta_usd'),
+    metricDeltaJson: jsonb('metric_delta_json'),
+    costDeltaUsd: numeric('cost_delta_usd', { mode: 'number' }),
     latencyDeltaMs: integer('latency_delta_ms'),
     errorCode: text('error_code'),
     errorMessage: text('error_message'),
@@ -409,7 +411,7 @@ export const runComparison = sqliteTable(
   ],
 );
 
-export const caseComparison = sqliteTable(
+export const caseComparison = pgTable(
   'case_comparison',
   {
     id: text('id').primaryKey(),
@@ -426,8 +428,8 @@ export const caseComparison = sqliteTable(
       .notNull()
       .references(() => testExecution.id),
     classification: text('classification').notNull(),
-    isCritical: integer('is_critical', { mode: 'boolean' }).notNull(),
-    metricDeltaJson: text('metric_delta_json'),
+    isCritical: boolean('is_critical').notNull(),
+    metricDeltaJson: jsonb('metric_delta_json'),
   },
   (table) => [
     uniqueIndex('case_comparison_case_unique').on(table.comparisonId, table.evalCaseId),
@@ -438,21 +440,39 @@ export const caseComparison = sqliteTable(
   ],
 );
 
-export const qualityGate = sqliteTable(
+export const qualityGate = pgTable(
   'quality_gate',
   {
     id: text('id').primaryKey(),
     name: text('name').notNull(),
     version: integer('version').notNull(),
     status: text('status').notNull().default('ACTIVE'),
-    minimumCriticalFindingRecall: real('minimum_critical_finding_recall').notNull().default(0.95),
-    minimumFindingPrecision: real('minimum_finding_precision').notNull().default(0.9),
-    minimumAuditCitationPrecision: real('minimum_audit_citation_precision').notNull().default(0.98),
-    minimumRuleReferenceAccuracy: real('minimum_rule_reference_accuracy').notNull().default(0.98),
-    minimumSchemaValidity: real('minimum_schema_validity').notNull().default(1),
-    minimumCapCompleteness: real('minimum_cap_completeness').notNull().default(0.95),
+    minimumCriticalFindingRecall: numeric('minimum_critical_finding_recall', {
+      mode: 'number',
+    })
+      .notNull()
+      .default(0.95),
+    minimumFindingPrecision: numeric('minimum_finding_precision', { mode: 'number' })
+      .notNull()
+      .default(0.9),
+    minimumAuditCitationPrecision: numeric('minimum_audit_citation_precision', {
+      mode: 'number',
+    })
+      .notNull()
+      .default(0.98),
+    minimumRuleReferenceAccuracy: numeric('minimum_rule_reference_accuracy', { mode: 'number' })
+      .notNull()
+      .default(0.98),
+    minimumSchemaValidity: numeric('minimum_schema_validity', { mode: 'number' })
+      .notNull()
+      .default(1),
+    minimumCapCompleteness: numeric('minimum_cap_completeness', { mode: 'number' })
+      .notNull()
+      .default(0.95),
     maximumCriticalRegressions: integer('maximum_critical_regressions').notNull().default(0),
-    maximumHallucinatedFindingRate: real('maximum_hallucinated_finding_rate')
+    maximumHallucinatedFindingRate: numeric('maximum_hallucinated_finding_rate', {
+      mode: 'number',
+    })
       .notNull()
       .default(0.02),
     createdAt: text('created_at').notNull(),
@@ -465,7 +485,7 @@ export const qualityGate = sqliteTable(
   ],
 );
 
-export const qualityGateEvaluation = sqliteTable(
+export const qualityGateEvaluation = pgTable(
   'quality_gate_evaluation',
   {
     id: text('id').primaryKey(),
@@ -476,9 +496,9 @@ export const qualityGateEvaluation = sqliteTable(
       .notNull()
       .references(() => runComparison.id),
     decision: text('decision').notNull(),
-    reasonsJson: text('reasons_json').notNull(),
-    qualityGateSnapshotJson: text('quality_gate_snapshot_json').notNull(),
-    metricsSnapshotJson: text('metrics_snapshot_json').notNull(),
+    reasonsJson: jsonb('reasons_json').notNull(),
+    qualityGateSnapshotJson: jsonb('quality_gate_snapshot_json').notNull(),
+    metricsSnapshotJson: jsonb('metrics_snapshot_json').notNull(),
     evaluatedAt: text('evaluated_at').notNull(),
   },
   (table) => [
@@ -486,7 +506,7 @@ export const qualityGateEvaluation = sqliteTable(
   ],
 );
 
-export const traceEvent = sqliteTable(
+export const traceEvent = pgTable(
   'trace_event',
   {
     id: text('id').primaryKey(),
@@ -506,7 +526,7 @@ export const traceEvent = sqliteTable(
     errorCode: text('error_code'),
     tokenInput: integer('token_input'),
     tokenOutput: integer('token_output'),
-    costUsd: real('cost_usd'),
+    costUsd: numeric('cost_usd', { mode: 'number' }),
   },
   (table) => [
     uniqueIndex('trace_event_job_sequence_unique').on(table.pipelineJobId, table.sequence),

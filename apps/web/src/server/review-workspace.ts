@@ -10,9 +10,9 @@ import {
 
 let seeded = false;
 
-export function ensureReviewWorkspace(): void {
+export async function ensureReviewWorkspace(): Promise<void> {
   if (seeded) return;
-  seedReviewWorkspace({
+  await seedReviewWorkspace({
     audit: SEED_AUDIT,
     findings: MOCK_FINDINGS,
     rulebook: SEED_RULEBOOK,
