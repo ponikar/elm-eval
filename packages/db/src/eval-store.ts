@@ -21,7 +21,7 @@ import {
   TestExecutionSchema,
   TraceEventSchema,
 } from '@repo/domain';
-import { and, asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from './index.js';
 import {
   agentVersion,
@@ -653,4 +653,12 @@ export async function failEvaluationRun(
     .where(and(eq(evaluationRun.id, input.runId), eq(evaluationRun.status, 'RUNNING')))
     .returning({ id: evaluationRun.id });
   if (updated.length === 0) throw new Error(`Evaluation run ${input.runId} is not RUNNING`);
+}
+
+export async function countRunningEvaluationRuns(database: EvalDatabase = db) {
+  const result = await database
+    .select({ count: sql<number>`cast(count(*) as int)` })
+    .from(evaluationRun)
+    .where(eq(evaluationRun.status, 'RUNNING'));
+  return result[0]?.count ?? 0;
 }

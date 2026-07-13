@@ -25,34 +25,49 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { trpc } from '@/trpc/react';
 
-const navSections = [
+type BadgeKey = 'pendingAudits' | 'evalCases' | 'runningEvals' | 'agentVersions' | 'failedTraces';
+
+const navSections: Array<{
+  label: string;
+  items: Array<{
+    href: string;
+    label: string;
+    icon: typeof FileText;
+    badgeKey?: BadgeKey;
+  }>;
+}> = [
   {
     label: 'Review',
     items: [
-      { href: '/audits', label: 'Audit Review', icon: FileText, badge: '1' },
+      { href: '/audits', label: 'Audit Review', icon: FileText, badgeKey: 'pendingAudits' },
       { href: '/rulebooks', label: 'Rulebooks', icon: BookOpen },
     ],
   },
   {
     label: 'Evaluation',
     items: [
-      { href: '/evals', label: 'Eval Suite', icon: FlaskConical, badge: '10' },
-      { href: '/runs', label: 'Eval Runs', icon: Play },
+      { href: '/evals', label: 'Eval Suite', icon: FlaskConical, badgeKey: 'evalCases' },
+      { href: '/runs', label: 'Eval Runs', icon: Play, badgeKey: 'runningEvals' },
       { href: '/compare', label: 'Version Compare', icon: GitCompare },
     ],
   },
   {
     label: 'Agents',
     items: [
-      { href: '/agents', label: 'Agent Versions', icon: Bot, badge: '2' },
-      { href: '/traces', label: 'Failure Traces', icon: Activity },
+      { href: '/agents', label: 'Agent Versions', icon: Bot, badgeKey: 'agentVersions' },
+      { href: '/traces', label: 'Failure Traces', icon: Activity, badgeKey: 'failedTraces' },
     ],
   },
-] as const;
+];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { data: counts } = trpc.sidebar.counts.useQuery(undefined, {
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+  });
 
   return (
     <Sidebar variant="inset" collapsible="icon" className="peer/sidebar">
@@ -85,6 +100,7 @@ export function AppSidebar() {
                 {section.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                  const badgeCount = item.badgeKey && counts ? counts[item.badgeKey] : undefined;
                   return (
                     <SidebarMenuItem key={item.href}>
                       <SidebarMenuButton
@@ -96,8 +112,8 @@ export function AppSidebar() {
                         <Link href={item.href}>
                           <Icon />
                           <span>{item.label}</span>
-                          {'badge' in item && item.badge ? (
-                            <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                          {badgeCount != null && badgeCount > 0 ? (
+                            <SidebarMenuBadge>{badgeCount}</SidebarMenuBadge>
                           ) : null}
                         </Link>
                       </SidebarMenuButton>
