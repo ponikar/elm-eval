@@ -720,3 +720,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** None for publication. PR #10 remains the explicit pre-integration Neon compatibility dependency.
 - **Next Step:** Stage the reviewed T-006 scope, commit as one implementation unit, push with tracking, and open a draft PR targeting `main` with no-merge and Neon follow-up notes.
 - **Changed Files and Evidence:** All T-006 files listed in Entry 28. Frozen install PASS; touched Biome PASS with zero diagnostics; typecheck 10/10 PASS; tests 39/39 across agent/DB/evals/web; build PASS; root format exit 0 with unchanged 22 unrelated warnings; `git diff --check` PASS.
+
+---
+
+## Entry 30 — 2026-07-13T07:23:32Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-006
+- **Branch:** feat/evaluation-engine
+- **Worktree:** /Users/darshan/work/agent-eval-evaluation-engine
+- **Status:** IN PROGRESS / REMOTE HANDOFF
+- **Scope:** Publish and verify the validated T-006 implementation without integration.
+- **Completed:** Committed the full reviewed scope as `a535993`; pushed and verified `origin/feat/evaluation-engine`; opened draft PR #11 targeting main; verified the PR is open/draft and its body explicitly prohibits merging while documenting PR #10's Neon dependency. Vercel Preview Comments passed.
+- **Pending:** Vercel deployment completion, then Neon async adapter reconciliation after PR #10 stabilizes. No merge is authorized.
+- **Blockers:** PR #11 currently reports UNSTABLE only because the Vercel deployment is still pending. Future integration depends on resolving the concrete async Neon changes from PR #10 if it lands first.
+- **Next Step:** Push this remote-handoff journal update, wait for PR #11 checks, and leave the draft PR unmerged for user review.
+- **Changed Files and Evidence:** Implementation commit `a535993a11a952519b7d127a64bf4cba503fad7a`; remote branch hash matches; draft PR https://github.com/ponikar/elm-eval/pull/11; Vercel Preview Comments PASS; Vercel PENDING.

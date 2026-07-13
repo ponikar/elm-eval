@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T07:20:15Z
+**Updated:** 2026-07-13T07:23:32Z
 
 ### Outcome
 
@@ -62,7 +62,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
 | T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
 | T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
-| T-006  | Evaluation engine                    | codex       | IN PROGRESS | feat/evaluation-engine | /Users/darshan/work/agent-eval-evaluation-engine | Publish validated PR; do not merge; port adapter after Neon finalizes |
+| T-006  | Evaluation engine                    | codex       | IN PROGRESS | feat/evaluation-engine | /Users/darshan/work/agent-eval-evaluation-engine | Draft PR #11 open; do not merge; port adapter after Neon finalizes |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
@@ -194,10 +194,10 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   isolated database; scripted worker integration for all approved cases; touched-scope Biome;
   strict TypeScript; full tests and production build; repeat affected checks after final edits.
 - **Started/checkpoint:** 2026-07-13T06:56:44Z / 2026-07-13T07:20:15Z
-- **Status/next action:** IN PROGRESS / VALIDATED — the main-based implementation and scripted
-  10-case integration pass. Review the final diff, commit/push, open a PR without merging, and
-  record that PR #10's pending async Neon contract requires a narrow adapter/API port before both
-  changes can integrate together.
+- **Status/next action:** IN PROGRESS / REMOTE HANDOFF — implementation commit `a535993` is pushed
+  and draft PR #11 is open with explicit no-merge instructions. Wait for PR #10's Neon contract to
+  stabilize, then port the concrete adapter/API/tests if Neon lands first and rerun every gate
+  before requesting user merge approval.
 
 ### Validation Commands
 
@@ -300,6 +300,9 @@ pnpm build                       # PASS (pipeline + Next.js)
   runner, durable outputs/graders/traces/usage, rulebook indexing command, worker adapter, and tRPC
   APIs. The tenth trusted case is a human correction; `eval-010` remains pending and excluded.
   PR #10 Neon support is now visible and requires a post-finalization async adapter port.
+- 2026-07-13T07:23:32Z — Pushed T-006 implementation `a535993` and opened draft PR #11 with an
+  explicit no-merge notice and PR #10 Neon compatibility dependency; local gates pass and remote
+  Vercel deployment is pending.
 
 ### Blockers
 
@@ -314,5 +317,5 @@ pnpm build                       # PASS (pipeline + Next.js)
 through an injected production-pipeline adapter, persists deterministic grades and observability,
 and exposes run creation/read APIs. T-007 comparison/gates and T-008 detailed trace UI remain
 planned. PR #10 independently migrates the database runtime to Neon and is not integrated here.
-**Next exact action:** Commit and push T-006, open and verify its PR without merging, then wait for
-explicit user merge direction and reconcile the async Neon adapter after PR #10 stabilizes.
+**Next exact action:** Do not merge draft PR #11. Monitor its remote checks, then reconcile the
+async Neon adapter after PR #10 stabilizes and only merge when the user explicitly instructs it.
