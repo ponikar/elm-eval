@@ -3,6 +3,7 @@ import { agentVersionRouter } from './agent-version';
 import { auditRouter } from './audit';
 import { correctionRouter } from './correction';
 import { evalCaseRouter } from './eval-case';
+import { evaluationRunRouter } from './evaluation-run';
 
 export const appRouter = createTRPCRouter({
   health: publicProcedure.query(() => {
@@ -12,6 +13,7 @@ export const appRouter = createTRPCRouter({
   correction: correctionRouter,
   agentVersion: agentVersionRouter,
   evalCase: evalCaseRouter,
+  evaluationRun: evaluationRunRouter,
 });
 
 export type AppRouter = typeof appRouter;

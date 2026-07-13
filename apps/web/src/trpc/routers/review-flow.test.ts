@@ -61,4 +61,34 @@ describe('review flow router', () => {
       'CORRECTED',
     );
   });
+
+  it('freezes all trusted cases and creates an idempotent evaluation run', async () => {
+    const { appRouter } = await import('./_app');
+    const caller = appRouter.createCaller({});
+    const trusted = (await caller.evalCase.list()).filter((item) => item.status === 'TRUSTED');
+    expect(trusted).toHaveLength(10);
+    const suite = await caller.evaluationRun.freezeTrustedSuite({
+      name: 'Trusted regression suite',
+      version: 1,
+      description: 'Nine approved seeds plus the reviewer-approved correction.',
+    });
+    expect(suite.cases).toHaveLength(10);
+    expect(suite.cases.every((item) => item.status === 'TRUSTED')).toBe(true);
+    const first = await caller.evaluationRun.create({
+      suiteId: suite.id,
+      agentVersionId: 'agent-v1',
+      idempotencyKey: `${suite.contentHash}:agent-v1`,
+    });
+    const second = await caller.evaluationRun.create({
+      suiteId: suite.id,
+      agentVersionId: 'agent-v1',
+      idempotencyKey: `${suite.contentHash}:agent-v1`,
+    });
+    expect(second.run.id).toBe(first.run.id);
+    expect(first.cases).toHaveLength(10);
+    expect(await caller.evaluationRun.list()).toHaveLength(1);
+    expect(await caller.evaluationRun.get({ id: first.run.id })).toMatchObject({
+      progress: { total: 10, pending: 10, completed: 0, failed: 0 },
+    });
+  });
 });

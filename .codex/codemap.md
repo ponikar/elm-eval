@@ -640,3 +640,83 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** None. Root Biome retains 22 known warnings outside T-011; touched DB scope is clean.
 - **Next Step:** Remove `/Users/darshan/work/agent-eval-schema-foundation`, then claim T-006 before implementing the evaluation engine.
 - **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`; merge `271da86`; PR #9 remote checks PASS; no Drizzle drift; typecheck 10/10 PASS; tests 15/15 PASS; build PASS.
+
+---
+
+## Entry 25 — 2026-07-13T06:57:27Z
+
+- **Agent:** codex
+- **Ticket:** T-006
+- **Branch:** feat/evaluation-engine
+- **Worktree:** /Users/darshan/work/agent-eval-evaluation-engine
+- **Status:** IN PROGRESS / ACCEPTED
+- **Scope:** Storage-independent deterministic grading and sequential evaluation execution, followed by narrowly coordinated persistence and worker/API adapters.
+- **Completed:** Published the T-006 board claim as `680efa6`; verified no Neon branch, PR, or board claim is remotely visible; created and verified the dedicated worktree.
+- **Pending:** Implement domain contracts, pure grader and runner tests, then persistence/worker/API integration without touching Neon-owned schema, migrations, or database bootstrap files.
+- **Blockers:** The tenth seed case remains `PENDING_REVIEW` and cannot enter a trusted suite without explicit human approval. This does not block the generic engine or the nine-case scripted integration. Neon DB ownership is unpublished, so shared DB integration must remain serialized.
+- **Next Step:** Characterize package boundaries and implement the typed deterministic grader with one-to-one finding matching and explicit metric denominators.
+- **Changed Files and Evidence:** `.codex/codemap.md`; worktree verified clean on `feat/evaluation-engine` at published claim `680efa6`.
+
+---
+
+## Entry 26 — 2026-07-13T07:06:04Z
+
+- **Agent:** codex worker (`t006_grader`)
+- **Ticket:** T-006
+- **Branch:** feat/evaluation-engine
+- **Worktree:** /Users/darshan/work/agent-eval-evaluation-engine
+- **Status:** COMPLETE / LOCAL HANDOFF
+- **Scope:** Storage-independent deterministic grader owned within `packages/evals/**`.
+- **Completed:** Implemented schema-safe grading with deterministic maximum-cardinality/maximum-score one-to-one matching, source-page citation validation, rule/category/severity/critical-underclassification/CAP/forbidden-claim checks, negative-case handling, duplicate and hallucination detection, explicit empty-denominator semantics, injected result identity/time, and complete metric counts/failure evidence. Added ten focused tests covering positive, negative, malformed, duplicate, adversarial matching, citation, and zero-output behavior.
+- **Pending:** Coordinator integration with the evaluation runner and persistence adapter; broader T-006 validation and remote handoff.
+- **Blockers:** None. The repository-wide formatter reports 22 existing warnings outside the owned eval package; `packages/evals` is clean.
+- **Next Step:** Coordinator reviews the eval diff, then wires `gradeEvaluationCase` into the sequential runner.
+- **Changed Files and Evidence:** `packages/evals/package.json`, `packages/evals/src/index.ts`, `packages/evals/src/grader.ts`, `packages/evals/src/grader.test.ts`, and this append-only entry. `pnpm format` completed; `pnpm --dir packages/evals test` PASS (10/10); `pnpm --dir packages/evals typecheck` PASS; `pnpm exec biome check packages/evals` PASS with zero diagnostics; `git diff --check` PASS.
+
+---
+
+## Entry 27 — 2026-07-13T07:10:23Z
+
+- **Agent:** codex worker (`t006_grader`)
+- **Ticket:** T-006
+- **Branch:** feat/evaluation-engine
+- **Worktree:** /Users/darshan/work/agent-eval-evaluation-engine
+- **Status:** COMPLETE / RUNNER LOCAL HANDOFF
+- **Scope:** Provider/storage-independent sequential evaluation runner within `packages/evals/**`.
+- **Completed:** Added injected executor/repository/clock/ID contracts aligned with the local eval-store boundary; the runner atomically claims a run once, processes frozen cases in order, records execution-owned traces, grades valid outputs, persists usage and grading results, continues after model/pipeline case failures, completes runs containing ordinary grading failures, and fails/stops the run on repository/infrastructure errors. Added six focused runner tests covering ordering, partial failure continuation, refused duplicate claims, usage/ID/trace propagation, grading-failure finalization, and infrastructure failure handling.
+- **Pending:** Coordinator review, concrete DB/provider adapter wiring, broader T-006 validation, and remote handoff.
+- **Blockers:** None. Repository-wide formatting exits successfully with 22 warnings outside `packages/evals`; the owned package has zero diagnostics.
+- **Next Step:** Coordinator wires the SQLite eval-store and audit-pipeline provider adapters to `runEvaluation`, then runs integrated store/runner tests.
+- **Changed Files and Evidence:** Added `packages/evals/src/runner.ts` and `packages/evals/src/runner.test.ts`; updated `packages/evals/src/index.ts`; appended this journal entry. `pnpm format` PASS; `pnpm --dir packages/evals test` PASS (16/16 across grader and runner); `pnpm --dir packages/evals typecheck` PASS; `pnpm exec biome check packages/evals` PASS with zero diagnostics; `git diff --check` PASS.
+
+---
+
+## Entry 28 — 2026-07-13T07:20:15Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-006
+- **Branch:** feat/evaluation-engine
+- **Worktree:** /Users/darshan/work/agent-eval-evaluation-engine
+- **Status:** IN PROGRESS / IMPLEMENTED AND VALIDATED
+- **Scope:** Integrate the pure grader/runner with durable suite/run persistence, the production audit-pipeline adapter, rulebook index readiness, and run APIs.
+- **Completed:** Added canonical frozen/run/execution/grader contracts; transactional suite freezing and idempotent run/execution state; durable outputs, graders, traces, usage, progress reads, and case-failure retention; standalone sequential worker and rulebook indexing commands; tRPC freeze/create/list/get APIs; and a scripted 10-case integration using nine approved seeds plus one explicitly reviewer-approved correction. Kept `eval-010` pending. Incorporated rejected pipeline findings into deterministic failure evidence and corrected trusted evidence anchors to term-based matching while retaining strict source citation validation.
+- **Pending:** Final diff review, commit/push, open and verify a PR without merging. PR #10 now exposes a pending async Neon/Postgres contract; after it stabilizes, port the concrete eval store/API awaits and DB-backed tests before integration if Neon lands first.
+- **Blockers:** No blocker to T-006 remote review against current main. Integration order with PR #10 is unresolved; its branch overlaps DB package metadata, lockfile, web review test, and changes all store calls from synchronous SQLite to asynchronous Postgres.
+- **Next Step:** Review scoped diff and dependency direction, rerun final touched checks after coordination edits, commit, push `feat/evaluation-engine`, open the T-006 PR, and explicitly document the no-merge and Neon follow-up constraints.
+- **Changed Files and Evidence:** Domain eval contracts; `packages/evals` grader/runner/integration tests; `packages/db/src/eval-store*` plus a subpath export; pipeline run/index adapters; web evaluation-run router and integration coverage; scoped manifests/lock and coordination files. Frozen install PASS; touched Biome zero diagnostics; typecheck 10/10 PASS; tests agent 7/7, DB 11/11, evals 19/19, web 2/2; build PASS; root format exits 0 with the same 22 unrelated warnings; `git diff --check` PASS.
+
+---
+
+## Entry 29 — 2026-07-13T07:22:05Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-006
+- **Branch:** feat/evaluation-engine
+- **Worktree:** /Users/darshan/work/agent-eval-evaluation-engine
+- **Status:** COMPLETE IMPLEMENTATION / READY TO PUBLISH
+- **Scope:** Final diff, dependency, and validation review before remote handoff.
+- **Completed:** Confirmed every dirty/untracked file belongs to T-006; no Drizzle schema, migration, DB bootstrap, or Neon implementation file is changed. Replaced the temporary root DB export with a narrow `@repo/db/eval-store` subpath. Repeated typecheck/tests after that boundary change and repeated production build plus touched-scope Biome after all final edits.
+- **Pending:** Commit, push, create a draft PR, verify its remote state/checks, and append the commit/PR handoff without merging.
+- **Blockers:** None for publication. PR #10 remains the explicit pre-integration Neon compatibility dependency.
+- **Next Step:** Stage the reviewed T-006 scope, commit as one implementation unit, push with tracking, and open a draft PR targeting `main` with no-merge and Neon follow-up notes.
+- **Changed Files and Evidence:** All T-006 files listed in Entry 28. Frozen install PASS; touched Biome PASS with zero diagnostics; typecheck 10/10 PASS; tests 39/39 across agent/DB/evals/web; build PASS; root format exit 0 with unchanged 22 unrelated warnings; `git diff --check` PASS.

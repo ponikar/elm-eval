@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
+    "eval": "tsx src/index.ts eval",
     "embed": "tsx src/embed.ts",
+    "index-rulebook": "tsx src/index-rulebook.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
