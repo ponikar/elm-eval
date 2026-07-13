@@ -4,7 +4,7 @@
 
 **Status:** `in_progress`
 **Started:** 2026-07-12T16:00:00Z
-**Updated:** 2026-07-13T05:36:14Z
+**Updated:** 2026-07-13T05:52:14Z
 
 ### Outcome
 
@@ -15,7 +15,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - [x] Monorepo scaffolded with pnpm + Turborepo
 - [x] Web app (Next.js) boots and renders home page
 - [x] Pipeline worker boots without errors
-- [ ] Drizzle schema covers all core tables, including corrections and durable grader/gate results
+- [x] Drizzle schema covers all core tables, including corrections and durable grader/gate results
 - [x] Seed audit loads in the audit review workspace
 - [x] Agent v1 extracts structured findings
 - [x] Evidence validation catches invalid citations
@@ -64,7 +64,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
-| T-011  | Eval persistence schema foundation   | codex       | IN PROGRESS | feat/eval-schema-foundation | /Users/darshan/work/agent-eval-schema-foundation | Add centralized durable eval schema + migration |
+| T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
 
 ### Decisions
 
@@ -154,9 +154,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 - **Validation:** migration generation and drift check; migrate empty and current-shape SQLite
   databases; DB invariant tests; touched-scope Biome; strict TypeScript; full tests and build.
 - **Started/checkpoint:** 2026-07-13T05:36:14Z / 2026-07-13T05:36:14Z
-- **Status/next action:** IN PROGRESS — publish the board-only claim, remove the completed T-005
-  worktree, create the fresh T-011 worktree, inspect current Drizzle tooling/call sites, then
-  implement the schema and forward migration.
+- **Status/next action:** COMPLETE — merged by PR #9 at `271da86`; T-006 can now implement frozen
+  suite execution and graders, followed by T-007 comparison and gate evaluation logic.
 
 ### Validation Commands
 
@@ -176,6 +175,23 @@ pnpm build                       # PASS (pipeline + Next.js)
 - `pnpm test` — PASS, 7/7 tests in @repo/agent.
 - Credentialed Gemini smoke test — not run because it would create billable external calls;
   scripted-provider tests cover the identical core contract.
+
+### T-011 Validation
+
+- `pnpm install --frozen-lockfile` — PASS.
+- Touched DB scope `biome check` — PASS with zero warnings/errors.
+- `pnpm --dir packages/db db:generate` — PASS; 21 tables and no schema drift.
+- Empty database migration — PASS with zero foreign-key violations.
+- Populated 0000+0001 database upgrade — PASS; legacy runs, costs, corrections, suites, executions,
+  and traces preserved with zero foreign-key violations.
+- `pnpm typecheck` — PASS, 10/10 tasks.
+- `pnpm test` — PASS, 15/15 tests across agent, DB, and web.
+- `pnpm build` — PASS, pipeline and production Next.js build.
+- `pnpm format:check` — PASS exit 0 with 22 known warnings outside T-011-owned paths and no new
+  warnings in the touched scope.
+- Remote Vercel and Vercel Preview Comments checks — PASS on PR #9.
+- Files changed: canonical Drizzle schema, migration bootstrap, correction persistence,
+  `0002_youthful_slyde.sql`, generated snapshot/journal, migration/invariant tests, and codemap.
 
 ### Progress Log
 
@@ -211,6 +227,9 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-13T05:36:14Z — T-005 merged via PR #8 after reconciling PR #7's temporary in-memory
   review mutations with the durable SQLite source of truth; claimed T-011 to complete the eval
   persistence schema before T-006/T-007 implementation.
+- 2026-07-13T05:52:14Z — T-011 merged via PR #9 at `271da86`; the canonical Drizzle schema now
+  persists frozen suites, reproducible runs, queryable grader metrics, comparisons, and versioned
+  quality-gate decisions. Empty and populated upgrades plus all repository gates pass.
 
 ### Blockers
 

@@ -624,3 +624,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** None.
 - **Next Step:** Merge https://github.com/ponikar/elm-eval/pull/9, pull canonical `main`, record T-011 completion, and remove this worktree.
 - **Changed Files and Evidence:** Commit `c2c617f`; remote branch verified; PR #9 CLEAN/MERGEABLE; both remote checks PASS.
+
+---
+
+## Entry 24 — 2026-07-13T05:52:14Z
+
+- **Agent:** codex (coordinator)
+- **Ticket:** T-011
+- **Branch:** main
+- **Worktree:** /Users/darshan/work/agent-eval
+- **Status:** COMPLETE / INTEGRATED
+- **Scope:** Integrate the centralized eval persistence foundation and reconcile the canonical board.
+- **Completed:** Merged PR #9 as `271da86`; pulled canonical `main`; reran frozen install, touched Biome, schema drift, strict typecheck, full tests, and production build successfully; marked T-011 complete and unblocked T-006/T-007.
+- **Pending:** Remove the completed T-011 worktree. Product work remaining is T-006 evaluation execution/graders, T-007 comparison/gate logic/UI, and T-008 trace viewer/demo validation.
+- **Blockers:** None. Root Biome retains 22 known warnings outside T-011; touched DB scope is clean.
+- **Next Step:** Remove `/Users/darshan/work/agent-eval-schema-foundation`, then claim T-006 before implementing the evaluation engine.
+- **Changed Files and Evidence:** `.codex/goal.md`, `.codex/codemap.md`; merge `271da86`; PR #9 remote checks PASS; no Drizzle drift; typecheck 10/10 PASS; tests 15/15 PASS; build PASS.
