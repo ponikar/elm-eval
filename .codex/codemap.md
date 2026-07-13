@@ -608,3 +608,19 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** None. Root Biome exits successfully with 22 known warnings outside owned paths; touched scope is clean with no warnings or errors.
 - **Next Step:** Commit the scoped diff, push `feat/eval-schema-foundation`, open a PR, and verify remote checks/mergeability.
 - **Changed Files and Evidence:** `.codex/codemap.md`, `packages/db/src/{schema,index,review-store}.ts`, `packages/db/src/schema-migration.test.ts`, and Drizzle migration/snapshot/journal. Frozen install PASS; touched Biome PASS; `db:generate` reports no drift; strict typecheck 10/10 PASS; tests 15/15 PASS; production build PASS; root Biome exit 0 with 22 pre-existing warnings; `git diff --check` PASS.
+
+---
+
+## Entry 23 — 2026-07-13T05:51:23Z
+
+- **Agent:** codex
+- **Ticket:** T-011
+- **Branch:** feat/eval-schema-foundation
+- **Worktree:** /Users/darshan/work/agent-eval-schema-foundation
+- **Status:** COMPLETE / REMOTE HANDOFF
+- **Scope:** Publish and verify the eval persistence schema ticket.
+- **Completed:** Committed implementation as `c2c617f`, pushed the branch, opened PR #9, and verified the PR is CLEAN/MERGEABLE with Vercel and Vercel Preview Comments passing.
+- **Pending:** Coordinator merge, main-board completion/validation update, then worktree removal.
+- **Blockers:** None.
+- **Next Step:** Merge https://github.com/ponikar/elm-eval/pull/9, pull canonical `main`, record T-011 completion, and remove this worktree.
+- **Changed Files and Evidence:** Commit `c2c617f`; remote branch verified; PR #9 CLEAN/MERGEABLE; both remote checks PASS.
