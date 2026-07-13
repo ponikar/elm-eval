@@ -7,40 +7,12 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  Button,
   Separator,
   SidebarTrigger,
 } from '@repo/ui';
-import { Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const initial = stored ?? preferred;
-    setTheme(initial);
-    document.documentElement.classList.toggle('dark', initial === 'dark');
-  }, []);
-
-  const toggle = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
-    localStorage.setItem('theme', next);
-  };
-
-  return (
-    <Button variant="ghost" size="icon" onClick={toggle} className="size-8">
-      {theme === 'light' ? <Moon className="size-4" /> : <Sun className="size-4" />}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
-  );
-}
+import { useEffect } from 'react';
 
 function DashboardBreadcrumbs() {
   const pathname = usePathname();
@@ -96,14 +68,16 @@ function DashboardBreadcrumbs() {
 }
 
 export function SiteHeader() {
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('theme');
+  }, []);
+
   return (
     <header className="bg-background/95 sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b px-4 backdrop-blur">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
       <DashboardBreadcrumbs />
-      <div className="ml-auto flex items-center gap-2">
-        <ThemeToggle />
-      </div>
     </header>
   );
 }

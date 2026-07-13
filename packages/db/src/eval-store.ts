@@ -373,6 +373,84 @@ export async function listEvaluationRuns(database: EvalDatabase = db): Promise<E
   return rows.map(parseRun);
 }
 
+export interface RunSummary {
+  id: string;
+  status: string;
+  createdAt: string;
+  startedAt: string | undefined;
+  completedAt: string | undefined;
+  errorCode: string | undefined;
+  errorMessage: string | undefined;
+  agentVersionName: string;
+  agentVersionModel: string;
+  suiteName: string;
+  suiteVersion: number;
+  progress: {
+    total: number;
+    pending: number;
+    running: number;
+    completed: number;
+    failed: number;
+    passed: number;
+  };
+  totalAgentCostUsd: number;
+  totalEvaluatorCostUsd: number;
+  totalTokenInput: number;
+  totalTokenOutput: number;
+  avgLatencyMs: number;
+}
+
+export async function listRunSummaries(database: EvalDatabase = db): Promise<RunSummary[]> {
+  const runs = await listEvaluationRuns(database);
+  if (runs.length === 0) return [];
+
+  const runIds = runs.map((r) => r.id);
+  const allExecutions = await database
+    .select()
+    .from(testExecution)
+    .where(inArray(testExecution.runId, runIds));
+  const executionsByRun = new Map<string, typeof allExecutions>();
+  for (const exec of allExecutions) {
+    const list = executionsByRun.get(exec.runId) ?? [];
+    list.push(exec);
+    executionsByRun.set(exec.runId, list);
+  }
+
+  return runs.map((run) => {
+    const execs = executionsByRun.get(run.id) ?? [];
+    const completed = execs.filter((e) => e.status === 'COMPLETED');
+    const totalLatency = execs.reduce((sum, e) => sum + (e.latencyMs ?? 0), 0);
+    const completedCount = execs.filter((e) => e.latencyMs > 0).length;
+
+    return {
+      id: run.id,
+      status: run.status,
+      createdAt: run.createdAt,
+      startedAt: run.startedAt,
+      completedAt: run.completedAt,
+      errorCode: run.errorCode,
+      errorMessage: run.errorMessage,
+      agentVersionName: run.agentVersionSnapshot.name,
+      agentVersionModel: run.agentVersionSnapshot.model,
+      suiteName: run.suiteSnapshot.name,
+      suiteVersion: run.suiteSnapshot.version,
+      progress: {
+        total: execs.length,
+        pending: execs.filter((e) => e.status === 'PENDING').length,
+        running: execs.filter((e) => e.status === 'RUNNING').length,
+        completed: completed.length,
+        failed: execs.filter((e) => e.status === 'FAILED').length,
+        passed: execs.filter((e) => e.passed === true).length,
+      },
+      totalAgentCostUsd: execs.reduce((sum, e) => sum + (e.agentCostUsd ?? 0), 0),
+      totalEvaluatorCostUsd: execs.reduce((sum, e) => sum + (e.evaluatorCostUsd ?? 0), 0),
+      totalTokenInput: execs.reduce((sum, e) => sum + (e.tokenInput ?? 0), 0),
+      totalTokenOutput: execs.reduce((sum, e) => sum + (e.tokenOutput ?? 0), 0),
+      avgLatencyMs: completedCount > 0 ? Math.round(totalLatency / completedCount) : 0,
+    };
+  });
+}
+
 export async function getEvaluationRunDetails(
   runId: string,
   database: EvalDatabase = db,
