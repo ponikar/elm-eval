@@ -77,16 +77,16 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-003  | Agent pipeline                       | codex       | COMPLETE    | feat/agent-pipeline    | /Users/darshan/work/agent-eval-agent-pipeline | Merged in PR #4; remove worktree after repair |
 | T-004  | Audit review UI                      | opencode    | COMPLETE    | feat/audit-review-ui   | —                                             | PR #7 merged; review actions working          |
 | T-005  | Human correction loop                | codex       | COMPLETE    | feat/human-correction-loop | —                                             | Merged in PR #8                               |
-| T-006  | Evaluation engine                    | codex       | IN PROGRESS | main                   | —                                             | PR #11 merged; repair async Neon adapter compatibility |
+| T-006  | Evaluation engine                    | codex       | COMPLETE    | main                   | —                                             | Neon adapter repair merged on main            |
 | T-007  | Version comparison + quality gates   | opencode    | planned     | —                      | —                                             | Comparison dashboard + gates                  |
-| T-008  | Trace viewer + demo validation       | codex       | IN PROGRESS | feat/trace-viewer      | /Users/darshan/work/agent-eval/worktrees/trace-viewer | Publish claim, create worktree, then replace the placeholder traces page with a real trace workspace |
+| T-008  | Trace viewer + demo validation       | codex       | COMPLETE    | feat/trace-viewer      | —                                             | Merged via PR #14                             |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
 | T-012  | SQLite → Neon Postgres migration     | opencode    | COMPLETE    | feat/neon-postgres        | —                                             | Merged in PR #10                              |
 | T-013  | Real Gemini cost accounting          | codex       | SUPERSEDED  | fix/gemini-cost-accounting | —                                             | Deferred by user in favor of UI repair        |
-| T-014  | Dashboard UI repair + shadcn alignment | codex     | IN PROGRESS | feat/dashboard-ui-repair   | /Users/darshan/work/agent-eval/worktrees/dashboard-ui-repair | Claim worktree, then replace the custom shell with shadcn dashboard patterns |
-| T-015  | Eval run cost + model visibility     | codex       | planned     | —                           | —                                             | After T-014/T-006, expose run summaries and render Runs table |
-| T-016  | Generic model pricing + PR repair    | codex       | BLOCKED     | fix/gemini-cost-accounting  | /Users/darshan/work/agent-eval-model-pricing  | PR #12 is mergeable; integration gates await T-006 Neon repair |
+| T-014  | Dashboard UI repair + shadcn alignment | codex     | COMPLETE    | feat/dashboard-ui-repair   | —                                             | Merged via PR #13                             |
+| T-015  | Eval run cost + model visibility     | opencode    | IN PROGRESS | feat/run-cost-visibility  | —                                             | Server-aggregated run summaries + Runs table  |
+| T-016  | Generic model pricing + PR repair    | codex       | COMPLETE    | fix/gemini-cost-accounting  | —                                             | Merged via PR #12                             |
 | T-017  | Review action UX: loading states + toasts | opencode | COMPLETE | fix/review-action-loading | /Users/darshan/work/agent-eval/worktrees/review-action-loading | PR ready; spinners + toasts added |
 
 ### Decisions
@@ -297,20 +297,19 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 
 ### T-015 Assignment
 
-- **Outcome:** After every evaluation run, the Runs screen shows the frozen Gemini model used and
-  the persisted USD cost produced by that model, alongside run status and progress.
+- **Outcome:** After every evaluation run, the Runs screen shows the frozen model used, the
+  persisted USD cost, progress counts, and latency — all aggregated server-side.
 - **Definition of done:** The run-list API returns one server-aggregated summary per run containing
-  frozen agent version name/model, progress counts, summed agent cost, summed evaluator cost, and
-  latency; the Runs page renders loading/error/empty states and a shadcn table with model and cost
-  visible without opening a run; small non-zero costs do not round to `$0.00`; focused and root
-  validation gates pass.
-- **Owner:** codex
-- **Branch/worktree:** To be claimed after T-014 releases the Runs page and T-006 releases eval
-  persistence/router paths.
-- **Owned paths:** evaluation summary query in `packages/db/src/eval-store.ts`, the evaluation-run
-  tRPC router, `apps/web/src/app/(dashboard)/runs/page.tsx`, focused tests, and coordination files.
-- **Dependencies:** T-013 pricing branch supplies `agentCostUsd`; T-006 must first port eval storage
-  and routers to async Neon; T-014 currently owns the Runs page and must complete or hand it off.
+  frozen agent version name/model, progress counts (total/pending/running/completed/failed/passed),
+  summed agent cost, summed evaluator cost, average latency, and created/started/completed timestamps;
+  the Runs page renders a shadcn table with model, cost, progress, and latency visible without
+  opening a run; small non-zero costs do not round to `$0.00`; focused and root validation gates
+  pass.
+- **Owner:** opencode
+- **Branch/worktree:** `feat/run-cost-visibility` at main
+- **Owned paths:** `packages/db/src/eval-store.ts` (new `listRunSummaries`), `apps/web/src/trpc/routers/evaluation-run.ts`,
+  `apps/web/src/app/(dashboard)/runs/page.tsx`, focused tests, and coordination files.
+- **Dependencies:** All dependencies complete (T-006, T-012, T-014, T-016 merged).
 - **Non-goals:** Recalculating model prices in the browser, invoice reconciliation, cost-based
   quality gates, comparison charts, schema changes, or per-trace cost visualization.
 - **Verified assumptions:** Display the model from the immutable `agentVersionSnapshot.model`, not
@@ -318,9 +317,9 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   costs separately; format USD to six fractional digits so MVP-scale token costs remain visible.
 - **Validation:** DB summary aggregation tests; evaluation-run router test; Runs page loading/error/
   empty/data rendering coverage where supported; touched Biome; DB/web typecheck and tests; root
-  typecheck, tests, and build after T-006 repair.
-- **Status/next action:** PLANNED — do not start or create a worktree while T-014 and T-006 own the
-  required paths. Implement immediately after both dependencies publish their handoffs.
+  typecheck, tests, and build.
+- **Status/next action:** IN PROGRESS — all dependencies merged. Implement server-aggregated run
+  summaries and enhance the Runs table.
 
 ### T-016 Assignment
 
@@ -499,20 +498,19 @@ pnpm build                       # PASS (pipeline + Next.js)
 - 2026-07-13T09:16:30Z — Pushed T-016 through `0c9e675`, updated draft PR #12, and verified GitHub
   reports it MERGEABLE rather than conflicting. The PR remains open, draft, and unmerged; broader
   integration remains blocked only by the recorded T-006 Neon adapter and test-database issues.
+- 2026-07-13T14:00:00Z — Synced main with all merged PRs. Marked T-006, T-008, T-014, T-016
+  complete. Claimed T-015 (eval run cost + model visibility) on main. All dependencies resolved.
 
 ### Blockers
 
-- T-006 and repository-wide validation are blocked because merged eval persistence and pipeline
-  adapters still use synchronous SQLite calls against Neon Postgres. Root DB tests also require a
-  test `DATABASE_URL`. T-013 focused behavior passes but cannot be marked complete until those
-  external gates are repaired and rerun.
+- None. All dependencies for T-015 are merged. Root validation may have pre-existing Neon test
+  configuration issues but T-015 scope is focused on UI + aggregation.
 
 ### Handoff
 
-**Current state:** T-016 is published in draft PR #12 with generic model-pricing names and no merge
-conflict. T-014 continues independently in its existing UI worktree. Repository-wide gates remain
-blocked by T-006 synchronous SQLite-shaped evaluation adapters against Neon and missing test DB
-configuration; PR #12 remains intentionally unmerged.
-**Next exact action:** Remove the completed T-016 worktree. After T-006 repairs the Neon adapters
-and provides an isolated test `DATABASE_URL`, rerun full gates on PR #12 before any user-authorized
-merge; continue T-014 separately without touching the pricing branch.
+**Current state:** All prior tickets (T-006, T-008, T-012, T-014, T-016, T-017) are merged.
+The Runs page exists but shows only basic fields (ID, status, suite, agent, created). T-015 is
+claimed and ready to implement server-aggregated run summaries with model, cost, progress, and
+latency.
+**Next exact action:** Implement `listRunSummaries` in eval-store, wire it through tRPC, and
+enhance the Runs page table. Commit, push, create PR.
