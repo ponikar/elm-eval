@@ -26,6 +26,7 @@ import {
   Play,
   XCircle,
 } from 'lucide-react';
+import Link from 'next/link';
 import { DashboardHeader } from '@/components/dashboard-header';
 import { trpc } from '@/trpc/react';
 
@@ -157,6 +158,7 @@ export default function RunsPage() {
                         <TableHead>Cost</TableHead>
                         <TableHead>Avg Latency</TableHead>
                         <TableHead>Created</TableHead>
+                        <TableHead className="w-[80px]"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -218,6 +220,14 @@ export default function RunsPage() {
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                               {formatDate(run.createdAt)}
+                            </TableCell>
+                            <TableCell>
+                              <Link
+                                href={`/runs/${run.id}`}
+                                className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+                              >
+                                View
+                              </Link>
                             </TableCell>
                           </TableRow>
                         );
