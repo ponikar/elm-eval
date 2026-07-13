@@ -511,3 +511,20 @@ https://github.com/ponikar/elm-eval/pull/5
 - **Blockers:** Visual browser click-through unavailable because the in-app browser surface was unavailable. Live tRPC audit/eval reads and the router mutation flow were verified. Repository-wide Biome retains the 29 warnings accepted and recorded by T-010; all T-005 touched files are clean.
 - **Next Step:** Commit scoped T-005 changes, push `feat/human-correction-loop`, create PR, verify remote state, and hand off to the coordinator.
 - **Changed Files and Evidence:** Domain correction contracts; Drizzle correction schema/migration; DB seed/review/correction store and five tests; audit/eval/correction routers and one integration test; correction UI; Next SQLite runtime config; package/lock/ignore files. Focused Biome PASS; frozen install PASS; tests 13/13 PASS; strict typecheck PASS; production build PASS; `git diff --check` PASS.
+
+---
+
+## Entry — 2026-07-12T23:30:00Z
+
+- **Agent:** opencode
+- **Ticket:** T-004
+- **Branch:** feat/audit-review-ui
+- **Worktree:** main
+- **Status:** COMPLETE
+- **Scope:** Audit review UI — approve/reject/correct review actions on finding detail view.
+- **Completed:** Added tRPC mutations (approveFinding, rejectFinding, correctFinding) with in-memory state. Added review action buttons (Approve, Reject, Correct) to FindingDetail. Added inline edit form for correcting finding fields (title, description, category, severity, evidence, ruleId). Wired mutations into audit detail page with query invalidation. PR #7 created.
+- **Pending:** Nothing — T-004 complete.
+- **Blockers:** None.
+- **Next Step:** Merge PR #7, update goal board, pick next ticket.
+- **Validation:** pnpm format PASS, pnpm typecheck PASS (10/10), pnpm test PASS (7/7), pnpm build PASS (2/2).
+- **Changed Files and Evidence:** apps/web/src/trpc/routers/audit.ts (mutations + mutable findings array), apps/web/src/components/finding-detail.tsx (action buttons + inline correct form), apps/web/src/app/(dashboard)/audits/[id]/page.tsx (wired mutations), .codex/goal.md (board update). PR: https://github.com/ponikar/elm-eval/pull/7
