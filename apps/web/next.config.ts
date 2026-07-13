@@ -1,11 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['better-sqlite3'],
+  serverExternalPackages: ['@neondatabase/serverless'],
   transpilePackages: ['@repo/domain', '@repo/db', '@repo/test-fixtures', '@repo/ui'],
-  outputFileTracingIncludes: {
-    '/api/trpc/[trpc]': ['../../packages/db/drizzle/**/*'],
-  },
   webpack(config) {
     config.resolve.extensionAlias = {
       ...config.resolve.extensionAlias,

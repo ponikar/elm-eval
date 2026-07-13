@@ -1,18 +1,11 @@
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-let directory = '';
-
 beforeAll(async () => {
-  directory = await mkdtemp(path.join(tmpdir(), 'audit-review-'));
-  vi.stubEnv('AUDIT_DB_PATH', path.join(directory, 'review.db'));
+  vi.stubEnv('DATABASE_URL', process.env['DATABASE_URL']!);
 });
 
-afterAll(async () => {
+afterAll(() => {
   vi.unstubAllEnvs();
-  await rm(directory, { recursive: true, force: true });
 });
 
 describe('review flow router', () => {

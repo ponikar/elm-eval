@@ -18,17 +18,16 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
-    "clean": "rm -rf node_modules .turbo *.db"
+    "clean": "rm -rf node_modules .turbo"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.0",
     "@repo/domain": "workspace:*",
-    "better-sqlite3": "^12.11.1",
     "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@repo/test-fixtures": "workspace:*",
-    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.0.0",
     "drizzle-kit": "^0.31.0",
     "typescript": "^5.7.0",

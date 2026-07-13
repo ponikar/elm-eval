@@ -1,36 +1,20 @@
-import path from 'node:path';
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
 import * as schema from './schema.js';
 
-const { AUDIT_DB_PATH: auditDbPath } = process.env;
-const workingDirectory = process.cwd();
-const parentDirectory = path.basename(path.dirname(workingDirectory));
-const workspaceRoot =
-  parentDirectory === 'apps' || parentDirectory === 'packages'
-    ? path.resolve(workingDirectory, '../..')
-    : workingDirectory;
-
-export function createDatabase(
-  filename = auditDbPath ?? path.join(workspaceRoot, 'audit-reliability.db'),
-) {
-  const sqlite = new Database(filename);
-  const database = drizzle(sqlite, { schema });
-  try {
-    sqlite.pragma('foreign_keys = OFF');
-    migrate(database, {
-      migrationsFolder: path.join(workspaceRoot, 'packages/db/drizzle'),
-    });
-    sqlite.pragma('foreign_keys = ON');
-    const violations = sqlite.pragma('foreign_key_check') as unknown[];
-    if (violations.length > 0)
-      throw new Error(`Database migration left ${violations.length} foreign-key violation(s)`);
-    return database;
-  } catch (error) {
-    sqlite.close();
-    throw error;
+function getDatabaseUrl(): string {
+  const url = process.env['DATABASE_URL'];
+  if (!url) {
+    throw new Error(
+      'DATABASE_URL environment variable is required. Set it to your Neon Postgres connection string.',
+    );
   }
+  return url;
+}
+
+export function createDatabase(databaseUrl?: string) {
+  const pool = new Pool({ connectionString: databaseUrl ?? getDatabaseUrl() });
+  return drizzle(pool, { schema });
 }
 
 export const db = createDatabase();

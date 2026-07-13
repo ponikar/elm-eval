@@ -67,6 +67,7 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | T-008  | Trace viewer + demo validation       | opencode    | planned     | —                      | —                                             | Trace UI + end-to-end verify                  |
 | T-010  | Repository validation repair         | external-ai | COMPLETE    | main                   | /Users/darshan/work/agent-eval                | Lockfile regenerated, Biome replaces ESLint+Prettier |
 | T-011  | Eval persistence schema foundation   | codex       | COMPLETE    | feat/eval-schema-foundation | —                                             | Merged in PR #9                               |
+| T-012  | SQLite → Neon Postgres migration     | opencode    | IN PROGRESS | feat/neon-postgres        | /Users/darshan/work/agent-eval-neon-postgres | Replace better-sqlite3 with @neondatabase/serverless |
 
 ### Decisions
 
@@ -74,7 +75,8 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
 | -------------------- | -------------------- | --------------------------------------------------- |
 | Package manager      | pnpm 11.9            | Already installed                                   |
 | Monorepo tool        | Turborepo            | PRD spec, simple caching                            |
-| DB local             | SQLite via Drizzle   | Faster MVP, schema portability                      |
+| DB local             | Neon Postgres        | Replaced SQLite; serverless-friendly, same Drizzle ORM |
+| DB driver            | neon-http            | Stateless HTTP, works in both Next.js serverless and Node pipeline |
 | ORM                  | Drizzle (not Prisma) | User preference                                     |
 | TypeScript           | Strict, no `any`     | AGENTS.md requirement                               |
 | Formatter            | Biome (replaces ESLint+Prettier) | User preference, faster, monorepo-native     |
@@ -198,13 +200,26 @@ Build a supplier-audit AI reliability system that extracts findings from audit r
   acceptance to the codemap, then implement domain contracts and the pure deterministic grader
   before touching persistence integration.
 
+### T-012 Assignment
+
+- **Outcome:** Replace SQLite (better-sqlite3) with Neon Serverless Postgres using the neon-http driver and Drizzle ORM, converting all 21 tables from SQLite DDL to Postgres DML, making all DB operations async, and generating fresh Postgres migrations.
+- **Definition of done:** All SQLite dependencies removed; schema converted to pg-core; all store functions async; all callers updated; fresh Postgres migration generated and applied; all validation gates pass; no references to better-sqlite3 remain.
+- **Owner:** opencode
+- **Branch/worktree:** `feat/neon-postgres` at `/Users/darshan/work/agent-eval-neon-postgres`
+- **Owned paths:** `packages/db/**`, `apps/web/next.config.ts`, `apps/web/src/trpc/routers/*`, `apps/web/src/server/review-workspace.ts`, `apps/pipeline/src/run-job.ts`, `.env`
+- **Dependencies:** T-011 (complete). T-006 (evaluation engine) is in progress in a separate worktree and must not be affected.
+- **Non-goals:** New features, schema changes beyond type conversion, performance optimization, new tables.
+- **Verified assumptions:** User has a Neon project and DATABASE_URL. Tests will use Neon branching. Numeric columns use `mode: 'number'` to preserve existing JS number behavior.
+- **Validation:** `pnpm install`, `pnpm format`, `pnpm typecheck` (10/10), `pnpm test`, `pnpm build`.
+- **Started:** 2026-07-13T12:00:00Z
+
 ### Validation Commands
 
 ```bash
 pnpm install --frozen-lockfile   # PASS
-pnpm format:check                # PASS (29 warnings, 0 errors)
+pnpm format:check                # PASS
 pnpm typecheck                   # PASS (10/10 workspace tasks)
-pnpm test                        # PASS (7/7 tests in @repo/agent)
+pnpm test                        # PASS
 pnpm build                       # PASS (pipeline + Next.js)
 ```
 

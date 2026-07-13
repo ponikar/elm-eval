@@ -6,7 +6,7 @@ import {
   SEED_RULEBOOK,
   SEED_RULES,
 } from '@repo/test-fixtures';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { createDatabase } from './index.js';
 import {
   CorrectionValidationError,
@@ -19,14 +19,17 @@ import {
 } from './review-store.js';
 import { complianceRule, rulebook } from './schema.js';
 
-const seed = {
-  audit: SEED_AUDIT,
-  findings: MOCK_FINDINGS,
-  rulebook: SEED_RULEBOOK,
-  rules: SEED_RULES,
-  agentVersions: SEED_AGENT_VERSIONS,
-  evalCases: SEED_EVAL_CASES,
-};
+const testDb = createDatabase();
+
+async function truncateAll() {
+  await testDb.execute(
+    `TRUNCATE TABLE audit_finding, audit_page, eval_case, human_correction, compliance_rule, rulebook, agent_version, supplier_audit CASCADE`,
+  );
+}
+
+afterEach(async () => {
+  await truncateAll();
+});
 
 function correctedFinding() {
   const finding = MOCK_FINDINGS[0];
@@ -44,20 +47,38 @@ function correctedFinding() {
 }
 
 describe('review store', () => {
-  it('seeds the persisted workspace idempotently', () => {
-    const database = createDatabase(':memory:');
-    seedReviewWorkspace(seed, database);
-    seedReviewWorkspace(seed, database);
-    expect(getAuditFindings(SEED_AUDIT.id, database)).toHaveLength(MOCK_FINDINGS.length);
-    expect(listEvalCases(database)).toHaveLength(SEED_EVAL_CASES.length);
+  it('seeds the persisted workspace idempotently', async () => {
+    const seed = {
+      audit: SEED_AUDIT,
+      findings: MOCK_FINDINGS,
+      rulebook: SEED_RULEBOOK,
+      rules: SEED_RULES,
+      agentVersions: SEED_AGENT_VERSIONS,
+      evalCases: SEED_EVAL_CASES,
+    };
+    await seedReviewWorkspace(seed, testDb);
+    await seedReviewWorkspace(seed, testDb);
+    expect(await getAuditFindings(SEED_AUDIT.id, testDb)).toHaveLength(MOCK_FINDINGS.length);
+    expect(await listEvalCases(testDb)).toHaveLength(SEED_EVAL_CASES.length);
     const findingId = MOCK_FINDINGS[0]?.id ?? '';
-    expect(setFindingReviewStatus(findingId, 'APPROVED', database).reviewStatus).toBe('APPROVED');
-    expect(setFindingReviewStatus(findingId, 'REJECTED', database).reviewStatus).toBe('REJECTED');
+    expect((await setFindingReviewStatus(findingId, 'APPROVED', testDb)).reviewStatus).toBe(
+      'APPROVED',
+    );
+    expect((await setFindingReviewStatus(findingId, 'REJECTED', testDb)).reviewStatus).toBe(
+      'REJECTED',
+    );
   });
 
-  it('atomically creates a correction and one trusted regression case', () => {
-    const database = createDatabase(':memory:');
-    seedReviewWorkspace(seed, database);
+  it('atomically creates a correction and one trusted regression case', async () => {
+    const seed = {
+      audit: SEED_AUDIT,
+      findings: MOCK_FINDINGS,
+      rulebook: SEED_RULEBOOK,
+      rules: SEED_RULES,
+      agentVersions: SEED_AGENT_VERSIONS,
+      evalCases: SEED_EVAL_CASES,
+    };
+    await seedReviewWorkspace(seed, testDb);
     const input = {
       findingId: MOCK_FINDINGS[0]?.id ?? '',
       failureType: 'WRONG_SEVERITY' as const,
@@ -65,9 +86,9 @@ describe('review store', () => {
       corrected: correctedFinding(),
       saveAsRegressionTest: true,
     };
-    const first = createCorrection(input, database);
+    const first = await createCorrection(input, testDb);
     expect(first.regressionEvalCaseId).toBeDefined();
-    const cases = listEvalCases(database);
+    const cases = await listEvalCases(testDb);
     expect(cases).toHaveLength(SEED_EVAL_CASES.length + 1);
     expect(cases.find((item) => item.id === first.regressionEvalCaseId)).toMatchObject({
       source: 'HUMAN_CORRECTION',
@@ -76,14 +97,21 @@ describe('review store', () => {
     expect(cases.find((item) => item.id === first.regressionEvalCaseId)?.input.auditPages).toEqual(
       SEED_AUDIT.pages,
     );
-    expect(getAuditFindings(SEED_AUDIT.id, database)[0]?.reviewStatus).toBe('CORRECTED');
+    expect((await getAuditFindings(SEED_AUDIT.id, testDb))[0]?.reviewStatus).toBe('CORRECTED');
   });
 
-  it('rolls back an invalid citation without changing the finding or cases', () => {
-    const database = createDatabase(':memory:');
-    seedReviewWorkspace(seed, database);
-    const before = getAuditFindings(SEED_AUDIT.id, database)[0];
-    expect(() =>
+  it('rolls back an invalid citation without changing the finding or cases', async () => {
+    const seed = {
+      audit: SEED_AUDIT,
+      findings: MOCK_FINDINGS,
+      rulebook: SEED_RULEBOOK,
+      rules: SEED_RULES,
+      agentVersions: SEED_AGENT_VERSIONS,
+      evalCases: SEED_EVAL_CASES,
+    };
+    await seedReviewWorkspace(seed, testDb);
+    const before = (await getAuditFindings(SEED_AUDIT.id, testDb))[0];
+    await expect(
       createCorrection(
         {
           findingId: before?.id ?? '',
@@ -95,17 +123,24 @@ describe('review store', () => {
           },
           saveAsRegressionTest: true,
         },
-        database,
+        testDb,
       ),
-    ).toThrow(CorrectionValidationError);
-    expect(getAuditFindings(SEED_AUDIT.id, database)[0]).toEqual(before);
-    expect(listEvalCases(database)).toHaveLength(SEED_EVAL_CASES.length);
+    ).rejects.toThrow(CorrectionValidationError);
+    expect((await getAuditFindings(SEED_AUDIT.id, testDb))[0]).toEqual(before);
+    expect(await listEvalCases(testDb)).toHaveLength(SEED_EVAL_CASES.length);
   });
 
-  it('converts a saved correction to a trusted case idempotently', () => {
-    const database = createDatabase(':memory:');
-    seedReviewWorkspace(seed, database);
-    const correction = createCorrection(
+  it('converts a saved correction to a trusted case idempotently', async () => {
+    const seed = {
+      audit: SEED_AUDIT,
+      findings: MOCK_FINDINGS,
+      rulebook: SEED_RULEBOOK,
+      rules: SEED_RULES,
+      agentVersions: SEED_AGENT_VERSIONS,
+      evalCases: SEED_EVAL_CASES,
+    };
+    await seedReviewWorkspace(seed, testDb);
+    const correction = await createCorrection(
       {
         findingId: MOCK_FINDINGS[0]?.id ?? '',
         failureType: 'WRONG_SEVERITY',
@@ -113,20 +148,27 @@ describe('review store', () => {
         corrected: correctedFinding(),
         saveAsRegressionTest: false,
       },
-      database,
+      testDb,
     );
-    const first = convertCorrectionToRegressionTest(correction.id, database);
-    const second = convertCorrectionToRegressionTest(correction.id, database);
+    const first = await convertCorrectionToRegressionTest(correction.id, testDb);
+    const second = await convertCorrectionToRegressionTest(correction.id, testDb);
     expect(second.id).toBe(first.id);
     expect(first).toMatchObject({ source: 'HUMAN_CORRECTION', status: 'TRUSTED' });
-    expect(listEvalCases(database)).toHaveLength(SEED_EVAL_CASES.length + 1);
+    expect(await listEvalCases(testDb)).toHaveLength(SEED_EVAL_CASES.length + 1);
   });
 
-  it('rejects a rule outside the finding agent version rulebook snapshot', () => {
-    const database = createDatabase(':memory:');
-    seedReviewWorkspace(seed, database);
+  it('rejects a rule outside the finding agent version rulebook snapshot', async () => {
+    const seed = {
+      audit: SEED_AUDIT,
+      findings: MOCK_FINDINGS,
+      rulebook: SEED_RULEBOOK,
+      rules: SEED_RULES,
+      agentVersions: SEED_AGENT_VERSIONS,
+      evalCases: SEED_EVAL_CASES,
+    };
+    await seedReviewWorkspace(seed, testDb);
     const timestamp = new Date().toISOString();
-    database
+    await testDb
       .insert(rulebook)
       .values({
         id: 'rulebook-other',
@@ -139,8 +181,8 @@ describe('review store', () => {
         createdAt: timestamp,
         updatedAt: timestamp,
       })
-      .run();
-    database
+      .onConflictDoNothing();
+    await testDb
       .insert(complianceRule)
       .values({
         id: 'OTHER_RULE',
@@ -152,8 +194,8 @@ describe('review store', () => {
         requirementText: 'Unrelated rule.',
         sourcePage: 1,
       })
-      .run();
-    expect(() =>
+      .onConflictDoNothing();
+    await expect(
       createCorrection(
         {
           findingId: MOCK_FINDINGS[0]?.id ?? '',
@@ -165,9 +207,9 @@ describe('review store', () => {
           },
           saveAsRegressionTest: true,
         },
-        database,
+        testDb,
       ),
-    ).toThrow(CorrectionValidationError);
-    expect(listEvalCases(database)).toHaveLength(SEED_EVAL_CASES.length);
+    ).rejects.toThrow(CorrectionValidationError);
+    expect(await listEvalCases(testDb)).toHaveLength(SEED_EVAL_CASES.length);
   });
 });
