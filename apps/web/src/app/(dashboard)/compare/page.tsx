@@ -22,6 +22,7 @@ import {
   TableRow,
 } from '@repo/ui';
 import { GitCompare, Loader2, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { DashboardHeader } from '@/components/dashboard-header';
 import { trpc } from '@/trpc/react';
@@ -144,6 +145,7 @@ function AgentCard({
 }
 
 export default function ComparePage() {
+  const router = useRouter();
   const utils = trpc.useUtils();
   const evalCases = trpc.evalCase.list.useQuery();
   const agents = trpc.agentVersion.list.useQuery();
@@ -183,6 +185,7 @@ export default function ComparePage() {
     onSuccess: async (data) => {
       setPollingRunId(data.runId);
       await runSummaries.refetch();
+      router.push('/runs');
     },
   });
 
